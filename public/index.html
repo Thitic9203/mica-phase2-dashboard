@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mica Phase 2 — MICA2 QA</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzBGNzY2RSIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjguNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMjUpIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTYgNy41IEE4LjUgOC41IDAgMSAxIDguMSAyMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMi41IDE2IEwxNSAxOC41IEwyMC41IDEzIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjwvc3ZnPgo=">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --elevated: #E5E5EA;
+  --border: rgba(0,0,0,0.06);
+  --border-strong: rgba(0,0,0,0.10);
+  --text: #1C1C1E;
+  --muted: #535358;
+  --dim: #8E8E93;
+  --accent: #0F766E;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --sidebar-w: 264px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── APP SHELL ── */
+#app { display: flex; flex-direction: column; flex: 1; width: 100%; min-height: 100vh; }
+
+/* ── AUTH GATE ── */
+#auth-gate {
+  position: fixed; inset: 0; z-index: 9999;
+  display: none; align-items: center; justify-content: center;
+  background: var(--bg);
+}
+.auth-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 44px 44px 40px;
+  text-align: center;
+  max-width: 380px; width: 90%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.10);
+  animation: authIn .5s cubic-bezier(.22,1,.36,1) backwards;
+}
+@keyframes authIn { from{opacity:0;transform:translateY(20px) scale(.98)} to{opacity:1;transform:none} }
+.auth-icon {
+  width: 60px; height: 60px; border-radius: 16px;
+  background: var(--accent); margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(15,118,110,0.28);
+}
+.auth-icon svg { width: 36px; height: 36px; }
+.auth-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -.02em; }
+.auth-box-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 13px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  background: var(--card); font-size: 14px; font-weight: 500; color: var(--text);
+  cursor: pointer; transition: background .15s, box-shadow .15s, border-color .15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); font-family: inherit;
+}
+.btn-google:hover { background: #F5F5F7; box-shadow: 0 2px 8px rgba(0,0,0,0.09); border-color: rgba(0,0,0,0.18); }
+.btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+.auth-error {
+  font-size: 12px; color: #991B1B; margin-top: 14px; display: none;
+  background: rgba(153,27,27,0.06); border: 1px solid rgba(153,27,27,0.15);
+  border-radius: 10px; padding: 8px 12px;
+}
+.auth-note { font-size: 11px; color: var(--muted); margin-top: 20px; opacity: 0.55; }
+
+/* ── TOP NAV ── */
+#topnav {
+  display: flex; align-items: stretch;
+  height: 52px; flex-shrink: 0;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.tn-brand {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 700; color: var(--accent);
+  letter-spacing: .015em; white-space: nowrap;
+  padding: 4px 11px 4px 9px;
+  margin-right: 14px;
+  background: rgba(15,118,110,0.08);
+  border: 1px solid rgba(15,118,110,0.18);
+  border-radius: 8px;
+  align-self: center;
+}
+.tn-brand::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+}
+.tn-tabs { display: flex; align-items: stretch; flex: 1; }
+.sb-nav-item {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 15px; height: 100%;
+  font-size: 12.5px; font-weight: 500; color: var(--muted);
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color .12s, border-color .12s, background .12s;
+  position: relative;
+}
+.sb-nav-item:hover { color: var(--text); background: rgba(0,0,0,0.025); }
+.sb-nav-item.active {
+  color: var(--accent); font-weight: 600;
+  border-bottom: 2px solid var(--accent);
+}
+.sb-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.tn-right {
+  display: flex; align-items: center; gap: 12px;
+  margin-left: auto; padding-left: 20px;
+  font-size: 11.5px; color: var(--muted); white-space: nowrap;
+}
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #34C759; flex-shrink: 0; animation: livepulse 2s infinite; }
+@keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.sb-logout {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: none; padding: 5px 8px;
+  font-size: 11.5px; color: var(--muted); cursor: pointer;
+  font-family: inherit; border-radius: 8px; transition: color .12s, background .12s;
+}
+.sb-logout:hover { color: #991B1B; background: rgba(153,27,27,0.06); }
+
+/* ── MAIN WRAP ── */
+#main-wrap {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+}
+.main-topbar { display: none; }
+.live-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+
+/* ── VIEW PANELS ── */
+.view-panel { padding: 28px 28px 40px; }
+#view-ticket-overview.view-panel,
+#view-epic-tc.view-panel { padding-top: 14px; }
+#view-ticket-overview .pie-section-body { flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 12px; }
+#view-ticket-overview .donut-wrap-md { width: 90px; height: 90px; }
+#view-ticket-overview .pie-section-card { height: 100%; box-sizing: border-box; }
+#view-ticket-overview .legend-lg { min-width: 0; max-width: none; }
+#view-ticket-overview .legend-lg .legend-item { padding: 5px 0; }
+#view-ticket-overview .legend-lg .legend-row-top { gap: 6px; }
+#view-ticket-overview .legend-lg .legend-name { font-size: 11px; white-space: normal; overflow: visible; text-overflow: clip; }
+#view-ticket-overview .legend-lg .legend-count { font-size: 12px; }
+#view-ticket-overview .legend-lg .legend-bar-track { margin-top: 3px; }
+/* Bottom-row pie cards: larger pie, bar fits content width, pies aligned top */
+#view-ticket-overview .pie-mid .pie-section-card { display: flex; flex-direction: column; }
+#view-ticket-overview .pie-mid .pie-section-body { margin-top: auto; margin-bottom: auto; align-items: flex-start; }
+#view-ticket-overview .pie-mid .legend-lg .legend-item:first-child { padding-top: 0; }
+#view-ticket-overview .pie-mid .donut-wrap-md { width: 110px; height: 110px; }
+#view-ticket-overview .pie-mid .legend-lg .legend-count { min-width: 26px; text-align: right; flex-shrink: 0; }
+#view-ticket-overview .pie-mid .legend-lg .legend-bar-track { max-width: calc(100% - 30px); }
+
+/* ── PAGE HEADER ── */
+.view-header { margin-bottom: 24px; }
+.view-title {
+  font-size: 22px; font-weight: 700; color: var(--text);
+  letter-spacing: -.03em; line-height: 1.2;
+}
+.view-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+/* ── SECTION LABELS ── */
+.section-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.section-title { font-size: 13px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+.section-sub { font-size: 11px; color: var(--dim); background: var(--elevated); border-radius: 6px; padding: 1px 8px; font-weight: 500; }
+
+/* ── GRID ── */
+.epic-grid { display: block; }
+.epic-system-group { margin-bottom: 26px; }
+.epic-system-header { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.epic-system-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+.epic-system-count { font-size: 12px; color: var(--muted); }
+.epic-grid-inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+/* ── CARD ── */
+.epic-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius) 0 var(--radius) var(--radius);
+  padding: 14px 16px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+  display: flex; flex-direction: column; align-items: flex-start;
+  overflow: hidden;
+  animation: cardIn .35s ease both;
+  transition: box-shadow .2s, transform .2s;
+  min-height: 200px;
+}
+.epic-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+.card-meta {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.epic-key {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: 10px; font-weight: 500; color: var(--dim);
+  background: var(--elevated); border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 6px; padding: 2px 7px;
+  text-decoration: none; cursor: pointer; transition: background .12s, color .12s, border-color .12s;
+}
+.epic-key:hover { background: rgba(15,118,110,0.08); color: var(--accent); border-color: rgba(15,118,110,0.22); }
+.epic-name {
+  width: 100%;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  letter-spacing: -.01em; line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+/* ── DONUT ── */
+.card-body { width: 100%; display: flex; flex-direction: row; align-items: center; gap: 14px; }
+.donut-wrap {
+  position: relative; width: 110px; height: 110px;
+  flex-shrink: 0;
+}
+.donut-wrap svg { width: 100%; height: 100%; overflow: visible; }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.donut-total {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1;
+}
+.donut-lbl { font-size: 8px; color: var(--muted); margin-top: 1px; letter-spacing: .04em; text-transform: uppercase; }
+
+/* ── DONUT (large — pie views) ── */
+.donut-wrap-lg {
+  position: relative; width: 200px; height: 200px;
+  flex-shrink: 0;
+}
+.donut-wrap-lg svg { width: 100%; height: 100%; overflow: visible; }
+.donut-wrap-lg .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.donut-wrap-lg .donut-total { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-size: 2.2rem; font-weight: 500; color: var(--text); line-height: 1; }
+.donut-wrap-lg .donut-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: .04em; text-transform: uppercase; }
+
+/* ── LEGEND ── */
+.legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.legend-item { display: flex; align-items: center; gap: 7px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
+.legend-name {
+  flex: 1; font-size: 10.5px; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .045em; font-weight: 500;
+  min-width: 0; white-space: nowrap; overflow: visible;
+}
+.legend-link { color: inherit; text-decoration: none; cursor: pointer; }
+.legend-link:hover { text-decoration: underline; }
+.legend-count { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; font-weight: 500; color: var(--text); }
+.legend-pct { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 10px; color: var(--dim); min-width: 34px; text-align: right; }
+
+/* ── LEGEND (large) ── */
+.legend-lg { display: flex; flex-direction: column; gap: 0; min-width: 260px; flex: 1; max-width: 420px; }
+.legend-lg .legend-item {
+  gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  align-items: flex-start;
+}
+.legend-lg .legend-item:last-child { border-bottom: none; }
+.legend-lg .legend-dot { width: 10px; height: 10px; border-radius: 3px; margin-top: 3px; }
+.legend-lg .legend-name { font-size: 12.5px; min-width: 0; flex: 1; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .045em; }
+.legend-lg .legend-count { font-size: 14px; font-weight: 600; color: var(--text); }
+.legend-lg .legend-pct { font-size: 11.5px; min-width: 38px; color: var(--muted); font-weight: 400; }
+.legend-lg .legend-row-top { display: flex; align-items: center; gap: 12px; width: 100%; }
+.legend-lg .legend-bar-track {
+  margin-top: 6px; height: 4px; border-radius: 99px;
+  background: var(--elevated); overflow: hidden; flex: 1;
+}
+.legend-lg .legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+
+/* ── DIVIDER ── */
+.legend-divider { width: 100%; height: 1px; background: var(--border); margin: 4px 0; }
+
+/* ── PIE VIEW LAYOUT ── */
+.pie-view-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 28px;
+  display: flex; align-items: flex-start; gap: 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+}
+.pie-view-meta { margin-bottom: 20px; }
+.pie-view-filter-link { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .8; }
+.pie-view-filter-link:hover { opacity: 1; text-decoration: underline; }
+
+/* ── DUAL PIE SECTIONS ── */
+.dual-pie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pie-section-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 16px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+}
+.pie-section-head { margin-bottom: 8px; }
+.pie-section-type {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.02em;
+  margin-bottom: 3px;
+}
+.pie-section-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.pie-section-meta { font-size: 12px; color: var(--muted); padding-left: 16px; }
+.pie-section-body { display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.detail-readiness .pie-section-body { justify-content: center; align-items: center; gap: 32px; }
+.detail-readiness .pie-section-head { text-align: left; margin-bottom: 20px; }
+.detail-readiness .pie-section-type { justify-content: flex-start; }
+.detail-readiness .pie-section-card { padding: 10px 16px 12px; }
+.detail-readiness .donut-wrap-md { width: 120px; height: 120px; }
+.donut-wrap-md {
+  position: relative; width: 110px; height: 110px; flex-shrink: 0;
+}
+.donut-wrap-md svg { width: 100%; height: 100%; overflow: visible; }
+.donut-wrap-md .donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.donut-wrap-md .donut-total { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-size: 1.8rem; font-weight: 500; color: var(--text); line-height: 1; }
+.donut-wrap-md .donut-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: .04em; text-transform: uppercase; }
+@media (max-width: 900px) { .dual-pie-grid { grid-template-columns: 1fr; } }
+.view-loading { font-size: 13px; color: var(--muted); padding: 48px 0; text-align: center; }
+
+/* ── TICKET TABLE ── */
+.tt-toolbar { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.tt-toolbar-row { display: flex; align-items: center; gap: 8px; }
+.tt-search {
+  flex: 0 0 300px;
+  padding: 7px 12px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); font-size: 11.5px; font-family: inherit;
+  background: var(--card); color: var(--text); outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.tt-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.tt-filter {
+  flex: 1; min-width: 0;
+  padding: 7px 26px 7px 9px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); font-size: 11.5px; font-family: inherit;
+  background: var(--card); color: var(--text); cursor: pointer; outline: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23AEAEB2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+}
+.tt-filter:focus { border-color: var(--accent); outline: none; }
+/* Custom dropdown */
+.tt-dd-wrap { flex: 1; min-width: 0; position: relative; }
+.tt-dd-btn {
+  width: 100%; padding: 7px 10px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); font-size: 11.5px; font-family: inherit;
+  background: var(--card); color: var(--muted); cursor: pointer;
+  text-align: left; display: flex; align-items: center; gap: 6px;
+  transition: border-color .12s, box-shadow .12s;
+}
+.tt-dd-btn:hover { border-color: rgba(0,0,0,0.18); color: var(--text); }
+.tt-dd-btn:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.tt-dd-btn.tt-dd-on { border-color: var(--accent); background: rgba(15,118,110,0.06); color: var(--accent); font-weight: 600; }
+.tt-dd-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-dd-arrow { flex-shrink: 0; transition: transform .15s; color: var(--dim); }
+.tt-dd-btn.tt-dd-on .tt-dd-arrow { color: var(--accent); }
+.tt-dd-btn[aria-expanded="true"] .tt-dd-arrow { transform: rotate(180deg); }
+.tt-dd-menu {
+  position: absolute; top: calc(100% + 5px); left: 0; min-width: 100%; max-width: 300px; z-index: 300;
+  background: var(--card); border: 1px solid var(--border-strong);
+  border-radius: 10px; padding: 4px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.13), 0 2px 6px rgba(0,0,0,0.06);
+  max-height: 220px; overflow-y: auto;
+}
+.tt-toolbar-row .tt-dd-wrap:last-of-type .tt-dd-menu,
+.tt-toolbar-row .tt-dd-wrap:nth-last-of-type(2) .tt-dd-menu,
+.tt-toolbar-row .tt-dd-wrap:nth-last-of-type(3) .tt-dd-menu { right: 0; left: auto; }
+.tt-dd-item {
+  padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: inherit;
+  cursor: pointer; color: var(--text); white-space: nowrap; transition: background .1s;
+}
+.tt-dd-item:hover { background: var(--elevated); }
+.tt-dd-item.tt-dd-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.tt-clear-btn {
+  padding: 7px 11px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); font-size: 11.5px; font-family: inherit;
+  background: var(--card); color: var(--muted); cursor: pointer;
+  transition: background .12s, color .12s; white-space: nowrap;
+}
+.tt-clear-btn:hover { background: var(--elevated); color: var(--text); }
+.tt-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+.tt-table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
+.tt-col-key { width: 72px; }
+.tt-col-summary { width: 16%; }
+.tt-col-tdstatus { width: 13%; }
+.tt-col-status { width: 8%; }
+.tt-col-tcstatus { width: 10%; }
+.tt-col-assignee { width: 9%; }
+.tt-col-qaowner { width: 12%; }
+.tt-col-epic { width: 16%; }
+.tt-col-sprint { width: 10%; }
+.tt-th {
+  padding: 10px 14px; text-align: left;
+  font-size: 10px; font-weight: 700; color: var(--dim);
+  text-transform: uppercase; letter-spacing: .09em;
+  background: var(--card); border-bottom: 1px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none; transition: color .12s;
+  position: sticky; top: 0; z-index: 4;
+  box-shadow: 0 1px 0 var(--border);
+}
+.tt-th:hover { color: var(--text); }
+.tt-th.tt-sort-active { color: var(--accent); }
+.tt-sort-icon { margin-left: 4px; opacity: .32; font-size: 9px; }
+.tt-th.tt-sort-active .tt-sort-icon { opacity: 1; }
+.tt-td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+.tt-tr:last-child .tt-td { border-bottom: none; }
+.tt-tr:hover .tt-td { background: rgba(0,0,0,0.018); }
+.tt-key { font-family:'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--accent); font-weight: 400; white-space: nowrap; text-decoration: none; }
+.tt-key:hover { text-decoration: underline; }
+.tt-summary-cell { max-width: 240px; }
+.tt-summary-text { line-height: 1.45; font-size: 11.5px; }
+.tt-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; border: 1px solid transparent; text-transform: uppercase; }
+.tt-nil { color: var(--dim); }
+.tt-parent-key { font-family:'JetBrains Mono',monospace; font-size: 10.5px; font-weight: 400; color: var(--accent); text-decoration: none; }
+.tt-parent-key:hover { text-decoration: underline; }
+.tt-parent-name { font-size: 11.5px; color: var(--text); margin-left: 4px; }
+.tt-empty-cell { padding: 52px 24px; text-align: center; }
+.tt-empty-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.tt-empty-sub { font-size: 13px; color: var(--muted); }
+.tt-pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 4px; gap: 12px; flex-wrap: wrap; }
+.tt-page-info { font-size: 12px; color: var(--muted); }
+.tt-page-controls { display: flex; align-items: center; gap: 3px; }
+.tt-page-btn { padding: 5px 12px; border: 1px solid var(--border-strong); border-radius: 8px; font-size: 12px; font-family: inherit; background: var(--card); color: var(--text); cursor: pointer; transition: background .12s; }
+.tt-page-btn:hover:not(:disabled) { background: var(--elevated); }
+.tt-page-btn:disabled { opacity: .32; cursor: default; }
+.tt-page-num { min-width: 30px; height: 30px; border: 1px solid transparent; border-radius: 7px; font-size: 12px; font-family: inherit; background: none; color: var(--muted); cursor: pointer; padding: 0 5px; transition: background .12s, color .12s, border-color .12s; }
+.tt-page-num:hover:not(.tt-pg-active) { background: var(--elevated); color: var(--text); }
+.tt-page-num.tt-pg-active { background: var(--accent); color: white; border-color: var(--accent); }
+.tt-pgsz-wrap { position: relative; }
+.tt-pgsz-btn {
+  padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px;
+  font-size: 11.5px; font-family: inherit; background: var(--card); color: var(--muted);
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: border-color .12s, box-shadow .12s;
+}
+.tt-pgsz-btn:hover { border-color: rgba(0,0,0,0.18); color: var(--text); }
+.tt-pgsz-btn:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.tt-pgsz-menu {
+  position: absolute; bottom: calc(100% + 5px); right: 0; min-width: 100%; z-index: 300;
+  background: var(--card); border: 1px solid var(--border-strong); border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10); overflow: hidden; display: none;
+}
+.tt-pgsz-item {
+  padding: 7px 14px; font-size: 11.5px; cursor: pointer; transition: background .1s;
+  white-space: nowrap; color: var(--text);
+}
+.tt-pgsz-item:hover { background: var(--elevated); }
+.tt-pgsz-item.tt-pgsz-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.view-error { font-size: 12px; color: #991B1B; padding: 32px 0; }
+.sprint-notice {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 11.5px; color: var(--muted); line-height: 1.5;
+  background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15);
+  border-radius: 10px; padding: 8px 14px; margin-bottom: 14px;
+}
+.sprint-notice svg { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
+.sprint-notice ul { margin: 0; padding: 0 0 0 14px; list-style: disc; }
+.sprint-notice ul li { margin: 0; }
+
+/* ── STATES ── */
+.card-skeleton {
+  min-height: 160px;
+  background: linear-gradient(90deg, #EBEBF0 25%, #E2E2E8 50%, #EBEBF0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 28px 0 12px; width: 100%; }
+.empty-circle { width: 64px; height: 64px; border-radius: 50%; border: 2px dashed var(--elevated); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
+.empty-circle svg { width: 22px; height: 22px; color: var(--dim); }
+.empty-title { font-size: 12px; font-weight: 600; color: var(--muted); }
+.empty-sub { font-size: 11px; color: var(--dim); text-align: center; line-height: 1.5; white-space: nowrap; }
+.error-wrap { width: 100%; }
+.error-box { background: rgba(153,27,27,0.05); border: 1px solid rgba(153,27,27,0.14); border-radius: 10px; padding: 12px 14px; }
+.error-text { font-size: 11px; color: #991B1B; line-height: 1.5; }
+.hidden { display: none !important; }
+
+/* ── SUMMARY SECTION ── */
+.summary-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05); }
+.groupby-wrap { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.groupby-label { font-size: 10.5px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; }
+.gb-dropdown { position: relative; }
+.gb-trigger {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 11.5px; font-weight: 500; color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 5px 10px 5px 12px;
+  cursor: pointer; outline: none;
+  transition: border-color .12s, box-shadow .12s;
+  white-space: nowrap;
+}
+.gb-trigger:hover { border-color: rgba(15,118,110,0.4); }
+.gb-trigger:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); }
+.gb-trigger[aria-expanded="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); }
+.gb-chevron { color: var(--dim); flex-shrink: 0; transition: transform .15s; }
+.gb-trigger[aria-expanded="true"] .gb-chevron { transform: rotate(180deg); }
+.gb-menu {
+  display: none; position: absolute; right: 0; top: calc(100% + 5px); z-index: 200;
+  background: var(--card); border: 1px solid var(--border-strong);
+  border-radius: 10px; padding: 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 12px 28px rgba(0,0,0,0.10);
+  min-width: 170px; list-style: none; margin: 0;
+}
+.gb-menu.gb-open { display: block; }
+.gb-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 10px; border-radius: 6px;
+  font-size: 12px; font-weight: 500; color: var(--text);
+  cursor: pointer; white-space: nowrap;
+  transition: background .08s;
+}
+.gb-item:hover { background: var(--elevated); }
+.gb-item--selected { color: var(--accent); }
+.gb-item--selected::after {
+  content: '';
+  display: inline-block; width: 14px; height: 14px; flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230F766E' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center;
+}
+.summary-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+.summary-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.summary-link { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .8; font-weight: 500; }
+.summary-link:hover { opacity: 1; text-decoration: underline; }
+.summary-table { width: 100%; border-collapse: collapse; }
+.summary-table th { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--border); }
+.summary-table th:nth-child(3), .summary-table th:nth-child(4) { text-align: right; }
+.summary-table td { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); vertical-align: middle; }
+.summary-table tr:last-child td { border-bottom: none; }
+.td-name { font-size: 12px; font-weight: 600; color: var(--text); width: 150px; padding-right: 16px; white-space: nowrap; }
+.td-dot { display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 8px; flex-shrink: 0; vertical-align: middle; position: relative; top: -1px; }
+.td-bar { padding-right: 16px; }
+.bar-track { height: 8px; background: var(--elevated); border-radius: 99px; overflow: hidden; min-width: 80px; }
+.bar-fill { height: 100%; border-radius: 99px; }
+.td-pct { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 12px; font-weight: 600; color: var(--text); text-align: right; width: 44px; padding-right: 12px; white-space: nowrap; }
+.td-count { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--muted); text-align: right; width: 60px; white-space: nowrap; }
+.summary-loading { font-size: 12px; color: var(--muted); padding: 12px 0; }
+
+/* ── DASHBOARD ── */
+.dash-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.dash-kpi-card { background: var(--elevated); border-radius: var(--radius-sm); padding: 20px 22px; }
+.dash-kpi-label { font-size: 14px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.dash-kpi-value { font-size: 48px; font-weight: 700; color: var(--text); line-height: 1; }
+.dash-kpi-sub { font-size: 15px; color: var(--muted); margin-top: 6px; }
+.dash-stacked { height: 24px; border-radius: 8px; overflow: hidden; display: flex; margin-bottom: 8px; }
+.dash-stacked-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.95); min-width: 0; }
+/* Stacked bar card */
+.sbc-wrap { position: relative; margin-bottom: 10px; }
+.sbc-bar { height: 44px; border-radius: 8px; overflow: hidden; display: flex; }
+.sbc-seg { height: 100%; }
+.sbc-labels { position: absolute; inset: 0; display: flex; pointer-events: none; }
+.sbc-pct { position: absolute; top: 0; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.sbc-legend { display: flex; flex-direction: column; gap: 6px; }
+.sbc-legend-item { display: flex; align-items: center; gap: 7px; }
+.sbc-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.sbc-link { font-size: 11.5px; color: var(--text); text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: .04em; font-weight: 500; }
+.sbc-link:hover { color: var(--accent); text-decoration: underline; }
+/* Stat card (for User Stories & Bug Reports) */
+.stc-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.stc-pill { flex: 1 1 calc(50% - 4px); background: var(--surface2,#f5f5f5); border-radius: 10px; padding: 10px 12px; text-align: center; text-decoration: none; display: block; transition: background .15s; }
+.stc-pill:hover { background: var(--surface3,#ececec); }
+.stc-num { font-size: 22px; font-weight: 700; line-height: 1; color: var(--text); }
+.stc-lbl { font-size: 9.5px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.stc-lbl.stc-lbl-status { font-weight: 700; }
+.dash-link { text-align: right; margin-bottom: 12px; }
+.dash-link a { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .8; font-weight: 500; }
+.dash-link a:hover { opacity: 1; text-decoration: underline; }
+
+/* ── OVERVIEW DASHBOARD GRID ── */
+.ov-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
+.ov-col { display: flex; flex-direction: column; padding: 0 6px; }
+.ov-col-half { grid-column: span 2; }
+.ov-col-1 { grid-column: span 1; }
+.ov-kpi { grid-template-columns: 1fr 1fr; flex: 1; grid-auto-rows: 1fr; gap: 8px; margin-bottom: 0; }
+.ov-kpi .dash-kpi-card { padding: 12px 14px; }
+.ov-kpi .dash-kpi-label { font-size: 11px; margin-bottom: 4px; }
+.ov-kpi .dash-kpi-value { font-size: 24px; }
+.ov-kpi .dash-kpi-sub { font-size: 11px; margin-top: 4px; }
+.ov-section-row { margin-bottom: 8px; padding-bottom: 8px; }
+.dash-qa-bars { display: flex; flex-direction: column; gap: 8px; }
+.dash-qa-row { display: flex; align-items: center; gap: 8px; }
+.dash-qa-name { font-size: 11px; color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
+.dash-qa-track { flex: 1; min-width: 40px; height: 18px; background: var(--elevated); border-radius: 6px; overflow: hidden; }
+.dash-qa-fill { height: 100%; border-radius: 6px; }
+.dash-qa-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 800px)  { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 900px)  { .dual-pie-grid { grid-template-columns: 1fr; } }
+/* ── iPad / tablet (portrait) ── */
+@media (max-width: 1024px) {
+  .view-panel { padding: 20px 20px 32px; }
+  #view-ticket-overview.view-panel,
+  #view-epic-tc.view-panel { padding-top: 10px; }
+  .pie-view-card { flex-direction: column; gap: 16px; padding: 16px 20px; }
+  .donut-wrap-lg { width: 160px; height: 160px; align-self: center; }
+  .legend-lg { min-width: 0; max-width: none; }
+  .tt-search { flex: 0 0 200px; }
+  .summary-card { padding: 16px 18px; }
+  .td-name { width: 120px; }
+  .ov-grid { grid-template-columns: 1fr 1fr; }
+  .ov-col-half { grid-column: span 2; }
+  .ov-col-1 { grid-column: span 1; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 520px) {
+  /* Nav */
+  #topnav { padding: 0 10px; height: 44px; }
+  .tn-brand { display: none; }
+  .sb-nav-item { padding: 0 8px; font-size: 11px; }
+  .sb-dot { width: 5px; height: 5px; }
+  .tn-right { gap: 8px; padding-left: 8px; font-size: 10px; }
+  .tn-right #last-updated { display: none; }
+  .sb-logout span { display: none; }
+  .sb-logout { padding: 5px; }
+  /* Panels */
+  .view-panel { padding: 0 12px 32px; }
+  #view-ticket-overview.view-panel,
+  #view-epic-tc.view-panel { padding-top: 8px; }
+  .view-title { font-size: 18px; }
+  .view-meta { font-size: 11px; }
+  .sprint-notice { font-size: 10.5px; padding: 6px 10px; }
+  /* Overview grid → single column */
+  .ov-grid { grid-template-columns: 1fr; }
+  .ov-col-half, .ov-col-1 { grid-column: span 1; }
+  .ov-col { padding: 0; }
+  .ov-kpi { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ov-kpi .dash-kpi-card { padding: 10px 12px; }
+  .ov-kpi .dash-kpi-value { font-size: 20px; }
+  .ov-kpi .dash-kpi-label { font-size: 10px; }
+  .ov-kpi .dash-kpi-sub { font-size: 10px; }
+  /* Epic grid + cards */
+  .epic-grid-inner { grid-template-columns: 1fr; }
+  .epic-card { min-height: auto; padding: 12px 14px; }
+  .card-body { gap: 10px; }
+  .donut-wrap { width: 70px; height: 70px; }
+  .donut-total { font-size: 0.7rem; }
+  .donut-lbl { font-size: 7px; }
+  .epic-name { font-size: 12px; margin-bottom: 6px; }
+  .legend-name { font-size: 9.5px; }
+  .legend-count { font-size: 10px; }
+  .legend-pct { font-size: 9px; min-width: 28px; }
+  .legend-dot { width: 6px; height: 6px; }
+  .legend { gap: 4px; }
+  /* Pie / donut (overview) */
+  .dual-pie-grid { grid-template-columns: 1fr; gap: 12px; }
+  .pie-view-card { flex-direction: column; gap: 12px; padding: 12px 14px; }
+  .donut-wrap-lg { width: 120px; height: 120px; align-self: center; }
+  .donut-wrap-lg .donut-total { font-size: 1.4rem; }
+  .donut-wrap-lg .donut-lbl { font-size: 9px; }
+  .donut-wrap-md { width: 80px; height: 80px; }
+  .donut-wrap-md .donut-total { font-size: 1.2rem; }
+  .donut-wrap-md .donut-lbl { font-size: 9px; }
+  #view-ticket-overview .donut-wrap-md { width: 70px; height: 70px; }
+  #view-ticket-overview .pie-mid .donut-wrap-md { width: 80px; height: 80px; }
+  .pie-section-card { padding: 10px 12px 12px; }
+  .pie-section-type { font-size: 13px; gap: 5px; }
+  .pie-section-dot { width: 7px; height: 7px; }
+  .pie-section-meta { font-size: 11px; padding-left: 12px; }
+  .pie-section-body { gap: 10px; }
+  .detail-readiness .pie-section-body { flex-direction: column; }
+  .detail-readiness .donut-wrap-md { width: 90px; height: 90px; }
+  .legend-lg { min-width: 0; max-width: none; }
+  .legend-lg .legend-item { gap: 8px; padding: 6px 0; }
+  .legend-lg .legend-dot { width: 8px; height: 8px; }
+  .legend-lg .legend-name { font-size: 10.5px; }
+  .legend-lg .legend-count { font-size: 12px; }
+  .legend-lg .legend-pct { font-size: 10px; }
+  /* Stacked bar */
+  .sbc-bar { height: 32px; }
+  .sbc-pct { height: 32px; font-size: 9px; }
+  .sbc-link { font-size: 10.5px; }
+  .sbc-dot { width: 7px; height: 7px; }
+  .sbc-legend { gap: 4px; }
+  /* Stat card */
+  .stc-grid { gap: 6px; }
+  .stc-pill { padding: 8px 10px; border-radius: 8px; }
+  .stc-num { font-size: 18px; }
+  .stc-lbl { font-size: 8.5px; }
+  /* Dashboard stacked bar */
+  .dash-stacked { height: 20px; }
+  .dash-stacked-seg { font-size: 9px; }
+  /* QA bars */
+  .dash-qa-name { font-size: 10px; }
+  .dash-qa-track { height: 14px; }
+  .dash-qa-val { font-size: 10px; }
+  /* KPI (epic tab) */
+  .dash-kpi { grid-template-columns: repeat(2, 1fr); }
+  .dash-kpi-card { padding: 14px 14px; }
+  .dash-kpi-value { font-size: 28px; }
+  .dash-kpi-label { font-size: 11px; }
+  .dash-kpi-sub { font-size: 12px; }
+  /* Toolbar + search */
+  .tt-search { flex: 1 1 auto; min-width: 0; }
+  .tt-toolbar-row { flex-wrap: wrap; gap: 6px; }
+  .tt-dd-wrap { flex: 1 1 calc(50% - 4px); min-width: 0; }
+  .tt-dd-btn { font-size: 11px; padding: 6px 8px; }
+  .tt-dd-menu { min-width: 160px; max-width: 90vw; max-height: 50vh; }
+  .tt-dd-item { padding: 9px 12px; font-size: 12.5px; }
+  .tt-clear-btn { font-size: 11px; padding: 6px 10px; }
+  /* Table */
+  .tt-table { min-width: 700px; font-size: 11px; }
+  .tt-th, .tt-td { padding: 8px 8px; }
+  .tt-pagination { gap: 8px; }
+  .tt-page-info { font-size: 10.5px; }
+  .tt-page-btn { padding: 4px 8px; font-size: 11px; }
+  .tt-page-num { min-width: 26px; height: 26px; font-size: 11px; }
+  /* Summary */
+  .summary-card { padding: 14px 14px; }
+  .summary-head { flex-direction: column; gap: 6px; align-items: flex-start; }
+  .td-name { width: auto; white-space: normal; padding-right: 8px; font-size: 11px; }
+  .bar-track { min-width: 60px; }
+  /* Section / groupby */
+  .section-row { flex-wrap: wrap; gap: 6px; }
+  .groupby-wrap { margin-left: 0; width: 100%; }
+  .gb-menu { min-width: 160px; max-width: 90vw; }
+  .gb-item { padding: 9px 12px; font-size: 12.5px; }
+  /* Page size dropdown */
+  .tt-pgsz-btn { font-size: 10.5px; padding: 4px 8px; }
+}
+  </style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="auth-box">
+    <div class="auth-icon">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="8.5" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+        <path d="M16 7.5 A8.5 8.5 0 1 1 8.1 21" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M12.5 16 L15 18.5 L20.5 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <h2>Mica Phase 2 — MICA2 QA</h2>
+    <button class="btn-google" id="btnGoogle">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      <span>Sign in with Google</span>
+    </button>
+    <div class="auth-error" id="auth-error"></div>
+    <div class="auth-note">เข้าถึงได้เฉพาะทีม Pluton เท่านั้น</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <!-- Top Navigation -->
+  <nav id="topnav">
+    <div class="tn-brand">Mica Phase 2 — MICA2 QA</div>
+    <div class="tn-tabs">
+      <a class="sb-nav-item active" data-view="ticket-overview">
+        <span class="sb-dot" style="background:#3B82F6"></span>Ticket Overview
+      </a>
+      <a class="sb-nav-item" data-view="epic-tc">
+        <span class="sb-dot" style="background:#0F766E"></span>Epic Breakdown
+      </a>
+    </div>
+    <div class="tn-right">
+      <span class="live-dot"></span>
+      <span id="last-updated">Loading…</span>
+      <button class="sb-logout" id="btn-logout">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div id="main-wrap">
+
+    <!-- View 1: TC Status from each Epic -->
+    <div id="view-epic-tc" class="view-panel hidden">
+      <div class="sprint-notice">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <ul>
+          <li><strong>Stories</strong> without a sprint assignment are excluded from all charts, statistics, and lists on this board.</li>
+          <li><strong>Bugs</strong> are always shown regardless of sprint assignment.</li>
+        </ul>
+      </div>
+      <div class="section-row">
+        <span class="section-title">Epics</span>
+        <span class="section-sub">16 epics</span>
+        <div class="groupby-wrap">
+          <span class="groupby-label">Group by</span>
+          <div class="gb-dropdown" id="gb-dropdown">
+            <button class="gb-trigger" id="gb-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="gb-trigger-label" id="gb-trigger-label">TC Status</span>
+              <svg class="gb-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="gb-menu" id="gb-menu" role="listbox">
+              <li class="gb-item gb-item--selected" role="option" data-value="tcStatus">TC Status</li>
+              <li class="gb-item" role="option" data-value="status">Status</li>
+              <li class="gb-item" role="option" data-value="tdStatus">Ticket Details Status</li>
+              <li class="gb-item" role="option" data-value="issueType">Issue Type</li>
+              <li class="gb-item" role="option" data-value="qaOwner">QA Owner</li>
+              <li class="gb-item" role="option" data-value="assignee">Assignee</li>
+            </ul>
+          </div>
+          <select id="epic-groupby" style="display:none">
+            <option value="tcStatus" selected>TC Status</option>
+            <option value="status">Status</option>
+            <option value="tdStatus">Ticket Details Status</option>
+            <option value="issueType">Issue Type</option>
+            <option value="qaOwner">QA Owner</option>
+            <option value="assignee">Assignee</option>
+          </select>
+        </div>
+      </div>
+      <div class="epic-grid" id="epic-grid"></div>
+    </div>
+
+    <!-- View 2: Ticket Overview (unified dashboard) -->
+    <div id="view-ticket-overview" class="view-panel">
+      <div id="ticket-overview-content"><div class="view-loading">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js'
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js'
+
+// ── Firebase ──
+const firebaseConfig = {
+  apiKey: 'AIzaSyAPs8mLoQCJrIcV8ZCV43quqALsLQ4bNXU',
+  authDomain: 'mica-phase2-ols.pages.dev',
+  projectId: 'pluton-dashboard',
+  storageBucket: 'pluton-dashboard.firebasestorage.app',
+  messagingSenderId: '248167015210',
+  appId: '1:248167015210:web:e50ec203a4069617a77453'
+}
+const fbApp = initializeApp(firebaseConfig)
+const auth = getAuth(fbApp)
+setPersistence(auth, browserLocalPersistence)
+const provider = new GoogleAuthProvider()
+provider.setCustomParameters({ hd: 'skilllane.com' })
+const ALLOWED_DOMAIN = 'skilllane.com'
+
+// ── Whitelist ──
+const WHITELIST_URL = 'https://script.google.com/a/macros/skilllane.com/s/AKfycbwQnLTEYSkE-6RgtWwHsD33pGsKaXWw0rOGxTEFrC0M424LvCxva7hBev-3IPWKeezu/exec'
+const HARDCODED_WHITELIST = [
+  'kasidesh@skilllane.com','peeti@skilllane.com','pongake.o@skilllane.com',
+  'nopadon@skilllane.com','totsawat@skilllane.com','jirapat.w@skilllane.com',
+  'thitichaya@skilllane.com','saran.n@skilllane.com','patcharaphol@skilllane.com',
+  'pakamon.p@skilllane.com','montacha@skilllane.com','nattaya@skilllane.com',
+  'pornchanok.i@skilllane.com','sasicha.s@skilllane.com','sarut@skilllane.com',
+  'autthapon.k@skilllane.com','sukit@skilllane.com','kritsada@skilllane.com',
+  'sarida@skilllane.com','thearrawit@skilllane.com','korpong@skilllane.com',
+  'jirayu@skilllane.com','tanabut@skilllane.com','kritpavin.c@skilllane.com',
+  'panisara.s@skilllane.com','namatsawin.b@skilllane.com','poom.c@skilllane.com',
+  'nakarin.m@skilllane.com','nartawat.p@skilllane.com','chamnan.d@skilllane.com',
+  'naroebordin.w@skilllane.com','samorn@skilllane.com','oran@skilllane.com',
+  'rajat@skilllane.com','sujaree.k@skilllane.com','pasit.l@skilllane.com',
+  'nipit.j@skilllane.com','papawarin.s@skilllane.com','duangsamon.t@skilllane.com',
+  'wasana.o@skilllane.com','makkawan.c@skilllane.com','atthaboon@skilllane.com',
+]
+
+async function checkWhitelist(email) {
+  const e = email.toLowerCase()
+  if (HARDCODED_WHITELIST.includes(e)) return true
+  try {
+    const res = await fetch(WHITELIST_URL + '?t=' + Date.now())
+    if (res.ok) {
+      const { emails } = await res.json()
+      return emails.map(x => x.toLowerCase()).includes(e)
+    }
+  } catch (_) {}
+  return false
+}
+
+onAuthStateChanged(auth, async user => {
+  if (user && user.email.endsWith('@' + ALLOWED_DOMAIN)) {
+    const allowed = await checkWhitelist(user.email)
+    if (allowed) {
+      document.getElementById('auth-gate').style.display = 'none'
+      showApp()
+    } else {
+      const errEl = document.getElementById('auth-error')
+      errEl.textContent = '⚠ ' + user.email + ' ไม่มีสิทธิ์เข้าถึง กรุณาติดต่อทีม QA'
+      errEl.style.display = 'block'
+      await signOut(auth)
+    }
+  } else {
+    if (user) await signOut(auth)
+    document.getElementById('auth-gate').style.display = 'flex'
+  }
+})
+
+document.getElementById('btnGoogle').addEventListener('click', async () => {
+  const btn = document.getElementById('btnGoogle')
+  btn.disabled = true
+  btn.querySelector('span').textContent = 'Signing in…'
+  try {
+    await signInWithPopup(auth, provider)
+  } catch (e) {
+    const errEl = document.getElementById('auth-error')
+    errEl.textContent = e.code === 'auth/popup-closed-by-user' ? 'Popup ถูกปิด ลองใหม่อีกครั้ง' : e.message
+    errEl.style.display = 'block'
+    btn.disabled = false
+    btn.querySelector('span').textContent = 'Sign in with Google'
+  }
+})
+
+// ── Jira ──
+const JIRA_BASE = '/api/jira'
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+function jqlEscape(name) {
+  return name.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+}
+function fieldClause(field, val) {
+  return val === 'Empty' ? `${field} is EMPTY` : `${field} = "${jqlEscape(val)}"`
+}
+function jiraJqlUrl(jql) {
+  return `https://skilllane.atlassian.net/issues/?jql=${encodeURIComponent(jql + ' ORDER BY created DESC')}`
+}
+
+const SYSTEMS = [
+  { id: 'EvMS', name: 'Evaluation Management System (EvMS)' },
+  { id: 'ELMS', name: 'Extended Learning Management System (ELMS)' },
+  { id: 'CBMS', name: 'Credit Bank Management System (CBMS)' },
+]
+const EPICS = [
+  // EvMS — Evaluation / Exam Management System
+  { key: 'MICA2-630', name: 'Exam Bank / Question Bank',       system: 'EvMS' },
+  { key: 'MICA2-631', name: 'Exam Timetable',                  system: 'EvMS' },
+  { key: 'MICA2-632', name: 'Exam Grading',                    system: 'EvMS' },
+  { key: 'MICA2-633', name: 'Exam Report and Evaluation',      system: 'EvMS' },
+  { key: 'MICA2-634', name: 'Exam Room Management',            system: 'EvMS' },
+  { key: 'MICA2-635', name: 'Create Exam (AI)',                system: 'EvMS' },
+  { key: 'MICA2-636', name: 'Exam Room',                       system: 'EvMS' },
+  { key: 'MICA2-706', name: 'Exam Session',                    system: 'EvMS' },
+  { key: 'MICA2-708', name: 'Exam Result',                     system: 'EvMS' },
+  // ELMS — Extended Learning Management System
+  { key: 'MICA2-125', name: 'AI Integration',                  system: 'ELMS' },
+  { key: 'MICA2-626', name: 'Google Docs',                     system: 'ELMS' },
+  { key: 'MICA2-627', name: 'Google Meet / VDO Conference',    system: 'ELMS' },
+  { key: 'MICA2-628', name: 'Google Drive',                    system: 'ELMS' },
+  { key: 'MICA2-629', name: 'Google Connect',                  system: 'ELMS' },
+  // CBMS — Credit Bank Management System
+  { key: 'MICA2-648', name: 'School Credit Bank Activation',   system: 'CBMS' },
+  { key: 'MICA2-649', name: 'Credit Bank Curriculum Management', system: 'CBMS' },
+  { key: 'MICA2-650', name: 'Credit Bank Course Management',   system: 'CBMS' },
+  { key: 'MICA2-651', name: 'Credit Transfer (Learner)',       system: 'CBMS' },
+  { key: 'MICA2-652', name: 'Credit Transfer (Staff)',         system: 'CBMS' },
+  { key: 'MICA2-653', name: 'My Credit',                       system: 'CBMS' },
+]
+const ALL_EPIC_KEYS = EPICS.map(e => e.key)
+function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',')})` }
+
+// ── Epic group-by options ──
+const GROUP_OPTIONS = [
+  {
+    key: 'tcStatus', label: 'TC Status',
+    fields: 'customfield_12128',
+    extract: iss => [iss.fields?.customfield_12128?.value || 'Empty'],
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12128]', val)}`,
+  },
+  {
+    key: 'status', label: 'Status',
+    fields: 'status',
+    extract: iss => [iss.fields?.status?.name || 'Empty'],
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('status', val)}`,
+  },
+  {
+    key: 'tdStatus', label: 'Ticket Details Status',
+    fields: 'customfield_12127',
+    extract: iss => [iss.fields?.customfield_12127?.value || 'Empty'],
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12127]', val)}`,
+  },
+  {
+    key: 'issueType', label: 'Issue Type',
+    fields: 'issuetype',
+    extract: iss => [iss.fields?.issuetype?.name || 'Empty'],
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('issuetype', val)}`,
+  },
+  {
+    key: 'qaOwner', label: 'QA Owner',
+    fields: 'customfield_12120',
+    extract: iss => {
+      const owners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName)).filter(Boolean)
+      return owners.length > 0 ? owners : ['Empty']
+    },
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12120]', val)}`,
+  },
+  {
+    key: 'assignee', label: 'Assignee',
+    fields: 'assignee',
+    extract: iss => [sn(iss.fields?.assignee?.displayName || '') || 'Empty'],
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('assignee', val)}`,
+  },
+]
+const ALL_EPIC_FIELDS = 'summary,status,issuetype,assignee,customfield_12127,customfield_12128,customfield_12120'
+const epicIssuesStore = {}
+
+function getActiveGroupOpt() {
+  const sel = document.getElementById('epic-groupby')
+  const key = sel ? sel.value : 'tcStatus'
+  return GROUP_OPTIONS.find(o => o.key === key) || GROUP_OPTIONS[0]
+}
+
+function groupByField(issues, groupOpt) {
+  const counts = {}
+  issues.forEach(iss => {
+    const vals = groupOpt.extract(iss)
+    vals.forEach(v => { counts[v] = (counts[v] || 0) + 1 })
+  })
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])
+}
+
+function reRenderAllEpics() {
+  const groupOpt = getActiveGroupOpt()
+  EPICS.forEach(epic => {
+    const issues = epicIssuesStore[epic.key]
+    if (issues) {
+      const groups = groupByField(issues, groupOpt)
+      renderCard(epic, groups, issues.length, groupOpt)
+    }
+  })
+}
+
+const STATUS_KEYWORD_COLORS = [
+  [['done','closed','resolved','completed','approved','accepted','finish'],   '#4CAF76'],
+  [['in progress','in development','progress','development'],                 '#4487C5'],
+  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#8A78BF'],
+  [['code review','in review','review','peer review'],                        '#B07AC0'],
+  [['to do','todo','open','backlog','new','ready','selected'],                '#A8A8AD'],
+  [['blocked','on hold','hold','waiting','pending'],                          '#C0986A'],
+  [['rejected','cancelled','canceled','wont fix',"won't fix",'invalid'],     '#C07A7A'],
+]
+const FALLBACK_PALETTE = ['#4487C5','#8A78BF','#4CAF76','#C0986A','#AEAEB2','#B07AC0','#C07A7A','#B8A87A']
+const _dynamicColorMap = {}
+
+function statusColor(name) {
+  const key = name.toLowerCase().trim()
+  for (const [keywords, color] of STATUS_KEYWORD_COLORS) {
+    if (keywords.some(k => key.includes(k))) return color
+  }
+  if (!_dynamicColorMap[key]) {
+    const idx = Object.keys(_dynamicColorMap).length
+    _dynamicColorMap[key] = FALLBACK_PALETTE[idx % FALLBACK_PALETTE.length]
+  }
+  return _dynamicColorMap[key]
+}
+
+function darkenForBadge(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16)
+  if ((0.299*r + 0.587*g + 0.114*b) < 130) return hex
+  const d = v => Math.round(v*0.42).toString(16).padStart(2,'0')
+  return `#${d(r)}${d(g)}${d(b)}`
+}
+
+async function fetchIssues(jql, fields = 'customfield_12128') {
+  const all = []
+  let nextPageToken = null
+  while (true) {
+    let url = `${JIRA_BASE}/search/jql?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100`
+    if (nextPageToken) url += `&nextPageToken=${encodeURIComponent(nextPageToken)}`
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = await res.json()
+    if (!data.issues || data.issues.length === 0) break
+    all.push(...data.issues)
+    if (data.isLast) break
+    nextPageToken = data.nextPageToken
+  }
+  return all
+}
+
+function groupByStatus(issues) {
+  const counts = {}
+  issues.forEach(issue => {
+    const s = (issue.fields.customfield_12128 && issue.fields.customfield_12128.value) || 'Empty'
+    counts[s] = (counts[s] || 0) + 1
+  })
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])
+}
+
+// ── SVG Donut ──
+function polar(cx, cy, r, deg) {
+  const rad = (deg - 90) * Math.PI / 180
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }
+}
+function arcPath(cx, cy, ro, ri, s, e) {
+  const p1 = polar(cx, cy, ro, s), p2 = polar(cx, cy, ro, e)
+  const p3 = polar(cx, cy, ri, e), p4 = polar(cx, cy, ri, s)
+  const lg = (e - s) > 180 ? 1 : 0
+  const f = n => n.toFixed(3)
+  return `M${f(p1.x)} ${f(p1.y)} A${ro} ${ro} 0 ${lg} 1 ${f(p2.x)} ${f(p2.y)} L${f(p3.x)} ${f(p3.y)} A${ri} ${ri} 0 ${lg} 0 ${f(p4.x)} ${f(p4.y)}Z`
+}
+
+function buildDonut(groups, total, sz = 210) {
+  const CX = sz/2, CY = sz/2
+  const RO = Math.round(sz * 0.429), RI = Math.round(sz * 0.22)
+  const GAP = groups.length > 1 ? 2.5 : 0
+  const MIN_SPAN = 30
+
+  if (total === 0) {
+    return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${CX}" cy="${CY}" r="${(RO+RI)/2}" fill="none" stroke="#E5E5EA" stroke-width="${RO-RI}"/>
+    </svg>`
+  }
+  if (groups.length === 1) {
+    const color = statusColor(groups[0][0])
+    const rm = (RO+RI)/2, sw = RO-RI
+    const lbl_sz = Math.round(sz * 0.073)
+    return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${CX}" cy="${CY}" r="${rm}" fill="none" stroke="${color}" stroke-width="${sw}"/>
+      <text x="${CX}" y="${CY - rm}" text-anchor="middle" dominant-baseline="central"
+        font-family="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="${lbl_sz}" font-weight="600" fill="rgba(255,255,255,0.95)">100%</text>
+    </svg>`
+  }
+  const rawSpans = groups.map(([,c]) => c / total * 360)
+  const boosts = rawSpans.map(s => s > 0 && s < MIN_SPAN ? MIN_SPAN - s : 0)
+  const totalBoost = boosts.reduce((a, b) => a + b, 0)
+  const totalReducible = rawSpans.reduce((a, s, i) => a + (boosts[i] === 0 && s > 0 ? s : 0), 0)
+  const adjSpans = totalBoost > 0 && totalReducible > totalBoost
+    ? rawSpans.map((s, i) => s === 0 ? 0 : boosts[i] > 0 ? MIN_SPAN : s - (s / totalReducible) * totalBoost)
+    : rawSpans
+
+  let paths = '', labels = '', cur = 0
+  const lbl_sz = Math.round(sz * 0.073)
+  const lbl_sz_sm = Math.round(sz * 0.058)
+  groups.forEach(([name, count], i) => {
+    const pct = count / total
+    const adj = adjSpans[i]
+    const span = adj - GAP
+    if (span <= 0) { cur += adj; return }
+    const s = cur + GAP / 2, e = s + span, mid = (s + e) / 2
+    const color = statusColor(name)
+    paths += `<path d="${arcPath(CX, CY, RO, RI, s, e)}" fill="${color}"/>`
+    const lr = (RO + RI) / 2
+    const lp = polar(CX, CY, lr, mid)
+    labels += `<text x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}"
+      text-anchor="middle" dominant-baseline="central"
+      font-family="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
+      font-size="${adj >= MIN_SPAN * 1.5 ? lbl_sz : lbl_sz_sm}" font-weight="600" fill="rgba(255,255,255,0.95)">${Math.round(pct*100)}%</text>`
+    cur += adj
+  })
+  return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">${paths}${labels}</svg>`
+}
+
+// ── SVG Pie (solid, no gap) ──
+function piePath(cx, cy, r, s, e) {
+  const p1 = polar(cx, cy, r, s), p2 = polar(cx, cy, r, e)
+  const lg = (e - s) > 180 ? 1 : 0
+  const f = n => n.toFixed(3)
+  return `M${cx} ${cy} L${f(p1.x)} ${f(p1.y)} A${r} ${r} 0 ${lg} 1 ${f(p2.x)} ${f(p2.y)}Z`
+}
+
+function buildPie(groups, total, sz = 170) {
+  const CX = sz/2, CY = sz/2, RO = Math.round(sz * 0.47)
+  const MIN_SPAN = 30
+  if (total === 0) {
+    return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><circle cx="${CX}" cy="${CY}" r="${RO}" fill="#E5E5EA"/></svg>`
+  }
+  if (groups.length === 1) {
+    const color = statusColor(groups[0][0])
+    return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><circle cx="${CX}" cy="${CY}" r="${RO}" fill="${color}"/>
+      <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="central" font-family="Inter,-apple-system,sans-serif" font-size="${Math.round(sz*0.08)}" font-weight="600" fill="rgba(255,255,255,0.95)">100%</text></svg>`
+  }
+  const rawSpans = groups.map(([,c]) => c / total * 360)
+  const boosts = rawSpans.map(s => s > 0 && s < MIN_SPAN ? MIN_SPAN - s : 0)
+  const totalBoost = boosts.reduce((a, b) => a + b, 0)
+  const totalReducible = rawSpans.reduce((a, s, i) => a + (boosts[i] === 0 && s > 0 ? s : 0), 0)
+  const adjSpans = totalBoost > 0 && totalReducible > totalBoost
+    ? rawSpans.map((s, i) => s === 0 ? 0 : boosts[i] > 0 ? MIN_SPAN : s - (s / totalReducible) * totalBoost)
+    : rawSpans
+
+  let paths = '', labels = '', cur = 0
+  const lbl_sz = Math.round(sz * 0.095)
+  const lbl_sz_sm = Math.round(sz * 0.072)
+  groups.forEach(([name, count], i) => {
+    const pct = count / total
+    const adj = adjSpans[i]
+    if (adj <= 0) return
+    const s = cur, e = s + adj, mid = (s + e) / 2
+    paths += `<path d="${piePath(CX, CY, RO, s, e)}" fill="${statusColor(name)}"/>`
+    const lp = polar(CX, CY, RO * 0.62, mid)
+    labels += `<text x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-family="Inter,-apple-system,sans-serif" font-size="${adj >= MIN_SPAN * 1.5 ? lbl_sz : lbl_sz_sm}" font-weight="700" fill="rgba(255,255,255,0.95)">${Math.round(pct*100)}%</text>`
+    cur += adj
+  })
+  return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">${paths}${labels}</svg>`
+}
+
+// ── Render epic cards ──
+function renderCard(epic, groups, total, groupOpt) {
+  const card = document.getElementById('card-' + epic.key)
+  if (!card) return
+  card.classList.remove('card-skeleton')
+  card.style.minHeight = ''
+  const svg = buildDonut(groups, total)
+  const hasData = total > 0
+  const _groupOpt = groupOpt || GROUP_OPTIONS[0]
+  const legendHTML = groups.map(([name, count]) => {
+    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const link = jiraJqlUrl(_groupOpt.jql(epic.key, name))
+    return `<div class="legend-item">
+      <span class="legend-dot" style="background:${statusColor(name)}"></span>
+      <a class="legend-name legend-link" href="${link}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)} (${count})</a>
+    </div>`
+  }).join('')
+  const body = hasData
+    ? `<div class="card-body">
+        <div class="donut-wrap">${svg}<div class="donut-center"><span class="donut-total">${total}</span><span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
+        <div class="legend">${legendHTML}</div>
+       </div>`
+    : `<div class="empty-state">
+        <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
+        <div class="empty-title">No tickets yet</div>
+        <div class="empty-sub">No tickets found for this epic in Jira</div>
+      </div>`
+  card.innerHTML = `
+    <div class="card-meta" style="align-items:center;flex-wrap:wrap;margin-bottom:10px;gap:8px">
+      <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key}`)}" target="_blank" rel="noopener">${epic.key}</a>
+      <span class="epic-name" style="margin-bottom:0;flex:1;min-width:0">${epic.name}</span>
+    </div>
+    ${body}`
+}
+
+function renderError(epic, err) {
+  const card = document.getElementById('card-' + epic.key)
+  if (!card) return
+  card.classList.remove('card-skeleton')
+  card.style.minHeight = ''
+  card.innerHTML = `
+    <div class="card-meta"><span class="epic-key">${epic.key}</span></div>
+    <div class="epic-name">${epic.name}</div>
+    <div class="error-wrap"><div class="error-box"><div class="error-text">Failed to load data<br><span style="opacity:.7">${err.message}</span></div></div></div>`
+}
+
+// ── Render pie view (large donut) ──
+function renderPieView(containerId, groups, total, title, jiraLink, jiraLinkText) {
+  const el = document.getElementById(containerId)
+  if (!el) return
+  const svg = buildDonut(groups, total, 200)
+  const legendHTML = groups.map(([name, count]) => {
+    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const color = statusColor(name)
+    return `<div class="legend-item">
+      <div style="flex:1;min-width:0">
+        <div class="legend-row-top">
+          <span class="legend-dot" style="background:${color}"></span>
+          <span class="legend-name" title="${esc(name)}">${esc(name)}</span>
+          <span class="legend-count">${count} (${pct}%)</span>
+        </div>
+        <div class="legend-bar-track"><div class="legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+    </div>`
+  }).join('')
+  el.innerHTML = `
+    <div class="view-header">
+      <div class="view-title">${title}</div>
+      <div class="view-meta"><a class="summary-link" href="${jiraLink}" target="_blank" rel="noopener">${jiraLinkText} ↗</a></div>
+    </div>
+    <div class="pie-view-card">
+      <div class="donut-wrap-lg">
+        ${svg}
+        <div class="donut-center">
+          <span class="donut-total">${total}</span>
+          <span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span>
+        </div>
+      </div>
+      <div class="legend-lg">${legendHTML}</div>
+    </div>`
+}
+
+// ── Dual Pie Section helpers ──
+function buildPieSectionLegend(groups, total, jqlFn) {
+  return groups.map(([name, count]) => {
+    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const color = statusColor(name)
+    const nameEl = jqlFn
+      ? `<a class="legend-name legend-link" href="${jqlFn(name)}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)}</a>`
+      : `<span class="legend-name" title="${esc(name)}">${esc(name)}</span>`
+    return `<div class="legend-item">
+      <div style="flex:1;min-width:0">
+        <div class="legend-row-top">
+          <span class="legend-dot" style="background:${color}"></span>
+          ${nameEl}
+          <span class="legend-count">${count}</span>
+        </div>
+        <div class="legend-bar-track"><div class="legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function renderDualPieSection(label, groups, total, accentColor) {
+  const head = `<div class="pie-section-head">
+      <div class="pie-section-type">
+        <span class="pie-section-dot" style="background:${accentColor}"></span>${label}
+      </div>
+      <div class="pie-section-meta">${total} ticket${total !== 1 ? 's' : ''} total</div>
+    </div>`
+  if (total === 0) {
+    return `<div class="pie-section-card">${head}
+      <div class="empty-state">
+        <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
+        <div class="empty-title">No data available</div>
+        <div class="empty-sub">No ${label.toLowerCase()} found in Jira</div>
+      </div>
+    </div>`
+  }
+  const svg = buildDonut(groups, total, 170)
+  return `<div class="pie-section-card">${head}
+    <div class="pie-section-body">
+      <div class="donut-wrap-md">${svg}<div class="donut-center"><span class="donut-total">${total}</span><span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
+      <div class="legend-lg">${buildPieSectionLegend(groups, total)}</div>
+    </div>
+  </div>`
+}
+
+function renderDualPieView(containerId, storySec, bugSec, title, jiraLink) {
+  const el = document.getElementById(containerId)
+  if (!el) return
+  el.innerHTML = `
+    <div class="view-header">
+      <div class="view-title">${title}</div>
+      <div class="view-meta"><a class="summary-link" href="${jiraLink}" target="_blank" rel="noopener">View in Jira ↗</a></div>
+    </div>
+    <div class="dual-pie-grid">
+      ${renderDualPieSection(storySec.label, storySec.groups, storySec.total, '#3B82F6')}
+      ${renderDualPieSection(bugSec.label, bugSec.groups, bugSec.total, '#EF4444')}
+    </div>`
+}
+
+// ── Summary bar section ──
+
+// ── Ticket Table ──
+function sn(name) { return (name || '').replace(/\s*\([^)]*\)/g, '').trim() }
+
+function initTicketTable(containerId, issues) {
+  const container = document.getElementById(containerId)
+  if (!container) return
+
+  const rows = issues.map(iss => {
+    const owners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName) || 'Empty').filter(Boolean)
+    const pk = iss.fields?.parent?.key || ''
+    const pn = iss.fields?.parent?.fields?.summary || ''
+    const sprintName = (iss.fields?.customfield_10008 || [])[0]?.name || ''
+    return {
+      key: iss.key,
+      summary: iss.fields?.summary || '',
+      tdStatus: iss.fields?.customfield_12127?.value || '',
+      status: iss.fields?.status?.name || '',
+      tcStatus: iss.fields?.customfield_12128?.value || '',
+      assignee: sn(iss.fields?.assignee?.displayName || ''),
+      qaOwners: owners, qaOwner: owners.join(', '),
+      parentKey: pk, parentName: pn,
+      parentDisplay: pk ? (pn ? `${pk} ${pn}` : pk) : '',
+      sprint: sprintName
+    }
+  })
+
+  const uniqFlat = fn => [...new Set(rows.flatMap(fn).filter(Boolean))].sort()
+  const FM = [
+    { key: 'tdStatus',  label: 'Ticket Details Status', vals: uniqFlat(r => [r.tdStatus]) },
+    { key: 'status',    label: 'Status',                 vals: uniqFlat(r => [r.status]) },
+    { key: 'tcStatus',  label: 'TC Status',              vals: uniqFlat(r => [r.tcStatus]) },
+    { key: 'assignee',  label: 'Assignee',               vals: uniqFlat(r => [r.assignee]) },
+    { key: 'qaOwner',   label: 'QA Owner',               vals: uniqFlat(r => r.qaOwners) },
+    { key: 'parentKey', label: 'Epic',                   vals: uniqFlat(r => [r.parentKey]) },
+    { key: 'sprint',    label: 'Sprint',                 vals: uniqFlat(r => [r.sprint]) }
+  ]
+  const COLS = [
+    { key:'key',      label:'Key' },
+    { key:'summary',  label:'Summary' },
+    { key:'tdStatus', label:'Ticket Details Status' },
+    { key:'status',   label:'Status' },
+    { key:'tcStatus', label:'TC Status' },
+    { key:'assignee', label:'Assignee' },
+    { key:'qaOwner',  label:'QA Owner' },
+    { key:'parentKey',label:'Epic' },
+    { key:'sprint',   label:'Sprint' }
+  ]
+  let st = {
+    search:'', sortCol:'key', sortDir:'asc', page:1, pageSize:10,
+    filters: Object.fromEntries(FM.map(f => [f.key, []])),
+    openMenu: null
+  }
+
+  function getFiltered() {
+    let data = rows
+    if (st.search) {
+      const q = st.search.toLowerCase()
+      data = data.filter(r =>
+        r.key.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q) ||
+        r.assignee.toLowerCase().includes(q) || r.qaOwner.toLowerCase().includes(q) ||
+        r.parentDisplay.toLowerCase().includes(q)
+      )
+    }
+    for (const { key } of FM) {
+      const vals = st.filters[key]; if (!vals.length) continue
+      data = key === 'qaOwner'
+        ? data.filter(r => r.qaOwners.some(o => vals.includes(o)))
+        : data.filter(r => vals.includes(r[key]))
+    }
+    return [...data].sort((a, b) => {
+      const va = (a[st.sortCol]||'').toString().toLowerCase()
+      const vb = (b[st.sortCol]||'').toString().toLowerCase()
+      return st.sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+    })
+  }
+
+  function bdg(val) {
+    if (!val) return '<span class="tt-nil">—</span>'
+    const c = statusColor(val)
+    const tc = darkenForBadge(c)
+    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${val}</span>`
+  }
+
+  // Persistent event delegation — survives innerHTML re-renders
+  if (!container._ttInit) {
+    container._ttInit = true
+    container.addEventListener('click', e => {
+      const btn = e.target.closest('.tt-dd-btn')
+      if (btn) {
+        e.stopPropagation()
+        const wrap = btn.closest('.tt-dd-wrap')
+        const fkey = wrap?.dataset.fkey
+        const menu = btn.nextElementSibling
+        const isOpen = menu.style.display !== 'none'
+        container.querySelectorAll('.tt-dd-menu').forEach(m => { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') })
+        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); st.openMenu = fkey }
+        else { st.openMenu = null }
+        return
+      }
+      const item = e.target.closest('.tt-dd-item[data-fkey]')
+      if (item) {
+        e.stopPropagation()
+        const key = item.dataset.fkey, val = item.dataset.val
+        if (val === '') {
+          st.filters[key] = []
+          st.openMenu = null
+        } else {
+          const idx = st.filters[key].indexOf(val)
+          if (idx >= 0) st.filters[key].splice(idx, 1)
+          else st.filters[key].push(val)
+          st.openMenu = key
+        }
+        st.page = 1
+        render()
+      }
+    })
+    document.addEventListener('click', () => {
+      container.querySelectorAll('.tt-dd-menu').forEach(m => {
+        if (m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
+      })
+      const pm = container.querySelector('.tt-pgsz-menu')
+      if (pm && pm.style.display !== 'none') pm.style.display = 'none'
+      st.openMenu = null
+    })
+  }
+
+  function render() {
+    const prevId = document.activeElement?.id
+    const filtered = getFiltered()
+    const total = filtered.length
+    const totalPages = Math.max(1, Math.ceil(total / st.pageSize))
+    if (st.page > totalPages) st.page = totalPages
+    const start = (st.page - 1) * st.pageSize
+    const slice = filtered.slice(start, start + st.pageSize)
+    const hasF = st.search || Object.values(st.filters).some(v => v.length > 0)
+
+    const thHTML = COLS.map(c => {
+      const act = st.sortCol === c.key
+      return `<th class="tt-th${act?' tt-sort-active':''}" data-col="${c.key}">${c.label}<span class="tt-sort-icon">${act?(st.sortDir==='asc'?'↑':'↓'):'↕'}</span></th>`
+    }).join('')
+
+    const tbodyHTML = slice.length === 0
+      ? `<tr><td class="tt-td tt-empty-cell" colspan="${COLS.length}">
+           <div class="tt-empty-title">No tickets found</div>
+           <div class="tt-empty-sub">Try adjusting your search or filters</div>
+         </td></tr>`
+      : slice.map(r => {
+          const par = r.parentKey
+            ? `<a class="tt-parent-key" href="https://skilllane.atlassian.net/browse/${r.parentKey}" target="_blank" rel="noopener">${r.parentKey}</a>${r.parentName?`<span class="tt-parent-name">${r.parentName}</span>`:''}`
+            : '<span class="tt-nil">—</span>'
+          return `<tr class="tt-tr">
+            <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
+            <td class="tt-td tt-summary-cell"><div class="tt-summary-text">${r.summary||'—'}</div></td>
+            <td class="tt-td">${bdg(r.tdStatus)}</td>
+            <td class="tt-td">${bdg(r.status)}</td>
+            <td class="tt-td">${bdg(r.tcStatus)}</td>
+            <td class="tt-td" style="white-space:nowrap">${r.assignee||'<span class="tt-nil">—</span>'}</td>
+            <td class="tt-td"><div class="tt-summary-text">${r.qaOwner||'<span class="tt-nil">—</span>'}</div></td>
+            <td class="tt-td">${par}</td>
+            <td class="tt-td" style="white-space:nowrap">${r.sprint||'<span class="tt-nil">—</span>'}</td>
+          </tr>`
+        }).join('')
+
+    const UPPER_KEYS = new Set(['tdStatus','status','tcStatus'])
+    const filtersHTML = FM.map(f => {
+      const selVals = st.filters[f.key]
+      const hasActive = selVals.length > 0
+      const dispV = v => f.key==='parentKey' ? (rows.find(r=>r.parentKey===v)?.parentDisplay||v) : UPPER_KEYS.has(f.key) ? v.toUpperCase() : v
+      const curLabel = !hasActive ? `All ${f.label}` : selVals.length === 1 ? dispV(selVals[0]) : `${selVals.length} selected`
+      const items = [
+        `<div class="tt-dd-item${!hasActive?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="">All ${f.label}</div>`,
+        ...f.vals.map(v => {
+          const isSel = selVals.includes(v)
+          return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="${v.replace(/"/g,'&quot;')}">${isSel?'✓ ':''}${dispV(v)}</div>`
+        })
+      ].join('')
+      return `<div class="tt-dd-wrap" data-fkey="${f.key}">
+        <button class="tt-dd-btn${hasActive?' tt-dd-on':''}" type="button" aria-expanded="false">
+          <span class="tt-dd-label">${curLabel}</span>
+          <svg class="tt-dd-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="tt-dd-menu" style="display:none">${items}</div>
+      </div>`
+    }).join('')
+
+    const from = total===0 ? 0 : start+1, to = Math.min(start+st.pageSize,total)
+    const pageInfo = total===0 ? 'No tickets found' : `${from}–${to} of ${total} tickets`
+
+    const pnums = []
+    if (totalPages<=7) { for(let i=1;i<=totalPages;i++) pnums.push(i) }
+    else if (st.page<=4) [1,2,3,4,5,'…',totalPages].forEach(n=>pnums.push(n))
+    else if (st.page>=totalPages-3) [1,'…',totalPages-4,totalPages-3,totalPages-2,totalPages-1,totalPages].forEach(n=>pnums.push(n))
+    else [1,'…',st.page-1,st.page,st.page+1,'…',totalPages].forEach(n=>pnums.push(n))
+
+    const pnHTML = pnums.map(n =>
+      typeof n==='string'
+        ? `<span style="padding:0 3px;color:var(--dim);line-height:30px;font-size:11px">${n}</span>`
+        : `<button class="tt-page-num${n===st.page?' tt-pg-active':''}" data-page="${n}">${n}</button>`
+    ).join('')
+
+    container.innerHTML = `
+      <div class="section-row" style="margin-top:24px">
+        <span class="section-title">Ticket List</span>
+        <span class="section-sub">${rows.length} tickets</span>
+      </div>
+      <div class="tt-toolbar">
+        <div class="tt-toolbar-row">
+          <input class="tt-search" id="tt-srch" placeholder="Search tickets" value="${st.search.replace(/"/g,'&quot;')}">
+          ${hasF?`<button class="tt-clear-btn" id="tt-clr">✕ Clear</button>`:''}
+        </div>
+        <div class="tt-toolbar-row">${filtersHTML}</div>
+      </div>
+      <div class="tt-table-wrap">
+        <table class="tt-table">
+          <colgroup>
+            <col class="tt-col-key"><col class="tt-col-summary"><col class="tt-col-tdstatus">
+            <col class="tt-col-status"><col class="tt-col-tcstatus"><col class="tt-col-assignee">
+            <col class="tt-col-qaowner"><col class="tt-col-epic"><col class="tt-col-sprint">
+          </colgroup>
+          <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
+      </div>
+      <div class="tt-pagination">
+        <span class="tt-page-info">${pageInfo}</span>
+        <div class="tt-page-controls">
+          <button class="tt-page-btn" id="tt-prv" ${st.page<=1?'disabled':''}>← Prev</button>
+          <div style="display:flex;align-items:center;gap:2px">${pnHTML}</div>
+          <button class="tt-page-btn" id="tt-nxt" ${st.page>=totalPages?'disabled':''}>Next →</button>
+        </div>
+        <div class="tt-pgsz-wrap">
+          <button class="tt-pgsz-btn" type="button" id="tt-pgsz-btn">
+            <span>${st.pageSize} / page</span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="tt-pgsz-menu" id="tt-pgsz-menu">
+            ${[10,25,50,100].map(n=>`<div class="tt-pgsz-item${st.pageSize===n?' tt-pgsz-sel':''}" data-pgsz="${n}">${n} / page</div>`).join('')}
+          </div>
+        </div>
+      </div>`
+
+    if (st.openMenu) {
+      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${st.openMenu}"]`)
+      if (wrap) {
+        const menu = wrap.querySelector('.tt-dd-menu')
+        const btn = wrap.querySelector('.tt-dd-btn')
+        if (menu) { menu.style.display = 'block'; btn?.setAttribute('aria-expanded', 'true') }
+      }
+    }
+
+    const g = id => container.querySelector('#'+id)
+    g('tt-srch')?.addEventListener('input', e=>{st.search=e.target.value;st.page=1;render()})
+    g('tt-clr')?.addEventListener('click', ()=>{st.search='';st.filters=Object.fromEntries(FM.map(f=>[f.key,[]]));st.openMenu=null;st.page=1;render()})
+    container.querySelectorAll('.tt-th[data-col]').forEach(th=>th.addEventListener('click',()=>{
+      const col=th.dataset.col
+      if(st.sortCol===col) st.sortDir=st.sortDir==='asc'?'desc':'asc'; else{st.sortCol=col;st.sortDir='asc'}
+      render()
+    }))
+    g('tt-prv')?.addEventListener('click',()=>{if(st.page>1){st.page--;render()}})
+    g('tt-nxt')?.addEventListener('click',()=>{if(st.page<totalPages){st.page++;render()}})
+    container.querySelectorAll('.tt-page-num[data-page]').forEach(btn=>btn.addEventListener('click',()=>{st.page=parseInt(btn.dataset.page);render()}))
+    const pgszBtn = g('tt-pgsz-btn'), pgszMenu = g('tt-pgsz-menu')
+    pgszBtn?.addEventListener('click', e => {
+      e.stopPropagation()
+      const open = pgszMenu.style.display !== 'none'
+      pgszMenu.style.display = open ? 'none' : 'block'
+    })
+    pgszMenu?.querySelectorAll('.tt-pgsz-item').forEach(item => item.addEventListener('click', e => {
+      e.stopPropagation()
+      st.pageSize = parseInt(item.dataset.pgsz); st.page = 1
+      pgszMenu.style.display = 'none'
+      render()
+    }))
+
+    if (prevId==='tt-srch') { const inp=g('tt-srch'); inp?.focus(); inp?.setSelectionRange(inp.value.length,inp.value.length) }
+  }
+
+  render()
+  container._ttReset = () => {
+    st.search = ''; st.sortCol = 'key'; st.sortDir = 'asc'; st.page = 1; st.pageSize = 10
+    st.filters = Object.fromEntries(FM.map(f => [f.key, []])); st.openMenu = null
+    render()
+  }
+}
+
+// ── View 2: Ticket Overview (unified dashboard) ──
+async function loadTicketOverview() {
+  const el = document.getElementById('ticket-overview-content')
+  try {
+    const [allTickets, sbTickets] = await Promise.all([
+      fetchIssues(jqlAllEpics(), 'summary,customfield_12127,customfield_12128,customfield_12120,status,assignee,parent,customfield_10008'),
+      fetchIssues(`${jqlAllEpics()} AND issuetype in (Story, Bug)`, 'status,issuetype,customfield_12120')
+    ])
+
+    const totalCount = allTickets.length
+    const stories = sbTickets.filter(i => i.fields?.issuetype?.name === 'Story')
+    const bugs = sbTickets.filter(i => i.fields?.issuetype?.name === 'Bug')
+
+    // Ticket details readiness
+    const detailCounts = {}
+    allTickets.forEach(iss => {
+      const v = iss.fields?.customfield_12127?.value || 'Empty'
+      detailCounts[v] = (detailCounts[v] || 0) + 1
+    })
+    const detailGroups = Object.entries(detailCounts).sort((a, b) => b[1] - a[1])
+
+    // TC Status (reuse allTickets — already fetched with customfield_12128)
+    const tcCounts = {}
+    allTickets.forEach(iss => {
+      const v = iss.fields?.customfield_12128?.value || 'Empty'
+      tcCounts[v] = (tcCounts[v] || 0) + 1
+    })
+    const tcGroups = Object.entries(tcCounts).sort((a, b) => b[1] - a[1])
+    const readyCount = detailGroups
+      .filter(([n]) => ['provided','ready','done'].some(k => n.toLowerCase().includes(k)))
+      .reduce((s, [, c]) => s + c, 0)
+    const readyPct = totalCount > 0 ? Math.round(readyCount / totalCount * 100) : 0
+
+    // By status
+    function byStatus(issues) {
+      const c = {}
+      issues.forEach(i => { const s = i.fields?.status?.name || 'Empty'; c[s] = (c[s]||0)+1 })
+      return Object.entries(c).sort((a,b) => b[1]-a[1])
+    }
+    // By QA Owner
+    function byOwner(issues) {
+      const c = {}
+      issues.forEach(i => {
+        const owners = i.fields?.customfield_12120
+        if (!owners || owners.length === 0) { c['Empty'] = (c['Empty']||0)+1 }
+        else { owners.forEach(o => { const n = sn(o.displayName)||'Empty'; c[n]=(c[n]||0)+1 }) }
+      })
+      return Object.entries(c).sort((a,b) => b[1]-a[1])
+    }
+
+    const storyStatusGroups = byStatus(stories)
+    const bugStatusGroups = byStatus(bugs)
+    const storyOwnerGroups = byOwner(stories)
+    const bugOwnerGroups = byOwner(bugs)
+
+    // Stacked bar segments
+    const stackedHTML = detailGroups.map(([name, count]) => {
+      const pct = totalCount > 0 ? Math.round(count / totalCount * 100) : 0
+      const w = totalCount > 0 ? Math.max(count / totalCount * 100, 2) : 0
+      const color = statusColor(name)
+      return `<div class="dash-stacked-seg" style="width:${w}%;background:${color}">${pct > 0 ? pct+'%' : ''}</div>`
+    }).join('')
+
+    const stackedLegend = detailGroups.map(([name, count]) => {
+      const pct = totalCount > 0 ? Math.round(count / totalCount * 100) : 0
+      return `<div class="legend-item"><span class="legend-dot" style="background:${statusColor(name)}"></span><span class="legend-name">${esc(name)}</span><span class="legend-count">${count} (${pct}%)</span></div>`
+    }).join('')
+
+    // Stat card (for User Stories & Bug Reports)
+    function statCard(label, groups, total, accent, jqlFn) {
+      const head = `<div class="pie-section-head"><div class="pie-section-type"><span class="pie-section-dot" style="background:${accent}"></span>${label}</div><div class="pie-section-meta">${total} ticket${total!==1?'s':''} total</div></div>`
+      if (total === 0) return `<div class="pie-section-card">${head}<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No data available</div></div></div>`
+      const pills = groups.map(([name, count]) => {
+        const color = statusColor(name)
+        const pct = total > 0 ? Math.round(count / total * 100) : 0
+        const href = jqlFn ? jqlFn(name) : '#'
+        return `<a class="stc-pill" href="${href}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">
+          <div class="stc-num">${count}</div>
+          <div class="stc-lbl stc-lbl-status" style="color:${darkenForBadge(color)}">${esc(name)}</div>
+          <div class="stc-lbl" style="margin-top:2px;opacity:.7">${pct}% of total</div>
+        </a>`
+      }).join('')
+      return `<div class="pie-section-card">${head}<div class="stc-grid">${pills}</div></div>`
+    }
+
+    // Stacked bar card (for Ticket Details & TC Status)
+    function stackedBarCard(label, groups, total, accent, jqlFn) {
+      const head = `<div class="pie-section-head"><div class="pie-section-type"><span class="pie-section-dot" style="background:${accent}"></span>${label}</div><div class="pie-section-meta">${total} ticket${total!==1?'s':''} total</div></div>`
+      if (total === 0) return `<div class="pie-section-card">${head}<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No data available</div></div></div>`
+
+      // Build segments — normalize so min-width segments never exceed 100%
+      const segData = groups.map(([name, count]) => {
+        const w = Math.max(count / total * 100, 8)
+        return { name, count, pct: Math.round(count / total * 100), w, color: statusColor(name) }
+      })
+      const totalW = segData.reduce((s, d) => s + d.w, 0)
+      let segs = '', lbls = '', offset = 0
+      segData.forEach(d => {
+        const nw = d.w / totalW * 100
+        segs += `<div class="sbc-seg" style="width:${nw}%;background:${d.color}"></div>`
+        lbls += `<div class="sbc-pct" style="left:${offset}%;width:${nw}%">${d.pct}%</div>`
+        offset += nw
+      })
+
+      // Build legend
+      const legend = groups.map(([name, count]) => {
+        const color = statusColor(name)
+        const href = jqlFn ? jqlFn(name) : '#'
+        return `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${color}"></span><a class="sbc-link" href="${href}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)} (${count})</a></div>`
+      }).join('')
+
+      return `<div class="pie-section-card">${head}<div class="sbc-wrap"><div class="sbc-bar">${segs}</div><div class="sbc-labels">${lbls}</div></div><div class="sbc-legend">${legend}</div></div>`
+    }
+
+    // Pie card builder
+    function pieCard(label, groups, total, accent, jqlFn) {
+      const head = `<div class="pie-section-head"><div class="pie-section-type"><span class="pie-section-dot" style="background:${accent}"></span>${label}</div><div class="pie-section-meta">${total} ticket${total!==1?'s':''} total</div></div>`
+      if (total === 0) return `<div class="pie-section-card">${head}<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No data available</div><div class="empty-sub">No ${label.toLowerCase()} found</div></div></div>`
+      const svg = buildPie(groups, total, 170)
+      const legend = buildPieSectionLegend(groups, total, jqlFn)
+      return `<div class="pie-section-card">${head}<div class="pie-section-body"><div class="donut-wrap-md">${svg}</div><div class="legend-lg">${legend}</div></div></div>`
+    }
+
+    // QA bar card builder
+    function qaCard(label, groups, total, accent, barColor) {
+      const head = `<div class="pie-section-head"><div class="pie-section-type"><span class="pie-section-dot" style="background:${accent}"></span>${label}</div><div class="pie-section-meta">${total} ticket${total!==1?'s':''} total</div></div>`
+      if (total === 0) return `<div class="pie-section-card">${head}<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No data available</div><div class="empty-sub">No ${label.toLowerCase()} found</div></div></div>`
+      const bars = groups.map(([name, count]) => {
+        const pct = Math.round(count / total * 100)
+        return `<div class="dash-qa-row"><div class="dash-qa-name" title="${esc(name)}">${esc(name)}</div><div class="dash-qa-track"><div class="dash-qa-fill" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div><div class="dash-qa-val">${count} (${pct}%)</div></div>`
+      }).join('')
+      return `<div class="pie-section-card">${head}<div class="dash-qa-bars">${bars}</div></div>`
+    }
+
+    el.innerHTML = `
+      <div class="sprint-notice">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <ul>
+          <li><strong>Stories</strong> without a sprint assignment are excluded from all charts, statistics, and lists on this board.</li>
+          <li><strong>Bugs</strong> are always shown regardless of sprint assignment.</li>
+        </ul>
+        <a href="${jiraJqlUrl(jqlAllEpics())}" target="_blank" rel="noopener" style="margin-left:auto;font-size:11px;color:var(--accent);text-decoration:none;opacity:.8;font-weight:500;white-space:nowrap;flex-shrink:0">View in Jira ↗</a>
+      </div>
+
+      <div class="ov-grid">
+        <div class="ov-col ov-col-half">
+          <div class="section-row ov-section-row"><span class="section-title">Key Metrics</span></div>
+          <div class="dash-kpi ov-kpi">
+            <div class="dash-kpi-card"><div class="dash-kpi-label">Total tickets</div><div class="dash-kpi-value">${totalCount}</div><div class="dash-kpi-sub">Story and Bug</div></div>
+            <div class="dash-kpi-card"><div class="dash-kpi-label">Details ready</div><div class="dash-kpi-value" style="color:var(--accent)">${readyPct}%</div><div class="dash-kpi-sub">${readyCount} / ${totalCount} tickets</div></div>
+            <div class="dash-kpi-card"><div class="dash-kpi-label">Stories</div><div class="dash-kpi-value">${stories.length}</div><div class="dash-kpi-sub">${totalCount>0?Math.round(stories.length/totalCount*100):0}% of total</div></div>
+            <div class="dash-kpi-card"><div class="dash-kpi-label">Bugs</div><div class="dash-kpi-value">${bugs.length}</div><div class="dash-kpi-sub">${totalCount>0?Math.round(bugs.length/totalCount*100):0}% of total</div></div>
+          </div>
+        </div>
+        <div class="ov-col ov-col-half">
+          <div class="section-row ov-section-row"><span class="section-title">QA Ownership</span></div>
+          <div class="dual-pie-grid" style="flex:1">
+            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('cf[12120]', n)}`))}
+            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('cf[12120]', n)}`))}
+          </div>
+        </div>
+        <div class="ov-col ov-col-1 pie-mid">
+          <div class="section-row ov-section-row"><span class="section-title">Ticket Details</span></div>
+          <div style="flex:1">
+            ${stackedBarCard('Ticket Details', detailGroups, totalCount, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12127]', n)}`))}
+          </div>
+        </div>
+        <div class="ov-col ov-col-1 pie-mid">
+          <div class="section-row ov-section-row"><span class="section-title">TC Status</span></div>
+          <div style="flex:1">
+            ${stackedBarCard('TC Status', tcGroups, totalCount, '#8A78BF', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12128]', n)}`))}
+          </div>
+        </div>
+        <div class="ov-col ov-col-half pie-mid">
+          <div class="section-row ov-section-row"><span class="section-title">Status Breakdown</span></div>
+          <div class="dual-pie-grid" style="flex:1">
+            ${(storyStatusGroups.length > 4 ? stackedBarCard : statCard)('User Stories', storyStatusGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('status', n)}`))}
+            ${(bugStatusGroups.length > 4 ? stackedBarCard : statCard)('Bug Reports', bugStatusGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('status', n)}`))}
+          </div>
+        </div>
+      </div>
+
+      <div id="pp-tbl"></div>`
+
+    initTicketTable('pp-tbl', allTickets)
+  } catch (err) {
+    el.innerHTML = `<div class="view-error">Failed: ${err.message}</div>`
+  }
+}
+
+// ── View switching ──
+const _loaded = {}
+
+function switchView(viewId) {
+  document.querySelectorAll('.sb-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === viewId)
+  })
+  document.querySelectorAll('.view-panel').forEach(el => {
+    el.classList.toggle('hidden', el.id !== 'view-' + viewId)
+  })
+  if (viewId === 'ticket-overview' && !_loaded.ticketOverview) {
+    _loaded.ticketOverview = true; loadTicketOverview()
+  }
+}
+
+// ── App ──
+function initGrid() {
+  const grid = document.getElementById('epic-grid')
+  grid.innerHTML = SYSTEMS.map(sys => {
+    const eps = EPICS.filter(e => e.system === sys.id)
+    if (!eps.length) return ''
+    const cards = eps.map((e, i) =>
+      `<div class="epic-card card-skeleton" id="card-${e.key}" style="min-height:160px;animation-delay:${i*0.03}s"></div>`
+    ).join('')
+    return `<div class="epic-system-group">
+      <div class="epic-system-header"><span class="epic-system-name">${sys.name}</span><span class="epic-system-count">${eps.length} epics</span></div>
+      <div class="epic-grid-inner">${cards}</div>
+    </div>`
+  }).join('')
+}
+
+async function loadAll() {
+  const _now = new Date()
+  const _mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][_now.getMonth()]
+  const _dd = String(_now.getDate()).padStart(2,'0')
+  const _h = _now.getHours(), _m = String(_now.getMinutes()).padStart(2,'0')
+  const _ampm = _h >= 12 ? 'PM' : 'AM', _h12 = String(_h % 12 || 12).padStart(2,'0')
+  document.getElementById('last-updated').textContent =
+    `Updated Date: ${_dd}/${_mo}/${_now.getFullYear()} ${_h12}:${_m} ${_ampm}`
+  await Promise.allSettled(EPICS.map(e => loadEpic(e)))
+}
+
+async function loadEpic(epic) {
+  try {
+    const issues = await fetchIssues(`parent = ${epic.key}`, ALL_EPIC_FIELDS)
+    epicIssuesStore[epic.key] = issues
+    const groupOpt = getActiveGroupOpt()
+    const groups = groupByField(issues, groupOpt)
+    renderCard(epic, groups, issues.length, groupOpt)
+  } catch (err) {
+    renderError(epic, err)
+  }
+}
+
+function showApp() {
+  document.getElementById('app').classList.remove('hidden')
+  document.getElementById('btn-logout').addEventListener('click', () => signOut(auth))
+  document.querySelectorAll('.sb-nav-item').forEach(el => {
+    el.addEventListener('click', () => switchView(el.dataset.view))
+  })
+  document.getElementById('epic-groupby')?.addEventListener('change', reRenderAllEpics)
+  // Custom group-by dropdown
+  ;(function() {
+    const trigger = document.getElementById('gb-trigger')
+    const menu = document.getElementById('gb-menu')
+    const label = document.getElementById('gb-trigger-label')
+    const hidden = document.getElementById('epic-groupby')
+    if (!trigger || !menu || !hidden) return
+    function close() { menu.classList.remove('gb-open'); trigger.setAttribute('aria-expanded','false') }
+    function open() { menu.classList.add('gb-open'); trigger.setAttribute('aria-expanded','true') }
+    trigger.addEventListener('click', e => { e.stopPropagation(); menu.classList.contains('gb-open') ? close() : open() })
+    menu.querySelectorAll('.gb-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const val = item.dataset.value
+        menu.querySelectorAll('.gb-item').forEach(i => i.classList.remove('gb-item--selected'))
+        item.classList.add('gb-item--selected')
+        label.textContent = item.textContent
+        hidden.value = val
+        hidden.dispatchEvent(new Event('change'))
+        close()
+      })
+    })
+    document.addEventListener('click', close)
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close() })
+  })()
+  initGrid()
+  loadAll()
+  _loaded.ticketOverview = true; loadTicketOverview()
+  setInterval(loadAll, 30 * 60 * 1000)
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# /api/jira/* is handled by the Pages Function at functions/api/jira/[[path]].js
+# (it injects the JIRA_AUTH credential). No static redirect needed.
