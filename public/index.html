@@ -928,18 +928,48 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 
     <!-- View 3: Progress Tracker -->
     <div id="view-progress-tracker" class="view-panel">
-      <div class="sprint-notice" style="align-items:flex-start">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <div>
-          <div style="font-weight:600;margin-bottom:6px">Data on this page is filtered — only tickets with both <strong>Epic</strong> and <strong>Sprint</strong> assigned are included across all four systems (EvMS, ELMS, CBMS, OLS).</div>
-          <div style="margin-bottom:4px;font-weight:500;color:var(--text)">To ensure accurate tracking, please keep the following up to date in Jira:</div>
-          <ul>
-            <li><strong>Epic</strong> — every ticket must be linked to its corresponding epic so it is correctly attributed to its system.</li>
-            <li><strong>Sprint</strong> — assign a sprint to every active ticket; unassigned tickets are excluded from all charts and statistics.</li>
-            <li><strong>Status</strong> — reflect the real-time progress of each ticket (e.g. In Progress, Ready to Test, Done).</li>
-            <li><strong>Assignee</strong> — indicate who is currently responsible for the ticket on the development side.</li>
-            <li><strong>QA Owner</strong> — assign the QA member responsible for verifying and signing off on each ticket.</li>
-          </ul>
+      <div class="sprint-notice" style="align-items:stretch;flex-direction:column;gap:0">
+        <div style="display:flex;gap:0;flex-wrap:wrap">
+          <!-- Left: Data source -->
+          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>
+              <div style="font-weight:600;margin-bottom:6px">ข้อมูลในหน้านี้ดึงมาจาก Jira — เฉพาะ ticket ที่มีทั้ง <strong>Epic</strong> และ <strong>Sprint</strong> เท่านั้น ครอบคลุมทั้ง 4 ระบบ (EvMS, ELMS, CBMS, OLS)</div>
+              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
+              <ul>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — Extended Learning Management System (ELMS), Credit Bank Management System (CBMS), Evaluation Management System (EvMS)</li>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — Open Learning System (OLS)</li>
+              </ul>
+              <div style="margin-top:6px;margin-bottom:4px;font-weight:500;color:var(--text)">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
+              <ul>
+                <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดเข้าระบบที่ถูก</li>
+                <li><strong>Sprint</strong> — กำหนด sprint ให้ทุก ticket ที่ active; ticket ที่ไม่มี sprint จะไม่แสดงในสถิติ</li>
+                <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง (เช่น In Progress, Ready to Test, Done)</li>
+                <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
+                <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
+              </ul>
+            </div>
+          </div>
+          <!-- Right: English version -->
+          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>
+              <div style="font-weight:600;margin-bottom:6px">Data on this page is sourced from Jira — only tickets with both <strong>Epic</strong> and <strong>Sprint</strong> assigned are included across all four systems (EvMS, ELMS, CBMS, OLS).</div>
+              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">Data sources:</div>
+              <ul>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — Extended Learning Management System (ELMS), Credit Bank Management System (CBMS), Evaluation Management System (EvMS)</li>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — Open Learning System (OLS)</li>
+              </ul>
+              <div style="margin-top:6px;margin-bottom:4px;font-weight:500;color:var(--text)">To ensure accurate tracking, please keep the following up to date in Jira:</div>
+              <ul>
+                <li><strong>Epic</strong> — every ticket must be linked to its corresponding epic so it is correctly attributed to its system.</li>
+                <li><strong>Sprint</strong> — assign a sprint to every active ticket; unassigned tickets are excluded from all charts and statistics.</li>
+                <li><strong>Status</strong> — reflect the real-time progress of each ticket (e.g. In Progress, Ready to Test, Done).</li>
+                <li><strong>Assignee</strong> — indicate who is currently responsible for the ticket on the development side.</li>
+                <li><strong>QA Owner</strong> — assign the QA member responsible for verifying and signing off on each ticket.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
       <div id="pt-content"><div class="view-loading">Loading…</div></div>
