@@ -1091,12 +1091,12 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js'
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js'
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js'
 
 // ── Firebase ──
 const firebaseConfig = {
   apiKey: 'AIzaSyAPs8mLoQCJrIcV8ZCV43quqALsLQ4bNXU',
-  authDomain: 'mica-phase2-ols.pages.dev',
+  authDomain: 'mica-phase2-dashboard.pages.dev',
   projectId: 'pluton-dashboard',
   storageBucket: 'pluton-dashboard.firebasestorage.app',
   messagingSenderId: '248167015210',
@@ -1159,12 +1159,18 @@ onAuthStateChanged(auth, async user => {
   }
 })
 
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
 document.getElementById('btnGoogle').addEventListener('click', async () => {
   const btn = document.getElementById('btnGoogle')
   btn.disabled = true
   btn.querySelector('span').textContent = 'Signing in…'
   try {
-    await signInWithPopup(auth, provider)
+    if (isMobile) {
+      await signInWithRedirect(auth, provider)
+    } else {
+      await signInWithPopup(auth, provider)
+    }
   } catch (e) {
     const errEl = document.getElementById('auth-error')
     errEl.textContent = e.code === 'auth/popup-closed-by-user' ? 'Popup ถูกปิด ลองใหม่อีกครั้ง' : e.message
