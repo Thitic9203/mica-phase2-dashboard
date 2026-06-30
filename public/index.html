@@ -1982,9 +1982,9 @@ function buildPtDonut(groups, total) {
 }
 
 const ISSUE_TYPE_COLORS = {
-  'story': '#3B82F6', 'bug': '#EF4444', 'task': '#F59E0B',
-  'sub-task': '#8B5CF6', 'subtask': '#8B5CF6', 'epic': '#0F766E',
-  'improvement': '#06B6D4', 'new feature': '#10B981',
+  'story': '#6B9BD2', 'bug': '#E88B8B', 'task': '#D4A96A',
+  'sub-task': '#A394D4', 'subtask': '#A394D4', 'epic': '#5BA89E',
+  'improvement': '#6BC5D4', 'new feature': '#6BBF96',
 }
 function issueTypeColor(name) {
   return ISSUE_TYPE_COLORS[name.toLowerCase()] || FALLBACK_PALETTE[Object.keys(ISSUE_TYPE_COLORS).length % FALLBACK_PALETTE.length]
@@ -2095,11 +2095,11 @@ function renderPtCard(sys, groups, total, issues) {
     typeCounts[t] = (typeCounts[t] || 0) + 1
   })
   const typeGroups = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])
-  const totalW = typeGroups.reduce((s, [,c]) => s + Math.max(c / total * 100, 6), 0)
+  const totalW = typeGroups.reduce((s, [,c]) => s + Math.max(c / total * 100, 12), 0)
   let barSegs = ''
   typeGroups.forEach(([name, count]) => {
     const color = issueTypeColor(name)
-    const rawW = Math.max(count / total * 100, 6)
+    const rawW = Math.max(count / total * 100, 12)
     const nw = rawW / totalW * 100
     const pct = Math.round(count / total * 100)
     const lbl = pct >= 1 ? `<span class="sbc-seg-lbl">${pct}%</span>` : ''
