@@ -2001,7 +2001,14 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude') 
     const match = ptStatusMatch(iss.fields?.status?.name || '', statusList)
     return mode === 'include' ? match : !match
   })
-  if (filtered.length === 0) return ''
+  if (filtered.length === 0) return `<div class="pt-waiting">
+    <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">0</span></div>
+    <div class="empty-state" style="padding:24px 0">
+      <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
+      <div class="empty-title">No tickets</div>
+      <div class="empty-sub">No tickets in "${title}" at this time</div>
+    </div>
+  </div>`
 
   const statusMap = {}, ownerMap = {}, matrix = {}
   filtered.forEach(iss => {
