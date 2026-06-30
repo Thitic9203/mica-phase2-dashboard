@@ -670,7 +670,7 @@ body {
 .pt-grand-total { color: var(--accent); }
 .pt-tfoot-label { text-align: left; font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
 .pt-cell-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-weight: 600; color: var(--text); }
-.pt-cell-zero { color: var(--elevated); font-size: 13px; }
+.pt-cell-zero { color: var(--dim); font-size: 13px; opacity: 0.5; }
 tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; background: rgba(0,0,0,0.015); }
 .pt-blocked-wrap {
   margin-top: 28px;
@@ -930,30 +930,10 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
     <div id="view-progress-tracker" class="view-panel">
       <div class="sprint-notice" style="align-items:stretch;flex-direction:column;gap:0">
         <div style="display:flex;gap:0;flex-wrap:wrap">
-          <!-- Left: Data source -->
-          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start">
+          <!-- Left: English version -->
+          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <div>
-              <div style="font-weight:600;margin-bottom:6px">ข้อมูลในหน้านี้ดึงมาจาก Jira — เฉพาะ ticket ที่มีทั้ง <strong>Epic</strong> และ <strong>Sprint</strong> เท่านั้น ครอบคลุมทั้ง 4 ระบบ (EvMS, ELMS, CBMS, OLS)</div>
-              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
-              <ul>
-                <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — Extended Learning Management System (ELMS), Credit Bank Management System (CBMS), Evaluation Management System (EvMS)</li>
-                <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — Open Learning System (OLS)</li>
-              </ul>
-              <div style="margin-top:6px;margin-bottom:4px;font-weight:500;color:var(--text)">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
-              <ul>
-                <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดเข้าระบบที่ถูก</li>
-                <li><strong>Sprint</strong> — กำหนด sprint ให้ทุก ticket ที่ active; ticket ที่ไม่มี sprint จะไม่แสดงในสถิติ</li>
-                <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง (เช่น In Progress, Ready to Test, Done)</li>
-                <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
-                <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
-              </ul>
-            </div>
-          </div>
-          <!-- Right: English version -->
-          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <div>
+            <div style="min-width:0">
               <div style="font-weight:600;margin-bottom:6px">Data on this page is sourced from Jira — only tickets with both <strong>Epic</strong> and <strong>Sprint</strong> assigned are included across all four systems (EvMS, ELMS, CBMS, OLS).</div>
               <div style="margin-bottom:4px;font-weight:500;color:var(--text)">Data sources:</div>
               <ul>
@@ -967,6 +947,26 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                 <li><strong>Status</strong> — reflect the real-time progress of each ticket (e.g. In Progress, Ready to Test, Done).</li>
                 <li><strong>Assignee</strong> — indicate who is currently responsible for the ticket on the development side.</li>
                 <li><strong>QA Owner</strong> — assign the QA member responsible for verifying and signing off on each ticket.</li>
+              </ul>
+            </div>
+          </div>
+          <!-- Right: Thai version -->
+          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div style="min-width:0">
+              <div style="font-weight:600;margin-bottom:6px">ข้อมูลในหน้านี้ดึงมาจาก Jira — เฉพาะ ticket ที่มีทั้ง <strong>Epic</strong> และ <strong>Sprint</strong> เท่านั้น ครอบคลุมทั้ง 4 ระบบ (EvMS, ELMS, CBMS, OLS)</div>
+              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
+              <ul>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — Extended Learning Management System (ELMS), Credit Bank Management System (CBMS), Evaluation Management System (EvMS)</li>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — Open Learning System (OLS)</li>
+              </ul>
+              <div style="margin-top:6px;margin-bottom:4px;font-weight:500;color:var(--text)">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
+              <ul>
+                <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดเข้าระบบที่ถูก</li>
+                <li><strong>Sprint</strong> — กำหนด sprint ให้ทุก ticket ที่ active; ticket ที่ไม่มี sprint จะไม่แสดงในสถิติ</li>
+                <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง (เช่น In Progress, Ready to Test, Done)</li>
+                <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
+                <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
               </ul>
             </div>
           </div>
@@ -1141,9 +1141,9 @@ const GROUP_OPTIONS = [
   },
   {
     key: 'qaOwner', label: 'QA Owner',
-    fields: 'customfield_12120',
+    fields: 'customfield_12120,customfield_11013',
     extract: iss => {
-      const owners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName)).filter(Boolean)
+      const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
       return owners.length > 0 ? owners : ['Empty']
     },
     jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12120]', val)}`,
@@ -1155,7 +1155,7 @@ const GROUP_OPTIONS = [
     jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('assignee', val)}`,
   },
 ]
-const ALL_EPIC_FIELDS = 'summary,status,issuetype,assignee,customfield_12127,customfield_12128,customfield_12120'
+const ALL_EPIC_FIELDS = 'summary,status,issuetype,assignee,customfield_12127,customfield_12128,customfield_12120,customfield_11013'
 const epicIssuesStore = {}
 
 function getActiveGroupOpt() {
@@ -1495,13 +1495,14 @@ function renderDualPieView(containerId, storySec, bugSec, title, jiraLink) {
 
 // ── Ticket Table ──
 function sn(name) { return (name || '').replace(/\s*\([^)]*\)/g, '').trim() }
+function getQaOwnerUsers(iss) { return iss.fields?.customfield_12120 || iss.fields?.customfield_11013 || [] }
 
 function initTicketTable(containerId, issues) {
   const container = document.getElementById(containerId)
   if (!container) return
 
   const rows = issues.map(iss => {
-    const owners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName) || 'Empty').filter(Boolean)
+    const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName) || 'Empty').filter(Boolean)
     const pk = iss.fields?.parent?.key || ''
     const pn = iss.fields?.parent?.fields?.summary || ''
     const sprintName = (iss.fields?.customfield_10008 || [])[0]?.name || ''
@@ -1781,8 +1782,8 @@ async function loadTicketOverview() {
   const el = document.getElementById('ticket-overview-content')
   try {
     const [allTickets, sbTickets] = await Promise.all([
-      fetchIssues(jqlAllEpics(), 'summary,customfield_12127,customfield_12128,customfield_12120,status,assignee,parent,customfield_10008'),
-      fetchIssues(`${jqlAllEpics()} AND issuetype in (Story, Bug)`, 'status,issuetype,customfield_12120')
+      fetchIssues(jqlAllEpics(), 'summary,customfield_12127,customfield_12128,customfield_12120,customfield_11013,status,assignee,parent,customfield_10008'),
+      fetchIssues(`${jqlAllEpics()} AND issuetype in (Story, Bug)`, 'status,issuetype,customfield_12120,customfield_11013')
     ])
 
     const totalCount = allTickets.length
@@ -1819,7 +1820,7 @@ async function loadTicketOverview() {
     function byOwner(issues) {
       const c = {}
       issues.forEach(i => {
-        const owners = i.fields?.customfield_12120
+        const owners = getQaOwnerUsers(i)
         if (!owners || owners.length === 0) { c['Empty'] = (c['Empty']||0)+1 }
         else { owners.forEach(o => { const n = sn(o.displayName)||'Empty'; c[n]=(c[n]||0)+1 }) }
       })
@@ -2003,14 +2004,17 @@ function issueTypeColor(name) {
 }
 
 const PT_EXCLUDED_DEV = ['ready to test', 'blocked', 'testing', 'done']
-const PT_EXCLUDED_QA  = ['ready to test', 'testing']
-function ptExcluded(statusName, list) {
+const PT_INCLUDED_QA  = ['ready to test', 'testing']
+function ptStatusMatch(statusName, list) {
   const s = statusName.toLowerCase().trim()
   return list.some(ex => s.includes(ex))
 }
 
-function buildPt2DTable(issues, title, excludeList, getOwners) {
-  const filtered = issues.filter(iss => !ptExcluded(iss.fields?.status?.name || '', excludeList))
+function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude') {
+  const filtered = issues.filter(iss => {
+    const match = ptStatusMatch(iss.fields?.status?.name || '', statusList)
+    return mode === 'include' ? match : !match
+  })
   if (filtered.length === 0) return ''
 
   const statusMap = {}, ownerMap = {}, matrix = {}
@@ -2086,7 +2090,8 @@ function renderPtCard(sys, groups, total, issues) {
   // ── Waiting for Dev table ──
   const waitingTableHTML = buildPt2DTable(
     issues, 'Waiting for Dev', PT_EXCLUDED_DEV,
-    iss => [sn(iss.fields?.assignee?.displayName || '') || 'Unassigned']
+    iss => [sn(iss.fields?.assignee?.displayName || '') || 'Unassigned'],
+    'exclude'
   )
 
   // ── Total Tickets by issue type ──
@@ -2137,11 +2142,12 @@ function renderPtCard(sys, groups, total, issues) {
 
   // ── Waiting for QA table ──
   const waitingQAHTML = buildPt2DTable(
-    issues, 'Waiting for QA', PT_EXCLUDED_QA,
+    issues, 'Waiting for QA', PT_INCLUDED_QA,
     iss => {
-      const owners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName)).filter(Boolean)
+      const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
       return owners.length > 0 ? owners : ['Unassigned']
-    }
+    },
+    'include'
   )
 
   const body = total > 0
@@ -2187,7 +2193,7 @@ function renderBlockedTable(issues) {
     const summary = iss.fields?.summary || '—'
     const status = iss.fields?.status?.name || '—'
     const assignee = sn(iss.fields?.assignee?.displayName || '') || '—'
-    const qaOwners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName)).filter(Boolean).join(', ') || '—'
+    const qaOwners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean).join(', ') || '—'
     const parentKey = iss.fields?.parent?.key || ''
     const parentName = iss.fields?.parent?.fields?.summary || ''
     const epicHTML = parentKey
@@ -2203,7 +2209,7 @@ function renderBlockedTable(issues) {
       <td class="tt-td" style="white-space:nowrap">${esc(assignee)}</td>
       <td class="tt-td"><div class="tt-summary-text">${esc(qaOwners)}</div></td>
       <td class="tt-td">${epicHTML}</td>
-      <td class="tt-td"><span class="tt-nil">—</span></td>
+      <td class="tt-td">${iss.fields?.customfield_11049 ? esc(iss.fields.customfield_11049) : '<span class="tt-nil">—</span>'}</td>
     </tr>`
   }).join('')
 
@@ -2212,7 +2218,7 @@ function renderBlockedTable(issues) {
     <div class="tt-table-wrap">
       <table class="tt-table" style="min-width:900px">
         <colgroup>
-          <col style="width:80px"><col style="width:22%"><col style="width:120px">
+          <col style="width:110px"><col style="width:22%"><col style="width:120px">
           <col style="width:11%"><col style="width:13%"><col style="width:20%"><col>
         </colgroup>
         <thead><tr>
@@ -2235,7 +2241,7 @@ async function loadProgressTracker() {
   el.innerHTML = '<div class="view-loading">Loading ticket data…</div>'
   try {
     const results = await Promise.allSettled(
-      PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), 'status,assignee,customfield_12120,summary,labels,parent,issuetype'))
+      PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049'))
     )
     const cards = PT_SYSTEMS.map((sys, i) => {
       const res = results[i]
