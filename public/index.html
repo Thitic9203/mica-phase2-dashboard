@@ -2025,7 +2025,12 @@ function buildPt2DTable(issues, title, excludeList, getOwners) {
     })
   })
 
-  const statuses = Object.entries(statusMap).sort((a, b) => b[1] - a[1]).map(([s]) => s)
+  const statuses = Object.entries(statusMap).sort((a, b) => {
+    const aIsTodo = a[0].toLowerCase().includes('to do') ? 0 : 1
+    const bIsTodo = b[0].toLowerCase().includes('to do') ? 0 : 1
+    if (aIsTodo !== bIsTodo) return aIsTodo - bIsTodo
+    return b[1] - a[1]
+  }).map(([s]) => s)
   const owners   = Object.entries(ownerMap).sort((a, b) => b[1] - a[1]).map(([o]) => o)
   const grandTotal = filtered.length
 
@@ -2033,7 +2038,7 @@ function buildPt2DTable(issues, title, excludeList, getOwners) {
   const rows = owners.map(o => {
     const tds = statuses.map(st => {
       const v = matrix[`${st}|||${o}`] || 0
-      return `<td class="pt-td">${v > 0 ? `<span class="pt-cell-val">${v}</span>` : '<span class="pt-cell-zero">–</span>'}</td>`
+      return `<td class="pt-td">${v > 0 ? `<span class="pt-cell-val">${v}</span>` : '<span class="pt-cell-zero">0</span>'}</td>`
     }).join('')
     const rowTotal = statuses.reduce((s, st) => s + (matrix[`${st}|||${o}`] || 0), 0)
     return `<tr>
