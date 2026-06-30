@@ -10,9 +10,9 @@ SHEET_CSV = "/tmp/pt.csv"
 DASHBOARD = "public/index.html"
 
 SYSTEMS = {
-    "ELMS": {"section_marker": "Extended Learning", "prefix": "NDLP68"},
-    "CBMS": {"section_marker": "Credit Bank", "prefix": "NDLP68"},
-    "EvMS": {"section_marker": "Evaluation", "prefix": "NDLP68"},
+    "ELMS": {"section_marker": "Extended Learning"},
+    "CBMS": {"section_marker": "Credit Bank"},
+    "EvMS": {"section_marker": "Evaluation"},
 }
 
 
@@ -38,8 +38,7 @@ def parse_sheet_epics():
         if not current_sys or not epic_raw or epic_raw == "N/A":
             continue
 
-        pattern = rf'{SYSTEMS[current_sys]["prefix"]}-(\d+)'
-        m = re.match(pattern, epic_raw)
+        m = re.match(r'(?:NDLP68|MICA2)-(\d+)', epic_raw)
         if m:
             mica_key = f"MICA2-{m.group(1)}"
             epics_by_sys[current_sys].add(mica_key)
