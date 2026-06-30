@@ -638,6 +638,7 @@ body {
 .pt-legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
 .pt-pie-side { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
 .pt-waiting { flex: 1 0 28%; min-width: 220px; border-left: 1px solid var(--border); padding-left: 20px; }
+.pt-waiting-narrow { flex: 0 0 auto; min-width: 140px; max-width: 200px; }
 .pt-waiting-head {
   font-size: 12px; font-weight: 700; color: var(--dim);
   text-transform: uppercase; letter-spacing: .07em;
@@ -2078,7 +2079,7 @@ function renderPtCard(sys, groups, total, issues) {
     const color = issueTypeColor(name)
     return `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${color}"></span><span class="sbc-link">${esc(name.toUpperCase())} (${count})</span></div>`
   }).join('')
-  const totalTicketsHTML = `<div class="pt-waiting">
+  const totalTicketsHTML = `<div class="pt-waiting pt-waiting-narrow">
     <div class="pt-waiting-head">Total Tickets <span class="pt-waiting-count">${total}</span></div>
     <div class="sbc-wrap">
       <div class="sbc-bar">${barSegs}</div>
@@ -2095,7 +2096,7 @@ function renderPtCard(sys, groups, total, issues) {
   const donePct = total > 0 ? Math.round(doneIssues.length / total * 100) : 0
   const doneStatuses = [...new Set(doneIssues.map(i => i.fields?.status?.name || 'Done'))]
   const doneLabel = doneStatuses.join(' / ') || 'Done'
-  const doneHTML = `<div class="pt-waiting">
+  const doneHTML = `<div class="pt-waiting pt-waiting-narrow">
     <div class="pt-waiting-head">Done <span class="pt-waiting-count">${doneIssues.length}</span></div>
     <div class="pt-done-pill">
       <div class="pt-done-num">${doneIssues.length}</div>
