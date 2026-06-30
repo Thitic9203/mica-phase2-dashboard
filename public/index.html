@@ -1482,6 +1482,7 @@ function renderDualPieView(containerId, storySec, bugSec, title, jiraLink) {
 
 // ── Ticket Table ──
 function sn(name) { return (name || '').replace(/\s*\([^)]*\)/g, '').trim() }
+function fn(name) { return sn(name).split(/\s+/)[0] || name }
 function getQaOwnerUsers(iss) { return iss.fields?.customfield_12120 || iss.fields?.customfield_11013 || [] }
 
 function initTicketTable(containerId, issues) {
@@ -1997,7 +1998,8 @@ function ptStatusMatch(statusName, list) {
   return list.some(ex => s.includes(ex))
 }
 
-function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude') {
+function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude', jqlConfig = {}) {
+  const { baseJql, ownerField } = jqlConfig
   const filtered = issues.filter(iss => {
     const match = ptStatusMatch(iss.fields?.status?.name || '', statusList)
     return mode === 'include' ? match : !match
@@ -2011,17 +2013,35 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude') 
     </div>
   </div>`
 
-  const statusMap = {}, ownerMap = {}, matrix = {}
+  const statusMap = {}, ownerMap = {}, matrix = {}, ownerFullNames = {}
   filtered.forEach(iss => {
     const st = iss.fields?.status?.name || 'Unknown'
     const owners = getOwners(iss)
     statusMap[st] = (statusMap[st] || 0) + 1
     owners.forEach(owner => {
-      ownerMap[owner] = (ownerMap[owner] || 0) + 1
-      const key = `${st}|||${owner}`
+      const short = fn(owner)
+      if (!ownerFullNames[short]) ownerFullNames[short] = owner
+      ownerMap[short] = (ownerMap[short] || 0) + 1
+      const key = `${st}|||${short}`
       matrix[key] = (matrix[key] || 0) + 1
     })
   })
+
+  function cellJql(status, ownerShort) {
+    if (!baseJql) return null
+    const parts = [baseJql]
+    if (status) parts.push(`status = "${jqlEscape(status)}"`)
+    if (ownerShort) {
+      const full = ownerFullNames[ownerShort]
+      if (full === 'Unassigned') parts.push(`${ownerField} is EMPTY`)
+      else parts.push(`${ownerField} = "${jqlEscape(full)}"`)
+    }
+    return jiraJqlUrl(parts.join(' AND '))
+  }
+  function linkWrap(href, content) {
+    if (!href) return content
+    return `<a href="${href}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${content}</a>`
+  }
 
   const statuses = Object.entries(statusMap).sort((a, b) => {
     const aIsTodo = a[0].toLowerCase().includes('to do') ? 0 : 1
@@ -2032,30 +2052,39 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude') 
   const owners   = Object.entries(ownerMap).sort((a, b) => b[1] - a[1]).map(([o]) => o)
   const grandTotal = filtered.length
 
-  const thCells = statuses.map(st => `<th class="pt-th pt-th-assignee">${esc(st)}</th>`).join('')
+  const thCells = statuses.map(st => {
+    const href = cellJql(st, null)
+    return `<th class="pt-th pt-th-assignee">${linkWrap(href, esc(st))}</th>`
+  }).join('')
   const rows = owners.map(o => {
     const tds = statuses.map(st => {
       const v = matrix[`${st}|||${o}`] || 0
-      return `<td class="pt-td">${v > 0 ? `<span class="pt-cell-val">${v}</span>` : '<span class="pt-cell-zero">0</span>'}</td>`
+      const href = v > 0 ? cellJql(st, o) : null
+      return `<td class="pt-td">${v > 0 ? linkWrap(href, `<span class="pt-cell-val">${v}</span>`) : '<span class="pt-cell-zero">0</span>'}</td>`
     }).join('')
     const rowTotal = statuses.reduce((s, st) => s + (matrix[`${st}|||${o}`] || 0), 0)
+    const rowHref = cellJql(null, o)
     return `<tr>
-      <td class="pt-td pt-td-status">${esc(o)}</td>
+      <td class="pt-td pt-td-status">${linkWrap(rowHref, esc(o))}</td>
       ${tds}
-      <td class="pt-td pt-td-total">${rowTotal}</td>
+      <td class="pt-td pt-td-total">${linkWrap(rowHref, String(rowTotal))}</td>
     </tr>`
   }).join('')
 
+  const footHref = baseJql ? jiraJqlUrl(baseJql) : null
   return `<div class="pt-waiting">
-    <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">${grandTotal}</span></div>
+    <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">${linkWrap(footHref, String(grandTotal))}</span></div>
     <div class="pt-table-wrap">
       <table class="pt-table">
         <thead><tr><th class="pt-th pt-th-status"></th>${thCells}<th class="pt-th pt-th-total">TOTAL</th></tr></thead>
         <tbody>${rows}</tbody>
         <tfoot><tr>
           <td class="pt-td pt-tfoot-label">Total</td>
-          ${statuses.map(st => `<td class="pt-td pt-td-total">${statusMap[st] || 0}</td>`).join('')}
-          <td class="pt-td pt-td-total pt-grand-total">${grandTotal}</td>
+          ${statuses.map(st => {
+            const href = cellJql(st, null)
+            return `<td class="pt-td pt-td-total">${linkWrap(href, String(statusMap[st] || 0))}</td>`
+          }).join('')}
+          <td class="pt-td pt-td-total pt-grand-total">${linkWrap(footHref, String(grandTotal))}</td>
         </tr></tfoot>
       </table>
     </div>
@@ -2082,10 +2111,12 @@ function renderPtCard(sys, groups, total, issues) {
   const svg = total > 0 ? buildPtDonut(groups, total) : buildPtDonut([], 0)
 
   // ── Waiting for Dev table ──
+  const devBaseJql = `${sys.jql()} AND status not in ("${PT_EXCLUDED_DEV.map(jqlEscape).join('","')}")`
   const waitingTableHTML = buildPt2DTable(
     issues, 'Waiting for Dev', PT_EXCLUDED_DEV,
     iss => [sn(iss.fields?.assignee?.displayName || '') || 'Unassigned'],
-    'exclude'
+    'exclude',
+    { baseJql: devBaseJql, ownerField: 'assignee' }
   )
 
   // ── Total Tickets by issue type ──
@@ -2135,13 +2166,15 @@ function renderPtCard(sys, groups, total, issues) {
   </div>`
 
   // ── Waiting for QA table ──
+  const qaBaseJql = `${sys.jql()} AND status in ("${PT_INCLUDED_QA.map(jqlEscape).join('","')}")`
   const waitingQAHTML = buildPt2DTable(
     issues, 'Waiting for QA', PT_INCLUDED_QA,
     iss => {
       const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
       return owners.length > 0 ? owners : ['Unassigned']
     },
-    'include'
+    'include',
+    { baseJql: qaBaseJql, ownerField: 'cf[12120]' }
   )
 
   const body = total > 0
