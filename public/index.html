@@ -1075,6 +1075,11 @@ function jqlEscape(name) {
 function fieldClause(field, val) {
   return val === 'Empty' ? `${field} is EMPTY` : `${field} = "${jqlEscape(val)}"`
 }
+function qaOwnerClause(val) {
+  if (val === 'Empty' || val === 'Unassigned') return '(cf[12120] is EMPTY AND cf[11013] is EMPTY)'
+  const escaped = jqlEscape(val)
+  return `(cf[12120] = "${escaped}" OR cf[11013] = "${escaped}")`
+}
 function jiraJqlUrl(jql) {
   return `https://skilllane.atlassian.net/issues/?jql=${encodeURIComponent(jql + ' ORDER BY created DESC')}`
 }
@@ -1166,7 +1171,7 @@ const GROUP_OPTIONS = [
       return owners.length > 0 ? owners : ['Empty']
     },
     displayFn: sn,
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12120]', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${qaOwnerClause(val)}`,
   },
   {
     key: 'assignee', label: 'Assignee',
@@ -1958,8 +1963,8 @@ async function loadTicketOverview() {
         <div class="ov-col ov-col-half">
           <div class="section-row ov-section-row"><span class="section-title">QA Ownership</span></div>
           <div class="dual-pie-grid" style="flex:1">
-            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('cf[12120]', n)}`), sn)}
-            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('cf[12120]', n)}`), sn)}
+            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${qaOwnerClause(n)}`), sn)}
+            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${qaOwnerClause(n)}`), sn)}
           </div>
         </div>
         <div class="ov-col ov-col-1 pie-mid">
@@ -2035,7 +2040,7 @@ function ptStatusMatch(statusName, list) {
   return list.some(ex => s.includes(ex))
 }
 
-function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude', jqlConfig = {}) {
+function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude', jqlConfig = {}, nameHeader = '') {
   const { baseJql, ownerField } = jqlConfig
   const filtered = issues.filter(iss => {
     const match = ptStatusMatch(iss.fields?.status?.name || '', statusList)
@@ -2070,8 +2075,12 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude', 
     if (status) parts.push(`status = "${jqlEscape(status)}"`)
     if (ownerShort) {
       const full = ownerFullNames[ownerShort]
-      if (full === 'Unassigned') parts.push(`${ownerField} is EMPTY`)
-      else parts.push(`${ownerField} = "${jqlEscape(full)}"`)
+      if (typeof ownerField === 'function') {
+        parts.push(ownerField(full))
+      } else {
+        if (full === 'Unassigned') parts.push(`${ownerField} is EMPTY`)
+        else parts.push(`${ownerField} = "${jqlEscape(full)}"`)
+      }
     }
     return jiraJqlUrl(parts.join(' AND '))
   }
@@ -2113,7 +2122,7 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude', 
     <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">${linkWrap(footHref, String(grandTotal))}</span></div>
     <div class="pt-table-wrap">
       <table class="pt-table">
-        <thead><tr><th class="pt-th pt-th-status"></th>${thCells}<th class="pt-th pt-th-total">TOTAL</th></tr></thead>
+        <thead><tr><th class="pt-th pt-th-status">${nameHeader ? esc(nameHeader) : ''}</th>${thCells}<th class="pt-th pt-th-total">TOTAL</th></tr></thead>
         <tbody>${rows}</tbody>
         <tfoot><tr>
           <td class="pt-td pt-tfoot-label">Total</td>
@@ -2155,7 +2164,8 @@ function renderPtCard(sys, groups, total, issues) {
     issues, 'Waiting for Dev', PT_EXCLUDED_DEV,
     iss => [iss.fields?.assignee?.displayName || 'Unassigned'],
     'exclude',
-    { baseJql: devBaseJql, ownerField: 'assignee' }
+    { baseJql: devBaseJql, ownerField: 'assignee' },
+    'ASSIGNEE'
   )
 
   // ── Total Tickets by issue type ──
@@ -2213,7 +2223,8 @@ function renderPtCard(sys, groups, total, issues) {
       return owners.length > 0 ? owners : ['Unassigned']
     },
     'include',
-    { baseJql: qaBaseJql, ownerField: 'cf[12120]' }
+    { baseJql: qaBaseJql, ownerField: qaOwnerClause },
+    'QA OWNER'
   )
 
   const body = total > 0
