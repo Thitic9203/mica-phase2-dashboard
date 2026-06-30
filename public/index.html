@@ -569,9 +569,9 @@ body {
 /* Stacked bar card */
 .sbc-wrap { position: relative; margin-bottom: 10px; }
 .sbc-bar { height: 44px; border-radius: 8px; overflow: hidden; display: flex; }
-.sbc-seg { height: 100%; }
-.sbc-labels { position: absolute; inset: 0; display: flex; pointer-events: none; }
-.sbc-pct { position: absolute; top: 0; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.sbc-seg { height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0 4px; box-sizing: border-box; }
+.sbc-seg-lbl { font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.35); overflow: hidden; text-overflow: clip; }
+.sbc-labels { display: none; }
 .sbc-legend { display: flex; flex-direction: column; gap: 6px; }
 .sbc-legend-item { display: flex; align-items: center; gap: 7px; }
 .sbc-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
@@ -788,7 +788,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .legend-lg .legend-pct { font-size: 10px; }
   /* Stacked bar */
   .sbc-bar { height: 32px; }
-  .sbc-pct { height: 32px; font-size: 9px; }
+  .sbc-seg-lbl { font-size: 9px; }
   .sbc-link { font-size: 10.5px; }
   .sbc-dot { width: 7px; height: 7px; }
   .sbc-legend { gap: 4px; }
@@ -1872,12 +1872,11 @@ async function loadTicketOverview() {
         return { name, count, pct: Math.round(count / total * 100), w, color: statusColor(name) }
       })
       const totalW = segData.reduce((s, d) => s + d.w, 0)
-      let segs = '', lbls = '', offset = 0
+      let segs = ''
       segData.forEach(d => {
         const nw = d.w / totalW * 100
-        segs += `<div class="sbc-seg" style="width:${nw}%;background:${d.color}"></div>`
-        lbls += `<div class="sbc-pct" style="left:${offset}%;width:${nw}%">${d.pct}%</div>`
-        offset += nw
+        const lbl = d.pct >= 1 ? `<span class="sbc-seg-lbl">${d.pct}%</span>` : ''
+        segs += `<div class="sbc-seg" style="width:${nw}%;background:${d.color}">${lbl}</div>`
       })
 
       // Build legend
@@ -1887,7 +1886,7 @@ async function loadTicketOverview() {
         return `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${color}"></span><a class="sbc-link" href="${href}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)} (${count})</a></div>`
       }).join('')
 
-      return `<div class="pie-section-card">${head}<div class="sbc-wrap"><div class="sbc-bar">${segs}</div><div class="sbc-labels">${lbls}</div></div><div class="sbc-legend">${legend}</div></div>`
+      return `<div class="pie-section-card">${head}<div class="sbc-wrap"><div class="sbc-bar">${segs}</div></div><div class="sbc-legend">${legend}</div></div>`
     }
 
     // Pie card builder
@@ -2093,15 +2092,14 @@ function renderPtCard(sys, groups, total, issues) {
   })
   const typeGroups = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])
   const totalW = typeGroups.reduce((s, [,c]) => s + Math.max(c / total * 100, 6), 0)
-  let barSegs = '', barLbls = '', offset = 0
+  let barSegs = ''
   typeGroups.forEach(([name, count]) => {
     const color = issueTypeColor(name)
     const rawW = Math.max(count / total * 100, 6)
     const nw = rawW / totalW * 100
     const pct = Math.round(count / total * 100)
-    barSegs += `<div class="sbc-seg" style="width:${nw}%;background:${color}"></div>`
-    barLbls += `<div class="sbc-pct" style="left:${offset}%;width:${nw}%">${pct}%</div>`
-    offset += nw
+    const lbl = pct >= 1 ? `<span class="sbc-seg-lbl">${pct}%</span>` : ''
+    barSegs += `<div class="sbc-seg" style="width:${nw}%;background:${color}">${lbl}</div>`
   })
   const typeLegend = typeGroups.map(([name, count]) => {
     const color = issueTypeColor(name)
@@ -2111,7 +2109,6 @@ function renderPtCard(sys, groups, total, issues) {
     <div class="pt-waiting-head">Total Tickets <span class="pt-waiting-count">${total}</span></div>
     <div class="sbc-wrap">
       <div class="sbc-bar">${barSegs}</div>
-      <div class="sbc-labels">${barLbls}</div>
     </div>
     <div class="sbc-legend">${typeLegend}</div>
   </div>`
