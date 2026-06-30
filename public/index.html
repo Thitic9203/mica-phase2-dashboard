@@ -2095,11 +2095,11 @@ function renderPtCard(sys, groups, total, issues) {
     typeCounts[t] = (typeCounts[t] || 0) + 1
   })
   const typeGroups = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])
-  const totalW = typeGroups.reduce((s, [,c]) => s + Math.max(c / total * 100, 12), 0)
+  const totalW = typeGroups.reduce((s, [,c]) => s + Math.max(c / total * 100, 18), 0)
   let barSegs = ''
   typeGroups.forEach(([name, count]) => {
     const color = issueTypeColor(name)
-    const rawW = Math.max(count / total * 100, 12)
+    const rawW = Math.max(count / total * 100, 18)
     const nw = rawW / totalW * 100
     const pct = Math.round(count / total * 100)
     const lbl = pct >= 1 ? `<span class="sbc-seg-lbl">${pct}%</span>` : ''
