@@ -607,7 +607,7 @@ body {
 .dash-qa-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
 
 /* ── PROGRESS TRACKER ── */
-.pt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pt-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
 .pt-card {
   background: var(--card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 22px 24px 20px;
@@ -619,7 +619,7 @@ body {
   letter-spacing: -.01em; margin-bottom: 3px;
 }
 .pt-system-meta { font-size: 12px; color: var(--muted); }
-.pt-body { display: flex; align-items: center; gap: 20px; }
+.pt-body { display: flex; align-items: flex-start; gap: 20px; }
 .pt-donut-wrap { position: relative; width: 130px; height: 130px; flex-shrink: 0; }
 .pt-donut-wrap svg { width: 100%; height: 100%; overflow: visible; }
 .pt-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
@@ -693,8 +693,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .pt-done-status { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .07em; margin-top: 4px; }
 .pt-done-pct { font-size: 10px; color: var(--dim); margin-top: 2px; letter-spacing: .05em; }
 
-@media (max-width: 900px) { .pt-grid { grid-template-columns: 1fr; } }
-@media (max-width: 1100px) {
+@media (max-width: 768px) {
   .pt-body { flex-direction: column; gap: 16px; }
   .pt-waiting { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 16px; }
 }
@@ -905,22 +904,18 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <span class="groupby-label">Group by</span>
           <div class="gb-dropdown" id="gb-dropdown">
             <button class="gb-trigger" id="gb-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
-              <span class="gb-trigger-label" id="gb-trigger-label">TC Status</span>
+              <span class="gb-trigger-label" id="gb-trigger-label">Status</span>
               <svg class="gb-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <ul class="gb-menu" id="gb-menu" role="listbox">
-              <li class="gb-item gb-item--selected" role="option" data-value="tcStatus">TC Status</li>
-              <li class="gb-item" role="option" data-value="status">Status</li>
-              <li class="gb-item" role="option" data-value="tdStatus">Ticket Details Status</li>
+              <li class="gb-item gb-item--selected" role="option" data-value="status">Status</li>
               <li class="gb-item" role="option" data-value="issueType">Issue Type</li>
               <li class="gb-item" role="option" data-value="qaOwner">QA Owner</li>
               <li class="gb-item" role="option" data-value="assignee">Assignee</li>
             </ul>
           </div>
           <select id="epic-groupby" style="display:none">
-            <option value="tcStatus" selected>TC Status</option>
-            <option value="status">Status</option>
-            <option value="tdStatus">Ticket Details Status</option>
+            <option value="status" selected>Status</option>
             <option value="issueType">Issue Type</option>
             <option value="qaOwner">QA Owner</option>
             <option value="assignee">Assignee</option>
@@ -1943,9 +1938,9 @@ async function loadTicketOverview() {
 // ── Progress Tracker ──
 const PT_SYSTEMS = [
   {
-    id: 'EvMS', name: 'Evaluation Management System (EvMS)', color: '#4487C5',
-    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636,MICA2-706,MICA2-708) AND sprint is not EMPTY`,
-    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
+    id: 'OLS', name: 'Open Learning System (OLS)', color: '#4CAF76',
+    jql: () => `project = OLS AND sprint is not EMPTY`,
+    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818',
   },
   {
     id: 'ELMS', name: 'Extended Learning Management System (ELMS)', color: '#8A78BF',
@@ -1958,9 +1953,9 @@ const PT_SYSTEMS = [
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
-    id: 'OLS', name: 'Open Learning System (OLS)', color: '#4CAF76',
-    jql: () => `project = OLS AND sprint is not EMPTY`,
-    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818',
+    id: 'EvMS', name: 'Evaluation Management System (EvMS)', color: '#4487C5',
+    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636,MICA2-706,MICA2-708) AND sprint is not EMPTY`,
+    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
 ]
 
