@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mica Phase 2 — MICA2 QA</title>
+  <title>Mica Phase 2</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzBGNzY2RSIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjguNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMjUpIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTYgNy41IEE4LjUgOC41IDAgMSAxIDguMSAyMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMi41IDE2IEwxNSAxOC41IEwyMC41IDEzIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjwvc3ZnPgo=">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,7 +144,6 @@ body {
 
 /* ── VIEW PANELS ── */
 .view-panel { padding: 28px 28px 40px; }
-#view-ticket-overview.view-panel,
 #view-epic-tc.view-panel { padding-top: 14px; }
 #view-ticket-overview .pie-section-body { flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 12px; }
 #view-ticket-overview .donut-wrap-md { width: 90px; height: 90px; }
@@ -184,7 +183,7 @@ body {
 .epic-system-count { font-size: 12px; color: var(--muted); }
 .epic-grid-inner {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 14px;
 }
 
@@ -711,8 +710,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 /* ── iPad / tablet (portrait) ── */
 @media (max-width: 1024px) {
   .view-panel { padding: 20px 20px 32px; }
-  #view-ticket-overview.view-panel,
-  #view-epic-tc.view-panel { padding-top: 10px; }
+    #view-epic-tc.view-panel { padding-top: 10px; }
   .pie-view-card { flex-direction: column; gap: 16px; padding: 16px 20px; }
   .donut-wrap-lg { width: 160px; height: 160px; align-self: center; }
   .legend-lg { min-width: 0; max-width: none; }
@@ -737,8 +735,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .sb-logout { padding: 5px; }
   /* Panels */
   .view-panel { padding: 0 12px 32px; }
-  #view-ticket-overview.view-panel,
-  #view-epic-tc.view-panel { padding-top: 8px; }
+    #view-epic-tc.view-panel { padding-top: 8px; }
   .view-title { font-size: 18px; }
   .view-meta { font-size: 11px; }
   .sprint-notice { font-size: 10.5px; padding: 6px 10px; }
@@ -854,7 +851,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
         <path d="M12.5 16 L15 18.5 L20.5 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </div>
-    <h2>Mica Phase 2 — MICA2 QA</h2>
+    <h2>Mica Phase 2</h2>
     <button class="btn-google" id="btnGoogle">
       <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       <span>Sign in with Google</span>
@@ -869,16 +866,13 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 
   <!-- Top Navigation -->
   <nav id="topnav">
-    <div class="tn-brand">Mica Phase 2 — MICA2 QA</div>
+    <div class="tn-brand">Mica Phase 2</div>
     <div class="tn-tabs">
-      <a class="sb-nav-item active" data-view="ticket-overview">
-        <span class="sb-dot" style="background:#3B82F6"></span>Ticket Overview
+      <a class="sb-nav-item active" data-view="progress-tracker">
+        <span class="sb-dot" style="background:#8A78BF"></span>Progress Tracker
       </a>
       <a class="sb-nav-item" data-view="epic-tc">
         <span class="sb-dot" style="background:#0F766E"></span>Epic Breakdown
-      </a>
-      <a class="sb-nav-item" data-view="progress-tracker">
-        <span class="sb-dot" style="background:#8A78BF"></span>Progress Tracker
       </a>
     </div>
     <div class="tn-right">
@@ -936,7 +930,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
     </div>
 
     <!-- View 3: Progress Tracker -->
-    <div id="view-progress-tracker" class="view-panel hidden">
+    <div id="view-progress-tracker" class="view-panel">
       <div class="sprint-notice" style="align-items:flex-start">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div>
@@ -954,10 +948,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       <div id="pt-content"><div class="view-loading">Loading…</div></div>
     </div>
 
-    <!-- View 2: Ticket Overview (unified dashboard) -->
-    <div id="view-ticket-overview" class="view-panel">
-      <div id="ticket-overview-content"><div class="view-loading">Loading…</div></div>
-    </div>
+
   </div>
 </div>
 
@@ -2263,10 +2254,7 @@ function switchView(viewId) {
   document.querySelectorAll('.view-panel').forEach(el => {
     el.classList.toggle('hidden', el.id !== 'view-' + viewId)
   })
-  if (viewId === 'ticket-overview' && !_loaded.ticketOverview) {
-    _loaded.ticketOverview = true; loadTicketOverview()
-  }
-  if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
+if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
     _loaded.progressTracker = true; loadProgressTracker()
   }
 }
@@ -2343,7 +2331,6 @@ function showApp() {
   })()
   initGrid()
   loadAll()
-  _loaded.ticketOverview = true; loadTicketOverview()
   setInterval(loadAll, 30 * 60 * 1000)
 }
 </script>
