@@ -2326,6 +2326,7 @@ function showApp() {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close() })
   })()
   initGrid()
+  _loaded.progressTracker = true; loadProgressTracker()
   loadAll()
   setInterval(loadAll, 30 * 60 * 1000)
 }
