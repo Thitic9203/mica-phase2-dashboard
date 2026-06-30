@@ -2426,7 +2426,7 @@ function initBlockedTable(containerId, issues) {
   let bst = {
     search:'', sortCol:'key', sortDir:'asc', page:1, pageSize:10,
     filters: Object.fromEntries(BFM.map(f => [f.key, []])),
-    openMenu: null
+    openMenus: new Set()
   }
 
   function getFiltered() {
@@ -2469,9 +2469,8 @@ function initBlockedTable(containerId, issues) {
         const fkey = wrap?.dataset.fkey
         const menu = btn.nextElementSibling
         const isOpen = menu.style.display !== 'none'
-        container.querySelectorAll('.tt-dd-menu').forEach(m => { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') })
-        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); bst.openMenu = fkey }
-        else { bst.openMenu = null }
+        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); bst.openMenus.add(fkey) }
+        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false'); bst.openMenus.delete(fkey) }
         return
       }
       const item = e.target.closest('.tt-dd-item[data-fkey]')
@@ -2480,12 +2479,12 @@ function initBlockedTable(containerId, issues) {
         const key = item.dataset.fkey, val = item.dataset.val
         if (val === '') {
           bst.filters[key] = []
-          bst.openMenu = null
+          bst.openMenus.delete(key)
         } else {
           const idx = bst.filters[key].indexOf(val)
           if (idx >= 0) bst.filters[key].splice(idx, 1)
           else bst.filters[key].push(val)
-          bst.openMenu = key
+          bst.openMenus.add(key)
         }
         bst.page = 1
         render()
@@ -2497,7 +2496,7 @@ function initBlockedTable(containerId, issues) {
       })
       const pm = container.querySelector('.tt-pgsz-menu')
       if (pm && pm.style.display !== 'none') pm.style.display = 'none'
-      bst.openMenu = null
+      bst.openMenus.clear()
     })
   }
 
@@ -2587,7 +2586,7 @@ function initBlockedTable(containerId, issues) {
         <div id="bt-dynamic"></div>`
       const g = id => container.querySelector('#'+id)
       g('bt-srch').addEventListener('input', e=>{bst.search=e.target.value;bst.page=1;render()})
-      g('bt-clr').addEventListener('click', ()=>{bst.search='';g('bt-srch').value='';bst.filters=Object.fromEntries(BFM.map(f=>[f.key,[]]));bst.openMenu=null;bst.page=1;render()})
+      g('bt-clr').addEventListener('click', ()=>{bst.search='';g('bt-srch').value='';bst.filters=Object.fromEntries(BFM.map(f=>[f.key,[]]));bst.openMenus.clear();bst.page=1;render()})
     }
 
     const g = id => container.querySelector('#'+id)
@@ -2595,8 +2594,8 @@ function initBlockedTable(containerId, issues) {
     clrBtn.style.display = hasF ? '' : 'none'
 
     g('bt-filters').innerHTML = filtersHTML
-    if (bst.openMenu) {
-      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${bst.openMenu}"]`)
+    for (const fkey of bst.openMenus) {
+      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${fkey}"]`)
       if (wrap) {
         const menu = wrap.querySelector('.tt-dd-menu')
         const btn = wrap.querySelector('.tt-dd-btn')
@@ -2713,7 +2712,7 @@ function initMissingTable(containerId, issues) {
     search:'', sortCol:'key', sortDir:'asc', page:1, pageSize:10,
     filters: Object.fromEntries(MFM.map(f => [f.key, []])),
     groupBy: '',
-    openMenu: null
+    openMenus: new Set()
   }
 
   function getFiltered() {
@@ -2760,9 +2759,8 @@ function initMissingTable(containerId, issues) {
         const fkey = wrap?.dataset.fkey
         const menu = btn.nextElementSibling
         const isOpen = menu.style.display !== 'none'
-        container.querySelectorAll('.tt-dd-menu').forEach(m => { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') })
-        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); mst.openMenu = fkey }
-        else { mst.openMenu = null }
+        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); mst.openMenus.add(fkey) }
+        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false'); mst.openMenus.delete(fkey) }
         return
       }
       const item = e.target.closest('.tt-dd-item[data-fkey]')
@@ -2771,19 +2769,19 @@ function initMissingTable(containerId, issues) {
         const key = item.dataset.fkey, val = item.dataset.val
         if (key === '__groupby') {
           mst.groupBy = val
-          mst.openMenu = null
+          mst.openMenus.delete('__groupby')
           mst.page = 1
           render()
           return
         }
         if (val === '') {
           mst.filters[key] = []
-          mst.openMenu = null
+          mst.openMenus.delete(key)
         } else {
           const idx = mst.filters[key].indexOf(val)
           if (idx >= 0) mst.filters[key].splice(idx, 1)
           else mst.filters[key].push(val)
-          mst.openMenu = key
+          mst.openMenus.add(key)
         }
         mst.page = 1
         render()
@@ -2795,7 +2793,7 @@ function initMissingTable(containerId, issues) {
       })
       const pm = container.querySelector('.tt-pgsz-menu')
       if (pm && pm.style.display !== 'none') pm.style.display = 'none'
-      mst.openMenu = null
+      mst.openMenus.clear()
     })
   }
 
@@ -2891,7 +2889,7 @@ function initMissingTable(containerId, issues) {
         <div id="mt-dynamic"></div>`
       const g = id => container.querySelector('#'+id)
       g('mt-srch').addEventListener('input', e=>{mst.search=e.target.value;mst.page=1;render()})
-      g('mt-clr').addEventListener('click', ()=>{mst.search='';g('mt-srch').value='';mst.groupBy='';mst.filters=Object.fromEntries(MFM.map(f=>[f.key,[]]));mst.openMenu=null;mst.page=1;render()})
+      g('mt-clr').addEventListener('click', ()=>{mst.search='';g('mt-srch').value='';mst.groupBy='';mst.filters=Object.fromEntries(MFM.map(f=>[f.key,[]]));mst.openMenus.clear();mst.page=1;render()})
     }
 
     const g = id => container.querySelector('#'+id)
@@ -2911,8 +2909,8 @@ function initMissingTable(containerId, issues) {
         <svg class="tt-dd-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="tt-dd-menu" style="display:none;right:0;left:auto">${gbItems}</div>`
-    if (mst.openMenu) {
-      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${mst.openMenu}"]`)
+    for (const fkey of mst.openMenus) {
+      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${fkey}"]`)
       if (wrap) {
         const menu = wrap.querySelector('.tt-dd-menu')
         const btn = wrap.querySelector('.tt-dd-btn')
