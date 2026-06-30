@@ -403,7 +403,7 @@ body {
 .tt-dd-btn.tt-dd-on .tt-dd-arrow { color: var(--accent); }
 .tt-dd-btn[aria-expanded="true"] .tt-dd-arrow { transform: rotate(180deg); }
 .tt-dd-menu {
-  position: absolute; top: calc(100% + 5px); left: 0; min-width: 100%; max-width: 300px; z-index: 300;
+  position: absolute; top: calc(100% + 5px); left: 0; min-width: 100%; max-width: min(90vw, 480px); width: max-content; z-index: 300;
   background: var(--card); border: 1px solid var(--border-strong);
   border-radius: 10px; padding: 4px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.13), 0 2px 6px rgba(0,0,0,0.06);
