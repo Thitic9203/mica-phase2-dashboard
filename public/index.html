@@ -648,7 +648,8 @@ body {
   font-size: 11px; background: var(--elevated); color: var(--muted);
   border-radius: 6px; padding: 1px 8px; font-weight: 600; text-transform: none; letter-spacing: 0;
 }
-.pt-table-wrap { overflow-x: auto; }
+.pt-table-wrap { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.pt-table-wrap::-webkit-scrollbar { display: none; }
 .pt-table { border-collapse: collapse; font-size: 11.5px; width: 100%; }
 .pt-th {
   padding: 6px 10px; text-align: center;
@@ -2049,7 +2050,7 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude') 
     <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">${grandTotal}</span></div>
     <div class="pt-table-wrap">
       <table class="pt-table">
-        <thead><tr><th class="pt-th pt-th-status"></th>${thCells}<th class="pt-th pt-th-total">T.</th></tr></thead>
+        <thead><tr><th class="pt-th pt-th-status"></th>${thCells}<th class="pt-th pt-th-total">TOTAL</th></tr></thead>
         <tbody>${rows}</tbody>
         <tfoot><tr>
           <td class="pt-td pt-tfoot-label">Total</td>
