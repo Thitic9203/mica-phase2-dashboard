@@ -408,12 +408,12 @@ body {
 .tt-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
 .tt-table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
 .tt-col-key { width: 72px; }
-.tt-col-summary { width: 16%; }
+.tt-col-summary { width: 22%; }
 .tt-col-tdstatus { width: 13%; }
 .tt-col-status { width: 8%; }
 .tt-col-tcstatus { width: 10%; }
-.tt-col-assignee { width: 9%; }
-.tt-col-qaowner { width: 12%; }
+.tt-col-assignee { width: 7%; }
+.tt-col-qaowner { width: 6%; }
 .tt-col-epic { width: 16%; }
 .tt-col-sprint { width: 10%; }
 .tt-th {
@@ -626,7 +626,7 @@ body {
   letter-spacing: -.01em; margin-bottom: 3px;
 }
 .pt-system-meta { font-size: 12px; color: var(--muted); }
-.pt-body { display: grid; grid-template-columns: 30% 35% 35%; gap: 0; align-items: stretch; }
+.pt-body { display: grid; grid-template-columns: 30% 50% 20%; gap: 0; align-items: stretch; }
 .pt-left-col { display: flex; flex-direction: column; gap: 16px; padding-right: 20px; }
 .pt-bottom-stats { display: flex; gap: 12px; }
 .pt-bottom-stats .pt-waiting { flex: 1; min-width: 0; border-left: none; padding: 0; }
@@ -669,15 +669,15 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
   text-transform: uppercase; letter-spacing: .07em;
   border-bottom: 2px solid var(--border); white-space: nowrap;
 }
-.pt-th-status { text-align: left; color: var(--dim); min-width: 120px; }
-.pt-th-assignee { min-width: 80px; }
+.pt-th-status { text-align: left; color: var(--dim); min-width: 70px; max-width: 100px; }
+.pt-th-assignee { min-width: 60px; }
 .pt-th-total { color: var(--dim); min-width: 40px; }
 .pt-td {
   padding: 6px 10px; text-align: center;
   border-bottom: 1px solid rgba(0,0,0,0.04);
   vertical-align: middle;
 }
-.pt-td-status { text-align: left; font-size: 11.5px; color: var(--text); white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+.pt-td-status { text-align: left; font-size: 11.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; display: flex; align-items: center; gap: 7px; }
 .pt-status-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 .pt-td-total { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-weight: 700; color: var(--text); }
 .pt-grand-total { color: var(--accent); }
@@ -905,11 +905,35 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 
     <!-- View 1: TC Status from each Epic -->
     <div id="view-epic-tc" class="view-panel hidden">
-      <div class="sprint-notice">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <ul>
-          <li>Only <strong>Story</strong>, <strong>Bug</strong>, and <strong>Task</strong> issues with a sprint assignment are shown on this board.</li>
-        </ul>
+      <div class="sprint-notice" style="align-items:stretch;flex-direction:column;gap:0">
+        <div style="display:flex;gap:0;flex-wrap:wrap">
+          <!-- Left: Data source -->
+          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;min-width:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div style="min-width:0">
+              <div style="font-weight:600;margin-bottom:6px">ข้อมูลในหน้านี้ดึงมาจาก Jira — เฉพาะ ticket ที่มีทั้ง <strong>Epic</strong> และ <strong>Sprint</strong> เท่านั้น ครอบคลุมทั้ง 4 ระบบ (EvMS, ELMS, CBMS, OLS)</div>
+              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
+              <ul>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — ELMS, CBMS, EvMS</li>
+                <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — OLS</li>
+              </ul>
+            </div>
+          </div>
+          <!-- Right: Jira update checklist -->
+          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div style="min-width:0">
+              <div style="font-weight:600;margin-bottom:6px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
+              <ul>
+                <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดเข้าระบบที่ถูก</li>
+                <li><strong>Sprint</strong> — กำหนด sprint ให้ทุก ticket ที่ active; ticket ที่ไม่มี sprint จะไม่แสดงในสถิติ</li>
+                <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง (เช่น In Progress, Ready to Test, Done)</li>
+                <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
+                <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="section-row">
         <span class="section-title">Epics</span>
