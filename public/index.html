@@ -234,9 +234,9 @@ body {
 }
 
 /* ── DONUT ── */
-.card-body { width: 100%; display: flex; flex-direction: row; align-items: center; gap: 14px; }
+.card-body { width: 100%; display: flex; flex-direction: row; align-items: center; gap: 18px; }
 .donut-wrap {
-  position: relative; width: 110px; height: 110px;
+  position: relative; width: 130px; height: 130px;
   flex-shrink: 0;
 }
 .donut-wrap svg { width: 100%; height: 100%; overflow: visible; }
@@ -247,9 +247,9 @@ body {
 }
 .donut-total {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1;
+  font-size: 1.15rem; font-weight: 600; color: var(--text); line-height: 1;
 }
-.donut-lbl { font-size: 8px; color: var(--muted); margin-top: 1px; letter-spacing: .04em; text-transform: uppercase; }
+.donut-lbl { font-size: 9px; color: var(--muted); margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
 
 /* ── DONUT (large — pie views) ── */
 .donut-wrap-lg {
@@ -913,7 +913,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       </div>
       <div class="section-row">
         <span class="section-title">Epics</span>
-        <span class="section-sub">16 epics</span>
+        <span class="section-sub" id="epic-total-count"></span>
         <div class="groupby-wrap">
           <span class="groupby-label">Group by</span>
           <div class="gb-dropdown" id="gb-dropdown">
@@ -1080,21 +1080,30 @@ function jiraJqlUrl(jql) {
 }
 
 const SYSTEMS = [
-  { id: 'EvMS', name: 'Evaluation Management System (EvMS)' },
+  { id: 'OLS',  name: 'Open Learning System (OLS)' },
   { id: 'ELMS', name: 'Extended Learning Management System (ELMS)' },
   { id: 'CBMS', name: 'Credit Bank Management System (CBMS)' },
+  { id: 'EvMS', name: 'Evaluation Management System (EvMS)' },
 ]
 const EPICS = [
-  // EvMS — Evaluation / Exam Management System
-  { key: 'MICA2-630', name: 'Exam Bank / Question Bank',       system: 'EvMS' },
-  { key: 'MICA2-631', name: 'Exam Timetable',                  system: 'EvMS' },
-  { key: 'MICA2-632', name: 'Exam Grading',                    system: 'EvMS' },
-  { key: 'MICA2-633', name: 'Exam Report and Evaluation',      system: 'EvMS' },
-  { key: 'MICA2-634', name: 'Exam Room Management',            system: 'EvMS' },
-  { key: 'MICA2-635', name: 'Create Exam (AI)',                system: 'EvMS' },
-  { key: 'MICA2-636', name: 'Exam Room',                       system: 'EvMS' },
-  { key: 'MICA2-706', name: 'Exam Session',                    system: 'EvMS' },
-  { key: 'MICA2-708', name: 'Exam Result',                     system: 'EvMS' },
+  // OLS — Open Learning System
+  { key: 'OLS-1',  name: 'Authentication',                     system: 'OLS' },
+  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS' },
+  { key: 'OLS-3',  name: 'Media Management',                   system: 'OLS' },
+  { key: 'OLS-4',  name: 'Course Management',                  system: 'OLS' },
+  { key: 'OLS-5',  name: 'Learning Path Management',           system: 'OLS' },
+  { key: 'OLS-6',  name: 'Media List and View',                system: 'OLS' },
+  { key: 'OLS-7',  name: 'Profile Page',                       system: 'OLS' },
+  { key: 'OLS-8',  name: 'Social Interaction',                 system: 'OLS' },
+  { key: 'OLS-9',  name: 'User Moderation',                    system: 'OLS' },
+  { key: 'OLS-10', name: 'Live Streaming',                     system: 'OLS' },
+  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS' },
+  { key: 'OLS-12', name: 'Recommendation System',              system: 'OLS' },
+  { key: 'OLS-13', name: 'Achievement/Badge System',           system: 'OLS' },
+  { key: 'OLS-14', name: 'Backoffice CMS',                     system: 'OLS' },
+  { key: 'OLS-15', name: 'Report/Stat/Dashboard',              system: 'OLS' },
+  { key: 'OLS-17', name: 'Content Management',                 system: 'OLS' },
+  { key: 'OLS-77', name: '[Profile,Setup][Creator] การตั้งค่าช่องของฉัน', system: 'OLS' },
   // ELMS — Extended Learning Management System
   { key: 'MICA2-125', name: 'AI Integration',                  system: 'ELMS' },
   { key: 'MICA2-626', name: 'Google Docs',                     system: 'ELMS' },
@@ -1108,6 +1117,16 @@ const EPICS = [
   { key: 'MICA2-651', name: 'Credit Transfer (Learner)',       system: 'CBMS' },
   { key: 'MICA2-652', name: 'Credit Transfer (Staff)',         system: 'CBMS' },
   { key: 'MICA2-653', name: 'My Credit',                       system: 'CBMS' },
+  // EvMS — Evaluation / Exam Management System
+  { key: 'MICA2-630', name: 'Exam Bank / Question Bank',       system: 'EvMS' },
+  { key: 'MICA2-631', name: 'Exam Timetable',                  system: 'EvMS' },
+  { key: 'MICA2-632', name: 'Exam Grading',                    system: 'EvMS' },
+  { key: 'MICA2-633', name: 'Exam Report and Evaluation',      system: 'EvMS' },
+  { key: 'MICA2-634', name: 'Exam Room Management',            system: 'EvMS' },
+  { key: 'MICA2-635', name: 'Create Exam (AI)',                system: 'EvMS' },
+  { key: 'MICA2-636', name: 'Exam Room',                       system: 'EvMS' },
+  { key: 'MICA2-706', name: 'Exam Session',                    system: 'EvMS' },
+  { key: 'MICA2-708', name: 'Exam Result',                     system: 'EvMS' },
 ]
 const ALL_EPIC_KEYS = EPICS.map(e => e.key)
 function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',')})` }
@@ -1143,15 +1162,17 @@ const GROUP_OPTIONS = [
     key: 'qaOwner', label: 'QA Owner',
     fields: 'customfield_12120,customfield_11013',
     extract: iss => {
-      const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
+      const owners = getQaOwnerUsers(iss).map(u => u.displayName).filter(Boolean)
       return owners.length > 0 ? owners : ['Empty']
     },
+    displayFn: sn,
     jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12120]', val)}`,
   },
   {
     key: 'assignee', label: 'Assignee',
     fields: 'assignee',
-    extract: iss => [sn(iss.fields?.assignee?.displayName || '') || 'Empty'],
+    extract: iss => [iss.fields?.assignee?.displayName || 'Empty'],
+    displayFn: sn,
     jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('assignee', val)}`,
   },
 ]
@@ -1359,12 +1380,14 @@ function renderCard(epic, groups, total, groupOpt) {
   const svg = buildDonut(groups, total)
   const hasData = total > 0
   const _groupOpt = groupOpt || GROUP_OPTIONS[0]
+  const _dispFn = _groupOpt.displayFn || (x => x)
   const legendHTML = groups.map(([name, count]) => {
     const pct = total > 0 ? Math.round(count / total * 100) : 0
     const link = jiraJqlUrl(_groupOpt.jql(epic.key, name))
+    const dispName = _dispFn(name)
     return `<div class="legend-item">
       <span class="legend-dot" style="background:${statusColor(name)}"></span>
-      <a class="legend-name legend-link" href="${link}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)} (${count})</a>
+      <a class="legend-name legend-link" href="${link}" target="_blank" rel="noopener noreferrer" title="${esc(dispName)}">${esc(dispName)} (${count})</a>
     </div>`
   }).join('')
   if (!hasData) {
@@ -1432,13 +1455,15 @@ function renderPieView(containerId, groups, total, title, jiraLink, jiraLinkText
 }
 
 // ── Dual Pie Section helpers ──
-function buildPieSectionLegend(groups, total, jqlFn) {
+function buildPieSectionLegend(groups, total, jqlFn, displayFn) {
+  const _df = displayFn || (x => x)
   return groups.map(([name, count]) => {
     const pct = total > 0 ? Math.round(count / total * 100) : 0
     const color = statusColor(name)
+    const dn = _df(name)
     const nameEl = jqlFn
-      ? `<a class="legend-name legend-link" href="${jqlFn(name)}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)}</a>`
-      : `<span class="legend-name" title="${esc(name)}">${esc(name)}</span>`
+      ? `<a class="legend-name legend-link" href="${jqlFn(name)}" target="_blank" rel="noopener noreferrer" title="${esc(dn)}">${esc(dn)}</a>`
+      : `<span class="legend-name" title="${esc(dn)}">${esc(dn)}</span>`
     return `<div class="legend-item">
       <div style="flex:1;min-width:0">
         <div class="legend-row-top">
@@ -1823,7 +1848,7 @@ async function loadTicketOverview() {
       issues.forEach(i => {
         const owners = getQaOwnerUsers(i)
         if (!owners || owners.length === 0) { c['Empty'] = (c['Empty']||0)+1 }
-        else { owners.forEach(o => { const n = sn(o.displayName)||'Empty'; c[n]=(c[n]||0)+1 }) }
+        else { owners.forEach(o => { const n = o.displayName||'Empty'; c[n]=(c[n]||0)+1 }) }
       })
       return Object.entries(c).sort((a,b) => b[1]-a[1])
     }
@@ -1892,11 +1917,11 @@ async function loadTicketOverview() {
     }
 
     // Pie card builder
-    function pieCard(label, groups, total, accent, jqlFn) {
+    function pieCard(label, groups, total, accent, jqlFn, displayFn) {
       const head = `<div class="pie-section-head"><div class="pie-section-type"><span class="pie-section-dot" style="background:${accent}"></span>${label}</div><div class="pie-section-meta">${total} ticket${total!==1?'s':''} total</div></div>`
       if (total === 0) return `<div class="pie-section-card">${head}<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No data available</div><div class="empty-sub">No ${label.toLowerCase()} found</div></div></div>`
       const svg = buildPie(groups, total, 170)
-      const legend = buildPieSectionLegend(groups, total, jqlFn)
+      const legend = buildPieSectionLegend(groups, total, jqlFn, displayFn)
       return `<div class="pie-section-card">${head}<div class="pie-section-body"><div class="donut-wrap-md">${svg}</div><div class="legend-lg">${legend}</div></div></div>`
     }
 
@@ -1933,8 +1958,8 @@ async function loadTicketOverview() {
         <div class="ov-col ov-col-half">
           <div class="section-row ov-section-row"><span class="section-title">QA Ownership</span></div>
           <div class="dual-pie-grid" style="flex:1">
-            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('cf[12120]', n)}`))}
-            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('cf[12120]', n)}`))}
+            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('cf[12120]', n)}`), sn)}
+            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('cf[12120]', n)}`), sn)}
           </div>
         </div>
         <div class="ov-col ov-col-1 pie-mid">
@@ -2128,7 +2153,7 @@ function renderPtCard(sys, groups, total, issues) {
   const devBaseJql = `${sys.jql()} AND status not in ("${PT_EXCLUDED_DEV.map(jqlEscape).join('","')}")`
   const waitingTableHTML = buildPt2DTable(
     issues, 'Waiting for Dev', PT_EXCLUDED_DEV,
-    iss => [sn(iss.fields?.assignee?.displayName || '') || 'Unassigned'],
+    iss => [iss.fields?.assignee?.displayName || 'Unassigned'],
     'exclude',
     { baseJql: devBaseJql, ownerField: 'assignee' }
   )
@@ -2184,7 +2209,7 @@ function renderPtCard(sys, groups, total, issues) {
   const waitingQAHTML = buildPt2DTable(
     issues, 'Waiting for QA', PT_INCLUDED_QA,
     iss => {
-      const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
+      const owners = getQaOwnerUsers(iss).map(u => u.displayName).filter(Boolean)
       return owners.length > 0 ? owners : ['Unassigned']
     },
     'include',
@@ -2544,6 +2569,7 @@ if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
 
 // ── App ──
 function initGrid() {
+  document.getElementById('epic-total-count').textContent = `${EPICS.length} epics`
   const grid = document.getElementById('epic-grid')
   grid.innerHTML = SYSTEMS.map(sys => {
     const eps = EPICS.filter(e => e.system === sys.id)
