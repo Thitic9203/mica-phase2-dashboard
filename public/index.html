@@ -182,9 +182,16 @@ body {
 .epic-system-header { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 .epic-system-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
 .epic-system-count { font-size: 12px; color: var(--muted); }
+.epic-empty-section { margin-top: 18px; padding: 14px 18px; background: var(--elevated); border-radius: var(--radius); border: 1px solid var(--border); }
+.epic-empty-heading { font-size: 12px; font-weight: 600; color: var(--dim); margin-bottom: 10px; }
+.epic-empty-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.epic-empty-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: var(--text); text-decoration: none; transition: border-color .15s, background .15s; }
+.epic-empty-chip:hover { border-color: rgba(15,118,110,0.3); background: rgba(15,118,110,0.04); }
+.epic-empty-chip .chip-key { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 10px; color: var(--accent); font-weight: 500; }
+.epic-empty-chip .chip-name { color: var(--muted); font-size: 11px; }
 .epic-grid-inner {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 
@@ -711,8 +718,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 800px)  { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 800px)  { .epic-grid-inner { grid-template-columns: 1fr; } }
 @media (max-width: 900px)  { .dual-pie-grid { grid-template-columns: 1fr; } }
 /* ── iPad / tablet (portrait) ── */
 @media (max-width: 1024px) {
@@ -1174,6 +1181,7 @@ function reRenderAllEpics() {
       renderCard(epic, groups, issues.length, groupOpt)
     }
   })
+  renderEmptyEpicLists()
 }
 
 const STATUS_KEYWORD_COLORS = [
@@ -1358,16 +1366,15 @@ function renderCard(epic, groups, total, groupOpt) {
       <a class="legend-name legend-link" href="${link}" target="_blank" rel="noopener noreferrer" title="${esc(name)}">${esc(name)} (${count})</a>
     </div>`
   }).join('')
-  const body = hasData
-    ? `<div class="card-body">
+  if (!hasData) {
+    card.style.display = 'none'
+    card.dataset.empty = '1'
+    return
+  }
+  const body = `<div class="card-body">
         <div class="donut-wrap">${svg}<div class="donut-center"><span class="donut-total">${total}</span><span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
         <div class="legend">${legendHTML}</div>
        </div>`
-    : `<div class="empty-state">
-        <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
-        <div class="empty-title">No tickets yet</div>
-        <div class="empty-sub">No tickets found for this epic in Jira</div>
-      </div>`
   card.innerHTML = `
     <div class="card-meta" style="align-items:center;flex-wrap:wrap;margin-bottom:10px;gap:8px">
       <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener">${epic.key}</a>
@@ -2542,7 +2549,7 @@ function initGrid() {
     const cards = eps.map((e, i) =>
       `<div class="epic-card card-skeleton" id="card-${e.key}" style="min-height:160px;animation-delay:${i*0.03}s"></div>`
     ).join('')
-    return `<div class="epic-system-group">
+    return `<div class="epic-system-group" data-system="${sys.id}">
       <div class="epic-system-header"><span class="epic-system-name">${sys.name}</span><span class="epic-system-count">${eps.length} epics</span></div>
       <div class="epic-grid-inner">${cards}</div>
     </div>`
@@ -2558,6 +2565,28 @@ async function loadAll() {
   document.getElementById('last-updated').textContent =
     `Updated Date: ${_dd}/${_mo}/${_now.getFullYear()} ${_h12}:${_m} ${_ampm}`
   await Promise.allSettled(EPICS.map(e => loadEpic(e)))
+  renderEmptyEpicLists()
+}
+
+function renderEmptyEpicLists() {
+  SYSTEMS.forEach(sys => {
+    const group = document.querySelector(`.epic-system-group[data-system="${sys.id}"]`)
+    if (!group) return
+    const emptyEpics = EPICS.filter(e => e.system === sys.id).filter(e => {
+      const card = document.getElementById('card-' + e.key)
+      return card && card.dataset.empty === '1'
+    })
+    const old = group.querySelector('.epic-empty-section')
+    if (old) old.remove()
+    if (!emptyEpics.length) return
+    const chips = emptyEpics.map(e =>
+      `<a class="epic-empty-chip" href="${jiraJqlUrl(`parent = ${e.key}`)}" target="_blank" rel="noopener"><span class="chip-key">${e.key}</span><span class="chip-name">${esc(e.name)}</span></a>`
+    ).join('')
+    const section = document.createElement('div')
+    section.className = 'epic-empty-section'
+    section.innerHTML = `<div class="epic-empty-heading">Epic ที่ไม่มีทิคเก็ต (${emptyEpics.length})</div><div class="epic-empty-list">${chips}</div>`
+    group.appendChild(section)
+  })
 }
 
 async function loadEpic(epic) {
