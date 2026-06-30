@@ -894,8 +894,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       <div class="sprint-notice">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <ul>
-          <li><strong>Stories</strong> without a sprint assignment are excluded from all charts, statistics, and lists on this board.</li>
-          <li><strong>Bugs</strong> are always shown regardless of sprint assignment.</li>
+          <li>Only <strong>Story</strong>, <strong>Bug</strong>, and <strong>Task</strong> issues with a sprint assignment are shown on this board.</li>
         </ul>
       </div>
       <div class="section-row">
@@ -1114,30 +1113,31 @@ const ALL_EPIC_KEYS = EPICS.map(e => e.key)
 function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',')})` }
 
 // ── Epic group-by options ──
+const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND sprint is not EMPTY'
 const GROUP_OPTIONS = [
   {
     key: 'tcStatus', label: 'TC Status',
     fields: 'customfield_12128',
     extract: iss => [iss.fields?.customfield_12128?.value || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12128]', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12128]', val)}`,
   },
   {
     key: 'status', label: 'Status',
     fields: 'status',
     extract: iss => [iss.fields?.status?.name || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('status', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('status', val)}`,
   },
   {
     key: 'tdStatus', label: 'Ticket Details Status',
     fields: 'customfield_12127',
     extract: iss => [iss.fields?.customfield_12127?.value || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12127]', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12127]', val)}`,
   },
   {
     key: 'issueType', label: 'Issue Type',
     fields: 'issuetype',
     extract: iss => [iss.fields?.issuetype?.name || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('issuetype', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('issuetype', val)}`,
   },
   {
     key: 'qaOwner', label: 'QA Owner',
@@ -1146,13 +1146,13 @@ const GROUP_OPTIONS = [
       const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
       return owners.length > 0 ? owners : ['Empty']
     },
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('cf[12120]', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12120]', val)}`,
   },
   {
     key: 'assignee', label: 'Assignee',
     fields: 'assignee',
     extract: iss => [sn(iss.fields?.assignee?.displayName || '') || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${fieldClause('assignee', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('assignee', val)}`,
   },
 ]
 const ALL_EPIC_FIELDS = 'summary,status,issuetype,assignee,customfield_12127,customfield_12128,customfield_12120,customfield_11013'
@@ -1378,7 +1378,7 @@ function renderCard(epic, groups, total, groupOpt) {
       </div>`
   card.innerHTML = `
     <div class="card-meta" style="align-items:center;flex-wrap:wrap;margin-bottom:10px;gap:8px">
-      <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key}`)}" target="_blank" rel="noopener">${epic.key}</a>
+      <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener">${epic.key}</a>
       <span class="epic-name" style="margin-bottom:0;flex:1;min-width:0">${epic.name}</span>
     </div>
     ${body}`
@@ -2321,7 +2321,7 @@ async function loadAll() {
 
 async function loadEpic(epic) {
   try {
-    const issues = await fetchIssues(`parent = ${epic.key}`, ALL_EPIC_FIELDS)
+    const issues = await fetchIssues(`parent = ${epic.key} AND ${EPIC_FILTER}`, ALL_EPIC_FIELDS)
     epicIssuesStore[epic.key] = issues
     const groupOpt = getActiveGroupOpt()
     const groups = groupByField(issues, groupOpt)
