@@ -428,9 +428,9 @@ body {
 .tt-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
 .tt-table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
 .tt-col-key { width: 72px; }
-.tt-col-summary { width: 22%; }
+.tt-col-summary { width: 20%; }
 .tt-col-tdstatus { width: 13%; }
-.tt-col-status { width: 8%; }
+.tt-col-status { width: 10%; }
 .tt-col-tcstatus { width: 10%; }
 .tt-col-assignee { width: 7%; }
 .tt-col-qaowner { width: 6%; }
@@ -646,7 +646,7 @@ body {
   letter-spacing: -.01em; margin-bottom: 3px;
 }
 .pt-system-meta { font-size: 12px; color: var(--muted); }
-.pt-body { display: grid; grid-template-columns: 27% 1fr; gap: 0; align-items: start; }
+.pt-body { display: grid; grid-template-columns: 38% 1fr; gap: 0; align-items: start; }
 .pt-left-col { display: flex; flex-direction: column; gap: 10px; padding-right: 14px; }
 .pt-bottom-stats { display: flex; gap: 8px; }
 .pt-bottom-stats .pt-waiting { flex: 1; min-width: 0; border-left: none; padding: 0; }
@@ -663,15 +663,14 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
 .pt-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; margin-top: 3px; }
 .pt-legend-info { flex: 1; min-width: 0; }
 .pt-legend-row { display: flex; align-items: center; gap: 8px; }
-.pt-legend-name { flex: 1; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-legend-name { flex: 1; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 500; min-width: 0; white-space: nowrap; }
 .pt-legend-count { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 12px; font-weight: 600; color: var(--text); }
 .pt-legend-pct { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 10.5px; color: var(--dim); min-width: 34px; text-align: right; }
 .pt-legend-bar { margin-top: 4px; height: 3px; border-radius: 99px; background: var(--elevated); overflow: hidden; }
 .pt-legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
 .pt-pie-side { display: flex; flex-direction: row; align-items: center; gap: 12px; }
-.pt-right-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.pt-right-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; border-left: 1px solid var(--border); padding-left: 14px; }
 .pt-waiting { min-width: 0; border-left: none; padding: 0; overflow: hidden; }
-.pt-right-col > .pt-waiting:first-child { border-left: 1px solid var(--border); padding-left: 14px; }
 .pt-right-col > .pt-waiting:nth-child(2) { border-top: 1px solid var(--border); padding-top: 14px; }
 .pt-waiting-narrow { min-width: 0; }
 .pt-waiting-head {
@@ -733,7 +732,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 @media (max-width: 768px) {
   .pt-body { grid-template-columns: 1fr; gap: 16px; }
   .pt-left-col { padding-right: 0; }
-  .pt-right-col > .pt-waiting:first-child { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
+  .pt-right-col { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
 }
 @media (max-width: 520px) {
   .pt-pie-side { flex-direction: column; gap: 14px; }
@@ -2312,7 +2311,7 @@ function renderPtCard(sys, groups, total, issues) {
   return `<div class="pt-card">
     <div class="pt-card-head">
       <div class="pt-system-name"><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${sys.color};margin-right:8px;vertical-align:middle"></span>${esc(sys.name)}</div>
-      <div class="pt-system-meta">${total} ticket${total !== 1 ? 's' : ''} · <a href="${sys.jiraLink}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:500">View in Jira ↗</a></div>
+      <div class="pt-system-meta">${total} ticket${total !== 1 ? 's' : ''} · <a href="${jiraJqlUrl(sys.jql())}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:500">View in Jira ↗</a></div>
     </div>
     ${body}
   </div>`
@@ -2619,9 +2618,14 @@ function initMissingTable(containerId, issues) {
 
   const uniqFlat = fn => [...new Set(dataRows.flatMap(fn).filter(Boolean))].sort()
   const MFM = [
-    { key: 'assignee', label: 'Assignee', vals: uniqFlat(r => [r.assignee]) },
-    { key: 'qaOwner',  label: 'QA Owner', vals: uniqFlat(r => r.qaOwners) },
     { key: 'system',   label: 'System',   vals: uniqFlat(r => [r.system]) }
+  ]
+  const MGROUP_OPTIONS = [
+    { value: '', label: 'All Missing Fields' },
+    { value: 'QA Owner', label: 'Missing QA Owner' },
+    { value: 'Assignee', label: 'Missing Assignee' },
+    { value: 'Epic', label: 'Missing Epic' },
+    { value: 'Sprint', label: 'Missing Sprint' },
   ]
   const MCOLS = [
     { key:'key',       label:'Key' },
@@ -2638,6 +2642,7 @@ function initMissingTable(containerId, issues) {
   let mst = {
     search:'', sortCol:'key', sortDir:'asc', page:1, pageSize:10,
     filters: Object.fromEntries(MFM.map(f => [f.key, []])),
+    groupBy: '',
     openMenu: null
   }
 
@@ -2651,6 +2656,9 @@ function initMissingTable(containerId, issues) {
         r.system.toLowerCase().includes(q) || r.missing.toLowerCase().includes(q) ||
         r.sprint.toLowerCase().includes(q) || r.parentDisplay.toLowerCase().includes(q)
       )
+    }
+    if (mst.groupBy) {
+      data = data.filter(r => r.missing.split(', ').includes(mst.groupBy))
     }
     for (const { key } of MFM) {
       const vals = mst.filters[key]; if (!vals.length) continue
@@ -2691,6 +2699,13 @@ function initMissingTable(containerId, issues) {
       if (item) {
         e.stopPropagation()
         const key = item.dataset.fkey, val = item.dataset.val
+        if (key === '__groupby') {
+          mst.groupBy = val
+          mst.openMenu = null
+          mst.page = 1
+          render()
+          return
+        }
         if (val === '') {
           mst.filters[key] = []
           mst.openMenu = null
@@ -2721,7 +2736,7 @@ function initMissingTable(containerId, issues) {
     if (mst.page > totalPages) mst.page = totalPages
     const start = (mst.page - 1) * mst.pageSize
     const slice = filtered.slice(start, start + mst.pageSize)
-    const hasF = mst.search || Object.values(mst.filters).some(v => v.length > 0)
+    const hasF = mst.search || mst.groupBy || Object.values(mst.filters).some(v => v.length > 0)
 
     const thHTML = MCOLS.map(c => {
       const act = mst.sortCol === c.key
@@ -2800,12 +2815,13 @@ function initMissingTable(containerId, issues) {
             <input class="tt-search" id="mt-srch" placeholder="Search tickets" value="">
             <span id="mt-filters" style="display:contents"></span>
             <button class="tt-clear-btn" id="mt-clr" style="display:none">✕ Clear</button>
+            <div class="tt-dd-wrap" data-fkey="__groupby" style="flex:0 0 200px;margin-left:auto" id="mt-groupby-wrap"></div>
           </div>
         </div>
         <div id="mt-dynamic"></div>`
       const g = id => container.querySelector('#'+id)
       g('mt-srch').addEventListener('input', e=>{mst.search=e.target.value;mst.page=1;render()})
-      g('mt-clr').addEventListener('click', ()=>{mst.search='';g('mt-srch').value='';mst.filters=Object.fromEntries(MFM.map(f=>[f.key,[]]));mst.openMenu=null;mst.page=1;render()})
+      g('mt-clr').addEventListener('click', ()=>{mst.search='';g('mt-srch').value='';mst.groupBy='';mst.filters=Object.fromEntries(MFM.map(f=>[f.key,[]]));mst.openMenu=null;mst.page=1;render()})
     }
 
     const g = id => container.querySelector('#'+id)
@@ -2813,6 +2829,18 @@ function initMissingTable(containerId, issues) {
     clrBtn.style.display = hasF ? '' : 'none'
 
     g('mt-filters').innerHTML = filtersHTML
+    const gbActive = !!mst.groupBy
+    const gbLabel = MGROUP_OPTIONS.find(o => o.value === mst.groupBy)?.label || 'All Missing Fields'
+    const gbItems = MGROUP_OPTIONS.map(o => {
+      const isSel = o.value === mst.groupBy
+      return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="__groupby" data-val="${o.value}">${isSel?'✓ ':''}${o.label}</div>`
+    }).join('')
+    g('mt-groupby-wrap').innerHTML = `
+      <button class="tt-dd-btn${gbActive?' tt-dd-on':''}" type="button" aria-expanded="false">
+        <span class="tt-dd-label">${gbLabel}</span>
+        <svg class="tt-dd-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="tt-dd-menu" style="display:none;right:0;left:auto">${gbItems}</div>`
     if (mst.openMenu) {
       const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${mst.openMenu}"]`)
       if (wrap) {
@@ -2826,9 +2854,9 @@ function initMissingTable(containerId, issues) {
       <div class="tt-table-wrap" style="min-height:${Math.min(mst.pageSize, 10) * 42 + 44}px">
         <table class="tt-table" style="min-width:1100px">
           <colgroup>
-            <col style="width:100px"><col style="width:18%"><col style="width:100px">
+            <col style="width:100px"><col style="width:17%"><col style="width:120px">
             <col style="width:9%"><col style="width:10%"><col style="width:10%">
-            <col style="width:14%"><col style="width:8%"><col>
+            <col style="width:13%"><col style="width:8%"><col>
           </colgroup>
           <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
       </div>
