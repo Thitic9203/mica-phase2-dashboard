@@ -1096,7 +1096,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRe
 // ── Firebase ──
 const firebaseConfig = {
   apiKey: 'AIzaSyAPs8mLoQCJrIcV8ZCV43quqALsLQ4bNXU',
-  authDomain: 'mica-phase2-dashboard.pages.dev',
+  authDomain: 'pluton-dashboard.firebaseapp.com',
   projectId: 'pluton-dashboard',
   storageBucket: 'pluton-dashboard.firebasestorage.app',
   messagingSenderId: '248167015210',
@@ -1689,7 +1689,7 @@ function initTicketTable(containerId, issues) {
   let st = {
     search:'', sortCol:'key', sortDir:'asc', page:1, pageSize:10,
     filters: Object.fromEntries(FM.map(f => [f.key, []])),
-    openMenu: null
+    openMenus: new Set()
   }
 
   function getFiltered() {
@@ -1733,9 +1733,8 @@ function initTicketTable(containerId, issues) {
         const fkey = wrap?.dataset.fkey
         const menu = btn.nextElementSibling
         const isOpen = menu.style.display !== 'none'
-        container.querySelectorAll('.tt-dd-menu').forEach(m => { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') })
-        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); st.openMenu = fkey }
-        else { st.openMenu = null }
+        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); st.openMenus.add(fkey) }
+        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false'); st.openMenus.delete(fkey) }
         return
       }
       const item = e.target.closest('.tt-dd-item[data-fkey]')
@@ -1744,12 +1743,12 @@ function initTicketTable(containerId, issues) {
         const key = item.dataset.fkey, val = item.dataset.val
         if (val === '') {
           st.filters[key] = []
-          st.openMenu = null
+          st.openMenus.delete(key)
         } else {
           const idx = st.filters[key].indexOf(val)
           if (idx >= 0) st.filters[key].splice(idx, 1)
           else st.filters[key].push(val)
-          st.openMenu = key
+          st.openMenus.add(key)
         }
         st.page = 1
         render()
@@ -1761,7 +1760,7 @@ function initTicketTable(containerId, issues) {
       })
       const pm = container.querySelector('.tt-pgsz-menu')
       if (pm && pm.style.display !== 'none') pm.style.display = 'none'
-      st.openMenu = null
+      st.openMenus.clear()
     })
   }
 
@@ -1878,8 +1877,8 @@ function initTicketTable(containerId, issues) {
         </div>
       </div>`
 
-    if (st.openMenu) {
-      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${st.openMenu}"]`)
+    for (const fkey of st.openMenus) {
+      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${fkey}"]`)
       if (wrap) {
         const menu = wrap.querySelector('.tt-dd-menu')
         const btn = wrap.querySelector('.tt-dd-btn')
@@ -1889,7 +1888,7 @@ function initTicketTable(containerId, issues) {
 
     const g = id => container.querySelector('#'+id)
     g('tt-srch')?.addEventListener('input', e=>{st.search=e.target.value;st.page=1;render()})
-    g('tt-clr')?.addEventListener('click', ()=>{st.search='';st.filters=Object.fromEntries(FM.map(f=>[f.key,[]]));st.openMenu=null;st.page=1;render()})
+    g('tt-clr')?.addEventListener('click', ()=>{st.search='';st.filters=Object.fromEntries(FM.map(f=>[f.key,[]]));st.openMenus.clear();st.page=1;render()})
     container.querySelectorAll('.tt-th[data-col]').forEach(th=>th.addEventListener('click',()=>{
       const col=th.dataset.col
       if(st.sortCol===col) st.sortDir=st.sortDir==='asc'?'desc':'asc'; else{st.sortCol=col;st.sortDir='asc'}
@@ -1917,7 +1916,7 @@ function initTicketTable(containerId, issues) {
   render()
   container._ttReset = () => {
     st.search = ''; st.sortCol = 'key'; st.sortDir = 'asc'; st.page = 1; st.pageSize = 10
-    st.filters = Object.fromEntries(FM.map(f => [f.key, []])); st.openMenu = null
+    st.filters = Object.fromEntries(FM.map(f => [f.key, []])); st.openMenus.clear()
     render()
   }
 }
