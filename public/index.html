@@ -606,6 +606,104 @@ body {
 .dash-qa-fill { height: 100%; border-radius: 6px; }
 .dash-qa-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
 
+/* ── PROGRESS TRACKER ── */
+.pt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.pt-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px 24px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+}
+.pt-card-head { margin-bottom: 16px; }
+.pt-system-name {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  letter-spacing: -.01em; margin-bottom: 3px;
+}
+.pt-system-meta { font-size: 12px; color: var(--muted); }
+.pt-body { display: flex; align-items: center; gap: 20px; }
+.pt-donut-wrap { position: relative; width: 130px; height: 130px; flex-shrink: 0; }
+.pt-donut-wrap svg { width: 100%; height: 100%; overflow: visible; }
+.pt-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.pt-donut-total { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-size: 1.6rem; font-weight: 600; color: var(--text); line-height: 1; }
+.pt-donut-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: .04em; text-transform: uppercase; }
+.pt-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0; }
+.pt-legend-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+.pt-legend-item:last-child { border-bottom: none; }
+.pt-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; margin-top: 3px; }
+.pt-legend-info { flex: 1; min-width: 0; }
+.pt-legend-row { display: flex; align-items: center; gap: 8px; }
+.pt-legend-name { flex: 1; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-legend-count { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 12px; font-weight: 600; color: var(--text); }
+.pt-legend-pct { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 10.5px; color: var(--dim); min-width: 34px; text-align: right; }
+.pt-legend-bar { margin-top: 4px; height: 3px; border-radius: 99px; background: var(--elevated); overflow: hidden; }
+.pt-legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+.pt-pie-side { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.pt-waiting { flex: 1; min-width: 0; border-left: 1px solid var(--border); padding-left: 20px; }
+.pt-waiting-head {
+  font-size: 12px; font-weight: 700; color: var(--dim);
+  text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.pt-waiting-count {
+  font-size: 11px; background: var(--elevated); color: var(--muted);
+  border-radius: 6px; padding: 1px 8px; font-weight: 600; text-transform: none; letter-spacing: 0;
+}
+.pt-table-wrap { overflow-x: auto; }
+.pt-table { border-collapse: collapse; font-size: 11.5px; width: 100%; }
+.pt-th {
+  padding: 6px 10px; text-align: center;
+  font-size: 10px; font-weight: 700; color: var(--accent);
+  text-transform: uppercase; letter-spacing: .07em;
+  border-bottom: 2px solid var(--border); white-space: nowrap;
+}
+.pt-th-status { text-align: left; color: var(--dim); min-width: 120px; }
+.pt-th-assignee { min-width: 80px; }
+.pt-th-total { color: var(--dim); min-width: 40px; }
+.pt-td {
+  padding: 6px 10px; text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  vertical-align: middle;
+}
+.pt-td-status { text-align: left; font-size: 11.5px; color: var(--text); white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+.pt-status-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.pt-td-total { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-weight: 700; color: var(--text); }
+.pt-grand-total { color: var(--accent); }
+.pt-tfoot-label { text-align: left; font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
+.pt-cell-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-weight: 600; color: var(--text); }
+.pt-cell-zero { color: var(--elevated); font-size: 13px; }
+tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; background: rgba(0,0,0,0.015); }
+.pt-blocked-wrap {
+  margin-top: 28px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 24px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+}
+.pt-blocked-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.pt-blocked-title {
+  font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -.01em;
+}
+.pt-done-pill {
+  background: var(--elevated); border-radius: 12px;
+  padding: 18px 24px; text-align: center; margin-top: 4px;
+}
+.pt-done-num { font-size: 2.4rem; font-weight: 700; color: var(--text); line-height: 1; }
+.pt-done-status { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .07em; margin-top: 4px; }
+.pt-done-pct { font-size: 10px; color: var(--dim); margin-top: 2px; letter-spacing: .05em; }
+
+@media (max-width: 900px) { .pt-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) {
+  .pt-body { flex-direction: column; gap: 16px; }
+  .pt-waiting { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 16px; }
+}
+@media (max-width: 520px) {
+  .pt-pie-side { flex-direction: column; gap: 14px; }
+  .pt-donut-wrap { width: 110px; height: 110px; align-self: center; }
+  .pt-donut-total { font-size: 1.3rem; }
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 800px)  { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
@@ -779,6 +877,9 @@ body {
       <a class="sb-nav-item" data-view="epic-tc">
         <span class="sb-dot" style="background:#0F766E"></span>Epic Breakdown
       </a>
+      <a class="sb-nav-item" data-view="progress-tracker">
+        <span class="sb-dot" style="background:#8A78BF"></span>Progress Tracker
+      </a>
     </div>
     <div class="tn-right">
       <span class="live-dot"></span>
@@ -832,6 +933,25 @@ body {
         </div>
       </div>
       <div class="epic-grid" id="epic-grid"></div>
+    </div>
+
+    <!-- View 3: Progress Tracker -->
+    <div id="view-progress-tracker" class="view-panel hidden">
+      <div class="sprint-notice" style="align-items:flex-start">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>
+          <div style="font-weight:600;margin-bottom:6px">Data on this page is filtered — only tickets with both <strong>Epic</strong> and <strong>Sprint</strong> assigned are included across all four systems (EvMS, ELMS, CBMS, OLS).</div>
+          <div style="margin-bottom:4px;font-weight:500;color:var(--text)">To ensure accurate tracking, please keep the following up to date in Jira:</div>
+          <ul>
+            <li><strong>Epic</strong> — every ticket must be linked to its corresponding epic so it is correctly attributed to its system.</li>
+            <li><strong>Sprint</strong> — assign a sprint to every active ticket; unassigned tickets are excluded from all charts and statistics.</li>
+            <li><strong>Status</strong> — reflect the real-time progress of each ticket (e.g. In Progress, Ready to Test, Done).</li>
+            <li><strong>Assignee</strong> — indicate who is currently responsible for the ticket on the development side.</li>
+            <li><strong>QA Owner</strong> — assign the QA member responsible for verifying and signing off on each ticket.</li>
+          </ul>
+        </div>
+      </div>
+      <div id="pt-content"><div class="view-loading">Loading…</div></div>
     </div>
 
     <!-- View 2: Ticket Overview (unified dashboard) -->
@@ -1828,6 +1948,311 @@ async function loadTicketOverview() {
   }
 }
 
+// ── Progress Tracker ──
+const PT_SYSTEMS = [
+  {
+    id: 'EvMS', name: 'Evaluation Management System (EvMS)', color: '#4487C5',
+    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636,MICA2-706,MICA2-708) AND sprint is not EMPTY`,
+    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
+  },
+  {
+    id: 'ELMS', name: 'Extended Learning Management System (ELMS)', color: '#8A78BF',
+    jql: () => `parent in (MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND sprint is not EMPTY`,
+    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
+  },
+  {
+    id: 'CBMS', name: 'Credit Bank Management System (CBMS)', color: '#C0986A',
+    jql: () => `parent in (MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND sprint is not EMPTY`,
+    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
+  },
+  {
+    id: 'OLS', name: 'Open Learning System (OLS)', color: '#4CAF76',
+    jql: () => `project = OLS AND sprint is not EMPTY`,
+    jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818',
+  },
+]
+
+function buildPtDonut(groups, total) {
+  return buildDonut(groups, total, 260)
+}
+
+const ISSUE_TYPE_COLORS = {
+  'story': '#3B82F6', 'bug': '#EF4444', 'task': '#F59E0B',
+  'sub-task': '#8B5CF6', 'subtask': '#8B5CF6', 'epic': '#0F766E',
+  'improvement': '#06B6D4', 'new feature': '#10B981',
+}
+function issueTypeColor(name) {
+  return ISSUE_TYPE_COLORS[name.toLowerCase()] || FALLBACK_PALETTE[Object.keys(ISSUE_TYPE_COLORS).length % FALLBACK_PALETTE.length]
+}
+
+const PT_EXCLUDED_DEV = ['ready to test', 'blocked', 'testing', 'done']
+const PT_EXCLUDED_QA  = ['ready to test', 'testing']
+function ptExcluded(statusName, list) {
+  const s = statusName.toLowerCase().trim()
+  return list.some(ex => s.includes(ex))
+}
+
+function buildPt2DTable(issues, title, excludeList, getOwners) {
+  const filtered = issues.filter(iss => !ptExcluded(iss.fields?.status?.name || '', excludeList))
+  if (filtered.length === 0) return ''
+
+  const statusMap = {}, ownerMap = {}, matrix = {}
+  filtered.forEach(iss => {
+    const st = iss.fields?.status?.name || 'Unknown'
+    const owners = getOwners(iss)
+    statusMap[st] = (statusMap[st] || 0) + 1
+    owners.forEach(owner => {
+      ownerMap[owner] = (ownerMap[owner] || 0) + 1
+      const key = `${st}|||${owner}`
+      matrix[key] = (matrix[key] || 0) + 1
+    })
+  })
+
+  const statuses = Object.entries(statusMap).sort((a, b) => b[1] - a[1]).map(([s]) => s)
+  const owners   = Object.entries(ownerMap).sort((a, b) => b[1] - a[1]).map(([o]) => o)
+  const grandTotal = filtered.length
+
+  const thCells = owners.map(o => `<th class="pt-th pt-th-assignee" title="${esc(o)}">${esc(o)}</th>`).join('')
+  const rows = statuses.map(st => {
+    const color = statusColor(st)
+    const tds = owners.map(o => {
+      const v = matrix[`${st}|||${o}`] || 0
+      return `<td class="pt-td">${v > 0 ? `<span class="pt-cell-val">${v}</span>` : '<span class="pt-cell-zero">–</span>'}</td>`
+    }).join('')
+    const rowTotal = owners.reduce((s, o) => s + (matrix[`${st}|||${o}`] || 0), 0)
+    return `<tr>
+      <td class="pt-td pt-td-status"><span class="pt-status-dot" style="background:${color}"></span>${esc(st)}</td>
+      ${tds}
+      <td class="pt-td pt-td-total">${rowTotal}</td>
+    </tr>`
+  }).join('')
+  const colTotals = owners.map(o => `<td class="pt-td pt-td-total">${owners.reduce ? (ownerMap[o] || 0) : 0}</td>`).join('')
+
+  return `<div class="pt-waiting">
+    <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">${grandTotal}</span></div>
+    <div class="pt-table-wrap">
+      <table class="pt-table">
+        <thead><tr><th class="pt-th pt-th-status">Status</th>${thCells}<th class="pt-th pt-th-total">T.</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr>
+          <td class="pt-td pt-tfoot-label">Total</td>
+          ${owners.map(o => `<td class="pt-td pt-td-total">${ownerMap[o] || 0}</td>`).join('')}
+          <td class="pt-td pt-td-total pt-grand-total">${grandTotal}</td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>`
+}
+
+function renderPtCard(sys, groups, total, issues) {
+  const legendHTML = groups.map(([name, count]) => {
+    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const color = statusColor(name)
+    return `<div class="pt-legend-item">
+      <span class="pt-legend-dot" style="background:${color}"></span>
+      <div class="pt-legend-info">
+        <div class="pt-legend-row">
+          <span class="pt-legend-name" title="${esc(name)}">${esc(name)}</span>
+          <span class="pt-legend-count">${count}</span>
+          <span class="pt-legend-pct">${pct}%</span>
+        </div>
+        <div class="pt-legend-bar"><div class="pt-legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+    </div>`
+  }).join('')
+
+  const svg = total > 0 ? buildPtDonut(groups, total) : buildPtDonut([], 0)
+
+  // ── Waiting for Dev table ──
+  const waitingTableHTML = buildPt2DTable(
+    issues, 'Waiting for Dev', PT_EXCLUDED_DEV,
+    iss => [sn(iss.fields?.assignee?.displayName || '') || 'Unassigned']
+  )
+
+  // ── Total Tickets by issue type ──
+  const typeCounts = {}
+  issues.forEach(iss => {
+    const t = iss.fields?.issuetype?.name || 'Other'
+    typeCounts[t] = (typeCounts[t] || 0) + 1
+  })
+  const typeGroups = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])
+  const totalW = typeGroups.reduce((s, [,c]) => s + Math.max(c / total * 100, 6), 0)
+  let barSegs = '', barLbls = '', offset = 0
+  typeGroups.forEach(([name, count]) => {
+    const color = issueTypeColor(name)
+    const rawW = Math.max(count / total * 100, 6)
+    const nw = rawW / totalW * 100
+    const pct = Math.round(count / total * 100)
+    barSegs += `<div class="sbc-seg" style="width:${nw}%;background:${color}"></div>`
+    barLbls += `<div class="sbc-pct" style="left:${offset}%;width:${nw}%">${pct}%</div>`
+    offset += nw
+  })
+  const typeLegend = typeGroups.map(([name, count]) => {
+    const color = issueTypeColor(name)
+    return `<div class="sbc-legend-item"><span class="sbc-dot" style="background:${color}"></span><span class="sbc-link">${esc(name.toUpperCase())} (${count})</span></div>`
+  }).join('')
+  const totalTicketsHTML = `<div class="pt-waiting">
+    <div class="pt-waiting-head">Total Tickets <span class="pt-waiting-count">${total}</span></div>
+    <div class="sbc-wrap">
+      <div class="sbc-bar">${barSegs}</div>
+      <div class="sbc-labels">${barLbls}</div>
+    </div>
+    <div class="sbc-legend">${typeLegend}</div>
+  </div>`
+
+  // ── Done stat ──
+  const doneIssues = issues.filter(iss => {
+    const s = (iss.fields?.status?.name || '').toLowerCase().trim()
+    return s === 'done' || s === 'closed' || s === 'resolved'
+  })
+  const donePct = total > 0 ? Math.round(doneIssues.length / total * 100) : 0
+  const doneStatuses = [...new Set(doneIssues.map(i => i.fields?.status?.name || 'Done'))]
+  const doneLabel = doneStatuses.join(' / ') || 'Done'
+  const doneHTML = `<div class="pt-waiting">
+    <div class="pt-waiting-head">Done <span class="pt-waiting-count">${doneIssues.length}</span></div>
+    <div class="pt-done-pill">
+      <div class="pt-done-num">${doneIssues.length}</div>
+      <div class="pt-done-status">${esc(doneLabel.toUpperCase())}</div>
+      <div class="pt-done-pct">${donePct}% OF TOTAL</div>
+    </div>
+  </div>`
+
+  // ── Waiting for QA table ──
+  const waitingQAHTML = buildPt2DTable(
+    issues, 'Waiting for QA', PT_EXCLUDED_QA,
+    iss => {
+      const owners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName)).filter(Boolean)
+      return owners.length > 0 ? owners : ['Unassigned']
+    }
+  )
+
+  const body = total > 0
+    ? `<div class="pt-body">
+        <div class="pt-pie-side">
+          <div class="pt-donut-wrap">${svg}<div class="pt-donut-center"><span class="pt-donut-total">${total}</span><span class="pt-donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
+          <div class="pt-legend">${legendHTML}</div>
+        </div>
+        ${waitingTableHTML}
+        ${waitingQAHTML}
+        ${doneHTML}
+        ${totalTicketsHTML}
+      </div>`
+    : `<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No tickets yet</div></div>`
+
+  return `<div class="pt-card">
+    <div class="pt-card-head">
+      <div class="pt-system-name"><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${sys.color};margin-right:8px;vertical-align:middle"></span>${esc(sys.name)}</div>
+      <div class="pt-system-meta">${total} ticket${total !== 1 ? 's' : ''} · <a href="${sys.jiraLink}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-weight:500">View in Jira ↗</a></div>
+    </div>
+    ${body}
+  </div>`
+}
+
+function renderBlockedTable(issues) {
+  const head = `<div class="pt-blocked-head">
+    <span class="pt-blocked-title">🚫 Blocked Tickets</span>
+    <span class="pt-waiting-count">${issues.length}</span>
+  </div>`
+
+  if (issues.length === 0) {
+    return `<div class="pt-blocked-wrap">${head}
+      <div class="empty-state" style="padding:32px 0">
+        <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
+        <div class="empty-title">No blocked tickets</div>
+        <div class="empty-sub">No tickets with "Blocked" status or label found</div>
+      </div>
+    </div>`
+  }
+
+  const rows = issues.map(iss => {
+    const key = iss.key
+    const summary = iss.fields?.summary || '—'
+    const status = iss.fields?.status?.name || '—'
+    const assignee = sn(iss.fields?.assignee?.displayName || '') || '—'
+    const qaOwners = (iss.fields?.customfield_12120 || []).map(u => sn(u.displayName)).filter(Boolean).join(', ') || '—'
+    const parentKey = iss.fields?.parent?.key || ''
+    const parentName = iss.fields?.parent?.fields?.summary || ''
+    const epicHTML = parentKey
+      ? `<a class="tt-parent-key" href="https://skilllane.atlassian.net/browse/${parentKey}" target="_blank" rel="noopener">${parentKey}</a>${parentName ? ` <span style="font-size:11px;color:var(--muted)">${esc(parentName)}</span>` : ''}`
+      : '<span class="tt-nil">—</span>'
+    const statusColor_ = statusColor(status)
+    const statusBadge = `<span class="tt-badge" style="background:${statusColor_}33;color:${darkenForBadge(statusColor_)};border-color:${statusColor_}55">${esc(status)}</span>`
+
+    return `<tr class="tt-tr">
+      <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${key}" target="_blank" rel="noopener">${key}</a></td>
+      <td class="tt-td tt-summary-cell"><div class="tt-summary-text">${esc(summary)}</div></td>
+      <td class="tt-td">${statusBadge}</td>
+      <td class="tt-td" style="white-space:nowrap">${esc(assignee)}</td>
+      <td class="tt-td"><div class="tt-summary-text">${esc(qaOwners)}</div></td>
+      <td class="tt-td">${epicHTML}</td>
+      <td class="tt-td"><span class="tt-nil">—</span></td>
+    </tr>`
+  }).join('')
+
+  return `<div class="pt-blocked-wrap">
+    ${head}
+    <div class="tt-table-wrap">
+      <table class="tt-table" style="min-width:900px">
+        <colgroup>
+          <col style="width:80px"><col style="width:22%"><col style="width:120px">
+          <col style="width:11%"><col style="width:13%"><col style="width:20%"><col>
+        </colgroup>
+        <thead><tr>
+          <th class="tt-th">KEY</th>
+          <th class="tt-th">SUMMARY</th>
+          <th class="tt-th">STATUS</th>
+          <th class="tt-th">ASSIGNEE</th>
+          <th class="tt-th">QA OWNER</th>
+          <th class="tt-th">EPIC</th>
+          <th class="tt-th">REMARK</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`
+}
+
+async function loadProgressTracker() {
+  const el = document.getElementById('pt-content')
+  el.innerHTML = '<div class="view-loading">Loading ticket data…</div>'
+  try {
+    const results = await Promise.allSettled(
+      PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), 'status,assignee,customfield_12120,summary,labels,parent,issuetype'))
+    )
+    const cards = PT_SYSTEMS.map((sys, i) => {
+      const res = results[i]
+      if (res.status === 'rejected') {
+        return `<div class="pt-card"><div class="pt-card-head"><div class="pt-system-name">${esc(sys.name)}</div></div><div class="error-box"><div class="error-text">Failed to load: ${esc(res.reason?.message || 'Unknown error')}</div></div></div>`
+      }
+      const issues = res.value
+      const counts = {}
+      issues.forEach(iss => {
+        const s = iss.fields?.status?.name || 'Unknown'
+        counts[s] = (counts[s] || 0) + 1
+      })
+      const groups = Object.entries(counts).sort((a, b) => b[1] - a[1])
+      return renderPtCard(sys, groups, issues.length, issues)
+    }).join('')
+
+    // ── Blocked Tickets table (all systems combined) ──
+    const allIssues = PT_SYSTEMS.flatMap((sys, i) => {
+      const res = results[i]
+      if (res.status !== 'fulfilled') return []
+      return res.value.map(iss => ({ ...iss, _system: sys.name }))
+    })
+    const blockedIssues = allIssues.filter(iss => {
+      const statusBlocked = (iss.fields?.status?.name || '').toLowerCase().includes('blocked')
+      const labelBlocked = (iss.fields?.labels || []).some(l => l.toLowerCase().includes('blocked'))
+      return statusBlocked || labelBlocked
+    })
+
+    const blockedTableHTML = renderBlockedTable(blockedIssues)
+    el.innerHTML = `<div class="pt-grid">${cards}</div>${blockedTableHTML}`
+  } catch (err) {
+    el.innerHTML = `<div class="view-error">Failed to load progress data: ${esc(err.message)}</div>`
+  }
+}
+
 // ── View switching ──
 const _loaded = {}
 
@@ -1840,6 +2265,9 @@ function switchView(viewId) {
   })
   if (viewId === 'ticket-overview' && !_loaded.ticketOverview) {
     _loaded.ticketOverview = true; loadTicketOverview()
+  }
+  if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
+    _loaded.progressTracker = true; loadProgressTracker()
   }
 }
 
