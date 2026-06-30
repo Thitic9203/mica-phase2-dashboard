@@ -2000,31 +2000,29 @@ function buildPt2DTable(issues, title, excludeList, getOwners) {
   const owners   = Object.entries(ownerMap).sort((a, b) => b[1] - a[1]).map(([o]) => o)
   const grandTotal = filtered.length
 
-  const thCells = owners.map(o => `<th class="pt-th pt-th-assignee" title="${esc(o)}">${esc(o)}</th>`).join('')
-  const rows = statuses.map(st => {
-    const color = statusColor(st)
-    const tds = owners.map(o => {
+  const thCells = statuses.map(st => `<th class="pt-th pt-th-assignee">${esc(st)}</th>`).join('')
+  const rows = owners.map(o => {
+    const tds = statuses.map(st => {
       const v = matrix[`${st}|||${o}`] || 0
       return `<td class="pt-td">${v > 0 ? `<span class="pt-cell-val">${v}</span>` : '<span class="pt-cell-zero">–</span>'}</td>`
     }).join('')
-    const rowTotal = owners.reduce((s, o) => s + (matrix[`${st}|||${o}`] || 0), 0)
+    const rowTotal = statuses.reduce((s, st) => s + (matrix[`${st}|||${o}`] || 0), 0)
     return `<tr>
-      <td class="pt-td pt-td-status"><span class="pt-status-dot" style="background:${color}"></span>${esc(st)}</td>
+      <td class="pt-td pt-td-status">${esc(o)}</td>
       ${tds}
       <td class="pt-td pt-td-total">${rowTotal}</td>
     </tr>`
   }).join('')
-  const colTotals = owners.map(o => `<td class="pt-td pt-td-total">${owners.reduce ? (ownerMap[o] || 0) : 0}</td>`).join('')
 
   return `<div class="pt-waiting">
     <div class="pt-waiting-head">${esc(title)} <span class="pt-waiting-count">${grandTotal}</span></div>
     <div class="pt-table-wrap">
       <table class="pt-table">
-        <thead><tr><th class="pt-th pt-th-status">Status</th>${thCells}<th class="pt-th pt-th-total">T.</th></tr></thead>
+        <thead><tr><th class="pt-th pt-th-status"></th>${thCells}<th class="pt-th pt-th-total">T.</th></tr></thead>
         <tbody>${rows}</tbody>
         <tfoot><tr>
           <td class="pt-td pt-tfoot-label">Total</td>
-          ${owners.map(o => `<td class="pt-td pt-td-total">${ownerMap[o] || 0}</td>`).join('')}
+          ${statuses.map(st => `<td class="pt-td pt-td-total">${statusMap[st] || 0}</td>`).join('')}
           <td class="pt-td pt-td-total pt-grand-total">${grandTotal}</td>
         </tr></tfoot>
       </table>
