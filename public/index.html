@@ -729,17 +729,6 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .pt-done-status { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .07em; margin-top: 4px; }
 .pt-done-pct { font-size: 10px; color: var(--dim); margin-top: 2px; letter-spacing: .05em; }
 
-@media (max-width: 768px) {
-  .pt-body { grid-template-columns: 1fr; gap: 16px; }
-  .pt-left-col { padding-right: 0; }
-  .pt-right-col { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
-}
-@media (max-width: 520px) {
-  .pt-pie-side { flex-direction: column; gap: 14px; }
-  .pt-donut-wrap { width: 110px; height: 110px; align-self: center; }
-  .pt-donut-total { font-size: 1.3rem; }
-}
-
 /* ── RESPONSIVE ── */
 @media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 800px)  { .epic-grid-inner { grid-template-columns: 1fr; } }
@@ -759,23 +748,50 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .ov-col-1 { grid-column: span 1; }
 }
 
+/* ── Small tablet / large phone (landscape) ── */
+@media (max-width: 768px) {
+  /* Nav: horizontal scroll for tabs */
+  #topnav { padding: 0 12px; overflow: visible; }
+  .tn-tabs { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; }
+  .tn-tabs::-webkit-scrollbar { display: none; }
+  .tn-brand { font-size: 9.5px; padding: 3px 8px 3px 7px; margin-right: 8px; }
+  .sb-nav-item { padding: 0 10px; font-size: 11.5px; flex-shrink: 0; }
+  .tn-right { gap: 8px; padding-left: 10px; }
+  /* Sprint notice: stack columns vertically */
+  .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(15,118,110,0.15) !important; }
+  /* Progress tracker: single column */
+  .pt-body { grid-template-columns: 1fr; gap: 16px; }
+  .pt-left-col { padding-right: 0; }
+  .pt-right-col { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
+  /* Blocked section */
+  .pt-blocked-wrap { padding: 16px 16px 18px; }
+  /* KPI */
+  .dash-kpi { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ── Mobile ── */
 @media (max-width: 520px) {
   /* Nav */
-  #topnav { padding: 0 10px; height: 44px; }
+  #topnav { padding: 0 8px; height: 44px; }
   .tn-brand { display: none; }
-  .sb-nav-item { padding: 0 8px; font-size: 11px; }
+  .tn-tabs { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; flex-shrink: 1; min-width: 0; }
+  .tn-tabs::-webkit-scrollbar { display: none; }
+  .sb-nav-item { padding: 0 8px; font-size: 11px; flex-shrink: 0; }
   .sb-dot { width: 5px; height: 5px; }
-  .tn-right { gap: 8px; padding-left: 8px; font-size: 10px; }
+  .tn-right { gap: 6px; padding-left: 6px; font-size: 10px; flex-shrink: 0; }
   .tn-right #last-updated { display: none; }
   .sb-logout span { display: none; }
   .sb-logout { padding: 5px; }
   /* Panels */
-  .view-panel { padding: 0 12px 32px; }
+  .view-panel { padding: 12px 10px 28px; }
     #view-epic-tc.view-panel { padding-top: 8px; }
   .view-title { font-size: 18px; }
   .view-meta { font-size: 11px; }
-  .sprint-notice { font-size: 10.5px; padding: 6px 10px; }
+  /* Sprint notice */
+  .sprint-notice { font-size: 10.5px; padding: 0; border-radius: 8px; }
+  .sprint-notice > div { flex-direction: column !important; }
+  .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(15,118,110,0.15) !important; }
+  .sprint-notice ul { font-size: 10px; }
   /* Overview grid → single column */
   .ov-grid { grid-template-columns: 1fr; }
   .ov-col-half, .ov-col-1 { grid-column: span 1; }
@@ -857,10 +873,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   /* Table */
   .tt-table { min-width: 700px; font-size: 11px; }
   .tt-th, .tt-td { padding: 8px 8px; }
-  .tt-pagination { gap: 8px; }
+  .tt-pagination { gap: 8px; flex-direction: column; align-items: stretch; text-align: center; }
   .tt-page-info { font-size: 10.5px; }
   .tt-page-btn { padding: 4px 8px; font-size: 11px; }
   .tt-page-num { min-width: 26px; height: 26px; font-size: 11px; }
+  .tt-page-controls { justify-content: center; }
   /* Summary */
   .summary-card { padding: 14px 14px; }
   .summary-head { flex-direction: column; gap: 6px; align-items: flex-start; }
@@ -873,6 +890,54 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .gb-item { padding: 9px 12px; font-size: 12.5px; }
   /* Page size dropdown */
   .tt-pgsz-btn { font-size: 10.5px; padding: 4px 8px; }
+  .tt-pgsz-menu { left: 0; right: auto; }
+  /* Progress tracker */
+  .pt-card { padding: 12px 12px 10px; }
+  .pt-system-name { font-size: 14px; }
+  .pt-system-meta { font-size: 11px; }
+  .pt-pie-side { flex-direction: column; align-items: center; gap: 10px; }
+  .pt-donut-wrap { width: 100px; height: 100px; }
+  .pt-donut-total { font-size: 1.2rem; }
+  .pt-legend-name { font-size: 10.5px; }
+  .pt-legend-count { font-size: 11px; }
+  .pt-legend-pct { font-size: 9.5px; }
+  .pt-legend-dot { width: 7px; height: 7px; }
+  .pt-right-col { padding-left: 0; }
+  .pt-table { font-size: 10.5px; }
+  .pt-th { font-size: 8.5px; padding: 4px 4px; }
+  .pt-td { padding: 4px 4px; }
+  .pt-td-status { font-size: 10.5px; max-width: 80px; }
+  .pt-waiting-head { font-size: 10px; }
+  .pt-bottom-stats { flex-direction: column; gap: 12px; }
+  .pt-done-pill { padding: 10px 14px; }
+  .pt-done-num { font-size: 1.5rem; }
+  /* Blocked section */
+  .pt-blocked-wrap { padding: 14px 12px 16px; }
+  .pt-blocked-head { gap: 8px; margin-bottom: 10px; padding-bottom: 10px; }
+  .pt-blocked-title { font-size: 13px; }
+  /* Auth */
+  .auth-box { padding: 28px 24px 24px; }
+  .auth-box h2 { font-size: 18px; }
+  .auth-icon { width: 50px; height: 50px; border-radius: 14px; margin-bottom: 16px; }
+  .auth-icon svg { width: 28px; height: 28px; }
+}
+
+/* ── Extra-small phones (≤360px) ── */
+@media (max-width: 360px) {
+  #topnav { height: 40px; padding: 0 6px; }
+  .sb-nav-item { padding: 0 6px; font-size: 10.5px; }
+  .view-panel { padding: 8px 8px 24px; }
+  .epic-card { padding: 10px 10px; }
+  .donut-wrap { width: 56px; height: 56px; }
+  .card-body { gap: 8px; }
+  .pt-card { padding: 10px 10px 8px; }
+  .pt-donut-wrap { width: 80px; height: 80px; }
+  .pt-donut-total { font-size: 1rem; }
+  .pie-section-card { padding: 8px 10px 10px; }
+  .summary-card { padding: 10px 10px; }
+  .tt-dd-wrap { flex: 1 1 100%; }
+  .ov-kpi .dash-kpi-value { font-size: 18px; }
+  .dash-kpi-value { font-size: 24px; }
 }
   </style>
 </head>
