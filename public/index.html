@@ -646,7 +646,7 @@ body {
   letter-spacing: -.01em; margin-bottom: 3px;
 }
 .pt-system-meta { font-size: 12px; color: var(--muted); }
-.pt-body { display: grid; grid-template-columns: 27% 46% 27%; gap: 0; align-items: stretch; }
+.pt-body { display: grid; grid-template-columns: 27% 1fr; gap: 0; align-items: start; }
 .pt-left-col { display: flex; flex-direction: column; gap: 10px; padding-right: 14px; }
 .pt-bottom-stats { display: flex; gap: 8px; }
 .pt-bottom-stats .pt-waiting { flex: 1; min-width: 0; border-left: none; padding: 0; }
@@ -669,7 +669,10 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
 .pt-legend-bar { margin-top: 4px; height: 3px; border-radius: 99px; background: var(--elevated); overflow: hidden; }
 .pt-legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
 .pt-pie-side { display: flex; flex-direction: row; align-items: center; gap: 12px; }
-.pt-waiting { min-width: 0; border-left: 1px solid var(--border); padding: 0 14px; overflow: hidden; }
+.pt-right-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.pt-waiting { min-width: 0; border-left: none; padding: 0; overflow: hidden; }
+.pt-right-col > .pt-waiting:first-child { border-left: 1px solid var(--border); padding-left: 14px; }
+.pt-right-col > .pt-waiting:nth-child(2) { border-top: 1px solid var(--border); padding-top: 14px; }
 .pt-waiting-narrow { min-width: 0; }
 .pt-waiting-head {
   font-size: 11px; font-weight: 700; color: var(--dim);
@@ -730,7 +733,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 @media (max-width: 768px) {
   .pt-body { grid-template-columns: 1fr; gap: 16px; }
   .pt-left-col { padding-right: 0; }
-  .pt-waiting { border-left: none; padding: 0; border-top: 1px solid var(--border); padding-top: 16px; }
+  .pt-right-col > .pt-waiting:first-child { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
 }
 @media (max-width: 520px) {
   .pt-pie-side { flex-direction: column; gap: 14px; }
@@ -2299,8 +2302,10 @@ function renderPtCard(sys, groups, total, issues) {
             ${totalTicketsHTML}
           </div>
         </div>
-        ${waitingTableHTML}
-        ${waitingQAHTML}
+        <div class="pt-right-col">
+          ${waitingTableHTML}
+          ${waitingQAHTML}
+        </div>
       </div>`
     : `<div class="empty-state"><div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div><div class="empty-title">No tickets yet</div></div>`
 
