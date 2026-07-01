@@ -1862,11 +1862,11 @@ function initTicketTable(containerId, issues) {
       <div class="section-row" style="margin-top:24px">
         <span class="section-title">Ticket List</span>
         <span class="section-sub">${rows.length} tickets</span>
+        ${hasF?`<button class="tt-clear-btn" id="tt-clr" style="margin-left:auto">✕ Clear</button>`:''}
       </div>
       <div class="tt-toolbar">
         <div class="tt-toolbar-row">
           <input class="tt-search" id="tt-srch" placeholder="Search tickets" value="${st.search.replace(/"/g,'&quot;')}">
-          ${hasF?`<button class="tt-clear-btn" id="tt-clr">✕ Clear</button>`:''}
         </div>
         <div class="tt-toolbar-row">${filtersHTML}</div>
       </div>
@@ -2599,12 +2599,12 @@ function initBlockedTable(containerId, issues) {
         <div class="section-row" style="margin-top:0">
           <span class="section-title">🚫 Blocked Tickets</span>
           <span class="section-sub">${dataRows.length} tickets</span>
+          <button class="tt-clear-btn" id="bt-clr" style="display:none;margin-left:auto">✕ Clear</button>
         </div>
         <div class="tt-toolbar" id="bt-toolbar">
           <div class="tt-toolbar-row">
             <input class="tt-search" id="bt-srch" placeholder="Search blocked tickets" value="">
             <span id="bt-filters" style="display:contents"></span>
-            <button class="tt-clear-btn" id="bt-clr" style="display:none">✕ Clear</button>
           </div>
         </div>
         <div id="bt-dynamic"></div>`
@@ -2905,12 +2905,12 @@ function initMissingTable(containerId, issues) {
         <div class="section-row" style="margin-top:0">
           <span class="section-title">⚠️ Tickets with Incomplete Fields</span>
           <span class="section-sub">${dataRows.length} tickets</span>
+          <button class="tt-clear-btn" id="mt-clr" style="display:none;margin-left:auto">✕ Clear</button>
         </div>
         <div class="tt-toolbar" id="mt-toolbar">
           <div class="tt-toolbar-row">
             <input class="tt-search" id="mt-srch" placeholder="Search tickets" value="">
             <span id="mt-filters" style="display:contents"></span>
-            <button class="tt-clear-btn" id="mt-clr" style="display:none">✕ Clear</button>
             <div class="tt-dd-wrap" data-fkey="__groupby" style="flex:2 1 160px;margin-left:auto" id="mt-groupby-wrap"></div>
           </div>
         </div>
