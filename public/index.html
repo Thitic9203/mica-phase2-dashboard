@@ -449,12 +449,12 @@ body {
 .tt-th.tt-sort-active { color: var(--accent); }
 .tt-sort-icon { margin-left: 4px; opacity: .32; font-size: 9px; }
 .tt-th.tt-sort-active .tt-sort-icon { opacity: 1; }
-.tt-td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+.tt-td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
 .tt-tr:last-child .tt-td { border-bottom: none; }
 .tt-tr:hover .tt-td { background: rgba(0,0,0,0.018); }
 .tt-key { font-family:'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--accent); font-weight: 400; white-space: nowrap; text-decoration: none; }
 .tt-key:hover { text-decoration: underline; }
-.tt-summary-cell { max-width: 240px; }
+.tt-summary-cell { max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
 .tt-summary-text { line-height: 1.45; font-size: 11.5px; }
 .tt-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; border: 1px solid transparent; text-transform: uppercase; }
 .tt-nil { color: var(--dim); }
