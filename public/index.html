@@ -1862,7 +1862,7 @@ function initTicketTable(containerId, issues) {
       <div class="section-row" style="margin-top:24px">
         <span class="section-title">Ticket List</span>
         <span class="section-sub">${rows.length} tickets</span>
-        ${hasF?`<button class="tt-clear-btn" id="tt-clr" style="margin-left:auto">✕ Clear</button>`:''}
+        <button class="tt-clear-btn" id="tt-clr" style="margin-left:auto;visibility:${hasF?'visible':'hidden'}">✕ Clear</button>
       </div>
       <div class="tt-toolbar">
         <div class="tt-toolbar-row">
@@ -2599,7 +2599,7 @@ function initBlockedTable(containerId, issues) {
         <div class="section-row" style="margin-top:0">
           <span class="section-title">🚫 Blocked Tickets</span>
           <span class="section-sub">${dataRows.length} tickets</span>
-          <button class="tt-clear-btn" id="bt-clr" style="display:none;margin-left:auto">✕ Clear</button>
+          <button class="tt-clear-btn" id="bt-clr" style="visibility:hidden;margin-left:auto">✕ Clear</button>
         </div>
         <div class="tt-toolbar" id="bt-toolbar">
           <div class="tt-toolbar-row">
@@ -2615,7 +2615,7 @@ function initBlockedTable(containerId, issues) {
 
     const g = id => container.querySelector('#'+id)
     const clrBtn = g('bt-clr')
-    clrBtn.style.display = hasF ? '' : 'none'
+    clrBtn.style.visibility = hasF ? 'visible' : 'hidden'
 
     g('bt-filters').innerHTML = filtersHTML
     for (const fkey of bst.openMenus) {
@@ -2905,7 +2905,7 @@ function initMissingTable(containerId, issues) {
         <div class="section-row" style="margin-top:0">
           <span class="section-title">⚠️ Tickets with Incomplete Fields</span>
           <span class="section-sub">${dataRows.length} tickets</span>
-          <button class="tt-clear-btn" id="mt-clr" style="display:none;margin-left:auto">✕ Clear</button>
+          <button class="tt-clear-btn" id="mt-clr" style="visibility:hidden;margin-left:auto">✕ Clear</button>
         </div>
         <div class="tt-toolbar" id="mt-toolbar">
           <div class="tt-toolbar-row">
@@ -2922,7 +2922,7 @@ function initMissingTable(containerId, issues) {
 
     const g = id => container.querySelector('#'+id)
     const clrBtn = g('mt-clr')
-    clrBtn.style.display = hasF ? '' : 'none'
+    clrBtn.style.visibility = hasF ? 'visible' : 'hidden'
 
     g('mt-filters').innerHTML = filtersHTML
     const gbActive = mst.groupBy.length > 0
