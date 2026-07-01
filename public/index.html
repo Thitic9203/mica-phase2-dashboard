@@ -3080,7 +3080,7 @@ async function loadAll() {
   const _h = _now.getHours(), _m = String(_now.getMinutes()).padStart(2,'0')
   const _ampm = _h >= 12 ? 'PM' : 'AM', _h12 = String(_h % 12 || 12).padStart(2,'0')
   document.getElementById('last-updated').innerHTML =
-    `Updated Date: ${_dd}/${_mo}/${_now.getFullYear()} ${_h12}:${_m} ${_ampm}<br><span style="font-size:11px;opacity:.65">Auto-refresh from Jira every 5 min</span>`
+    `Updated Date: ${_dd}/${_mo}/${_now.getFullYear()} ${_h12}:${_m} ${_ampm}<br><span style="font-size:11px;opacity:.65">Auto-refresh from Jira every 5 minutes</span>`
   await Promise.allSettled(EPICS.map(e => loadEpic(e)))
   renderEmptyEpicLists()
 }
