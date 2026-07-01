@@ -795,7 +795,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(15,118,110,0.15) !important; }
   .sprint-notice ul { font-size: 10px; }
   /* Sprint notice: collapsible on mobile (Phase 3) */
-  .sprint-notice.sn-collapsed { max-height: 48px; overflow: hidden; position: relative; }
+  .sprint-notice.sn-collapsed { max-height: 120px; overflow: hidden; position: relative; }
   .sprint-notice.sn-collapsed::after {
     content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 28px;
     background: linear-gradient(to bottom, transparent 60%, var(--bg) 100%);
@@ -924,7 +924,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-system-meta { font-size: 11px; }
   .pt-pie-side { flex-direction: column; align-items: center; gap: 10px; }
   .pt-donut-wrap { width: 100px; height: 100px; }
-  .pt-donut-total { font-size: 0.95rem; }
+  .pt-donut-total { font-size: 0.7rem; }
   .pt-legend-name { font-size: 10.5px; }
   .pt-legend-count { font-size: 11px; }
   .pt-legend-pct { font-size: 9.5px; }
@@ -962,7 +962,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .card-body { gap: 8px; }
   .pt-card { padding: 10px 10px 8px; }
   .pt-donut-wrap { width: 80px; height: 80px; }
-  .pt-donut-total { font-size: 0.75rem; }
+  .pt-donut-total { font-size: 0.56rem; }
   .pie-section-card { padding: 8px 10px 10px; }
   .summary-card { padding: 10px 10px; }
   .tt-dd-wrap { flex: 1 1 100%; }
@@ -1501,7 +1501,9 @@ function buildDonut(groups, total, sz = 210) {
         font-size="${lbl_sz}" font-weight="600" fill="rgba(255,255,255,0.95)">100%</text>
     </svg>`
   }
-  const rawSpans = groups.map(([,c]) => c / total * 360)
+  const sumGroups = groups.reduce((s, [,c]) => s + c, 0)
+  const arcTotal = Math.max(sumGroups, 1)
+  const rawSpans = groups.map(([,c]) => c / arcTotal * 360)
   const boosts = rawSpans.map(s => s > 0 && s < MIN_SPAN ? MIN_SPAN - s : 0)
   const totalBoost = boosts.reduce((a, b) => a + b, 0)
   const totalReducible = rawSpans.reduce((a, s, i) => a + (boosts[i] === 0 && s > 0 ? s : 0), 0)
@@ -1513,7 +1515,7 @@ function buildDonut(groups, total, sz = 210) {
   const lbl_sz = Math.round(sz * 0.073)
   const lbl_sz_sm = Math.round(sz * 0.058)
   groups.forEach(([name, count], i) => {
-    const pct = count / total
+    const pct = count / arcTotal
     const adj = adjSpans[i]
     const span = adj - GAP
     if (span <= 0) { cur += adj; return }
@@ -1550,7 +1552,9 @@ function buildPie(groups, total, sz = 170) {
     return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><circle cx="${CX}" cy="${CY}" r="${RO}" fill="${color}"/>
       <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="central" font-family="Inter,-apple-system,sans-serif" font-size="${Math.round(sz*0.08)}" font-weight="600" fill="rgba(255,255,255,0.95)">100%</text></svg>`
   }
-  const rawSpans = groups.map(([,c]) => c / total * 360)
+  const sumGroups = groups.reduce((s, [,c]) => s + c, 0)
+  const arcTotal = Math.max(sumGroups, 1)
+  const rawSpans = groups.map(([,c]) => c / arcTotal * 360)
   const boosts = rawSpans.map(s => s > 0 && s < MIN_SPAN ? MIN_SPAN - s : 0)
   const totalBoost = boosts.reduce((a, b) => a + b, 0)
   const totalReducible = rawSpans.reduce((a, s, i) => a + (boosts[i] === 0 && s > 0 ? s : 0), 0)
@@ -1562,7 +1566,7 @@ function buildPie(groups, total, sz = 170) {
   const lbl_sz = Math.round(sz * 0.095)
   const lbl_sz_sm = Math.round(sz * 0.072)
   groups.forEach(([name, count], i) => {
-    const pct = count / total
+    const pct = count / arcTotal
     const adj = adjSpans[i]
     if (adj <= 0) return
     const s = cur, e = s + adj, mid = (s + e) / 2
@@ -1626,8 +1630,9 @@ function renderPieView(containerId, groups, total, title, jiraLink, jiraLinkText
   const el = document.getElementById(containerId)
   if (!el) return
   const svg = buildDonut(groups, total, 200)
+  const legendTotal = Math.max(groups.reduce((s, [,c]) => s + c, 0), 1)
   const legendHTML = groups.map(([name, count]) => {
-    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const pct = legendTotal > 0 ? Math.round(count / legendTotal * 100) : 0
     const color = statusColor(name)
     return `<div class="legend-item">
       <div style="flex:1;min-width:0">
@@ -1660,8 +1665,9 @@ function renderPieView(containerId, groups, total, title, jiraLink, jiraLinkText
 // ── Dual Pie Section helpers ──
 function buildPieSectionLegend(groups, total, jqlFn, displayFn) {
   const _df = displayFn || (x => x)
+  const legendTotal = Math.max(groups.reduce((s, [,c]) => s + c, 0), 1)
   return groups.map(([name, count]) => {
-    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const pct = legendTotal > 0 ? Math.round(count / legendTotal * 100) : 0
     const color = statusColor(name)
     const dn = _df(name)
     const nameEl = jqlFn
@@ -2358,8 +2364,9 @@ function buildPt2DTable(issues, title, statusList, getOwners, mode = 'exclude', 
 }
 
 function renderPtCard(sys, groups, total, issues) {
+  const legendTotal = Math.max(groups.reduce((s, [,c]) => s + c, 0), 1)
   const legendHTML = groups.map(([name, count]) => {
-    const pct = total > 0 ? Math.round(count / total * 100) : 0
+    const pct = legendTotal > 0 ? Math.round(count / legendTotal * 100) : 0
     const color = statusColor(name)
     const jql = `${sys.jql()} AND status = "${jqlEscape(name)}"`
     const href = jiraJqlUrl(jql)
@@ -3375,8 +3382,15 @@ function showApp() {
     if (ddBtn) {
       e.preventDefault(); e.stopPropagation()
       const wrap = ddBtn.closest('.tt-dd-wrap')
-      const isGroupBy = wrap?.dataset.fkey === '__groupby'
-      const menuFinder = () => wrap ? wrap.querySelector('.tt-dd-menu') : null
+      const fkey = wrap?.dataset.fkey
+      const isGroupBy = fkey === '__groupby'
+      let root = wrap?.parentElement
+      while (root && !root.id) root = root.parentElement
+      if (!root) root = document.body
+      const menuFinder = () => {
+        const liveWrap = root.querySelector(`.tt-dd-wrap[data-fkey="${fkey}"]`)
+        return liveWrap ? liveWrap.querySelector('.tt-dd-menu') : null
+      }
       openSheet(isGroupBy ? 'Group by' : 'Filter', isGroupBy ? 'single' : 'multi', menuFinder, '.tt-dd-item', ['tt-dd-sel'])
       return
     }
