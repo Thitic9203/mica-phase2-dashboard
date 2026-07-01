@@ -711,7 +711,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .pt-blocked-wrap {
   margin-top: 28px;
   background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px 24px 24px;
+  border-radius: var(--radius); padding: 13px 24px 24px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
 }
 .pt-blocked-head {
@@ -765,7 +765,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-left-col { padding-right: 0; }
   .pt-right-col { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 14px; }
   /* Blocked section */
-  .pt-blocked-wrap { padding: 16px 16px 18px; }
+  .pt-blocked-wrap { padding: 13px 16px 18px; }
   /* KPI */
   .dash-kpi { grid-template-columns: repeat(2, 1fr); }
 }
@@ -913,7 +913,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-done-pill { padding: 10px 14px; }
   .pt-done-num { font-size: 1.5rem; }
   /* Blocked section */
-  .pt-blocked-wrap { padding: 14px 12px 16px; }
+  .pt-blocked-wrap { padding: 13px 12px 16px; }
   .pt-blocked-head { gap: 8px; margin-bottom: 10px; padding-bottom: 10px; }
   .pt-blocked-title { font-size: 13px; }
   /* Auth */
@@ -1860,7 +1860,7 @@ function initTicketTable(containerId, issues) {
     ).join('')
 
     container.innerHTML = `
-      <div class="section-row" style="margin-top:24px">
+      <div class="section-row" style="margin-top:13px">
         <span class="section-title">Ticket List</span>
         <span class="section-sub">${rows.length} tickets</span>
         <button class="tt-clear-btn" id="tt-clr" style="margin-left:auto;visibility:${hasF?'visible':'hidden'}">✕ Clear</button>
