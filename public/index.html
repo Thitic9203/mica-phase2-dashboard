@@ -1090,6 +1090,21 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 </div>
 
 <script type="module">
+const APP_VERSION = '2025.07.01a'
+;(function cacheBust() {
+  const prev = localStorage.getItem('mica_app_version')
+  if (prev && prev !== APP_VERSION) {
+    localStorage.clear()
+    sessionStorage.clear()
+    if ('caches' in window) caches.keys().then(ks => ks.forEach(k => caches.delete(k)))
+    navigator.serviceWorker?.getRegistrations().then(rs => rs.forEach(r => r.unregister()))
+    localStorage.setItem('mica_app_version', APP_VERSION)
+    location.reload()
+    return
+  }
+  localStorage.setItem('mica_app_version', APP_VERSION)
+})()
+
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js'
 
