@@ -458,6 +458,7 @@ body {
 .tt-summary-cell { max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
 .tt-summary-text { line-height: 1.45; font-size: 11.5px; }
 .tt-badge { display: inline-flex; align-items: center; max-width: 100%; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: normal; word-break: break-word; border: 1px solid transparent; text-transform: uppercase; }
+.mt-status-cell .tt-badge { white-space: nowrap; }
 .tt-nil { color: var(--dim); }
 .tt-parent-key { font-family:'JetBrains Mono',monospace; font-size: 10.5px; font-weight: 400; color: var(--accent); text-decoration: none; }
 .tt-parent-key:hover { text-decoration: underline; }
@@ -2729,7 +2730,6 @@ function initMissingTable(containerId, issues) {
     { key:'qaOwner',   label:'QA Owner' },
     { key:'sprint',    label:'Sprint' },
     { key:'parentKey', label:'Epic' },
-    { key:'system',    label:'System' },
     { key:'missing',   label:'Missing' }
   ]
   const MUPPER = new Set(['status'])
@@ -2855,12 +2855,11 @@ function initMissingTable(containerId, issues) {
           return `<tr class="tt-tr">
             <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
             <td class="tt-td tt-summary-cell"><div class="tt-summary-text">${esc(r.summary)||'—'}</div></td>
-            <td class="tt-td">${mbdg(r.status)}</td>
+            <td class="tt-td mt-status-cell">${mbdg(r.status)}</td>
             <td class="tt-td" style="white-space:nowrap">${r.assignee||'<span class="tt-nil">—</span>'}</td>
             <td class="tt-td"><div class="tt-summary-text">${r.qaOwner||'<span class="tt-nil">—</span>'}</div></td>
             <td class="tt-td" style="white-space:nowrap">${r.sprint||'<span class="tt-nil">—</span>'}</td>
             <td class="tt-td">${par}</td>
-            <td class="tt-td" style="white-space:nowrap">${r.system||'<span class="tt-nil">—</span>'}</td>
             <td class="tt-td">${missingTags}</td>
           </tr>`
         }).join('')
@@ -2951,9 +2950,9 @@ function initMissingTable(containerId, issues) {
       <div class="tt-table-wrap" style="min-height:${Math.min(mst.pageSize, 10) * 42 + 44}px">
         <table class="tt-table" style="min-width:1100px">
           <colgroup>
-            <col style="width:100px"><col style="width:17%"><col style="width:120px">
+            <col style="width:100px"><col style="width:17%"><col style="width:160px">
             <col style="width:9%"><col style="width:10%"><col style="width:10%">
-            <col style="width:13%"><col style="width:8%"><col>
+            <col style="width:13%"><col>
           </colgroup>
           <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
       </div>
