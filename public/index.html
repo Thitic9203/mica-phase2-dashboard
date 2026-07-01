@@ -794,6 +794,19 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .sprint-notice > div { flex-direction: column !important; }
   .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(15,118,110,0.15) !important; }
   .sprint-notice ul { font-size: 10px; }
+  /* Sprint notice: collapsible on mobile (Phase 3) */
+  .sprint-notice.sn-collapsed { max-height: 48px; overflow: hidden; position: relative; }
+  .sprint-notice.sn-collapsed::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 28px;
+    background: linear-gradient(to bottom, transparent 60%, var(--bg) 100%);
+    pointer-events: none;
+  }
+  .sprint-notice.sn-expanded { max-height: none; }
+  .sn-toggle-btn {
+    display: block; width: 100%; text-align: center; background: none; border: none;
+    font-size: 11px; color: var(--accent); font-weight: 500; cursor: pointer;
+    padding: 4px 0 2px; margin: 0;
+  }
   /* Overview grid → single column */
   .ov-grid { grid-template-columns: 1fr; }
   .ov-col-half, .ov-col-1 { grid-column: span 1; }
@@ -865,7 +878,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .dash-kpi-label { font-size: 11px; }
   .dash-kpi-sub { font-size: 12px; }
   /* Toolbar + search */
-  .tt-search { flex: 1 1 auto; min-width: 0; }
+  .tt-search { flex: 1 1 100%; min-width: 0; }
   .tt-toolbar-row { flex-wrap: wrap; gap: 6px; }
   .tt-dd-wrap { flex: 1 1 calc(50% - 4px); min-width: 0; }
   .tt-dd-btn { font-size: 11px; padding: 6px 8px; }
@@ -875,10 +888,20 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   /* Table */
   .tt-table { min-width: 700px; font-size: 11px; }
   .tt-th, .tt-td { padding: 8px 8px; }
+  /* Right-edge fade to signal horizontal scrollability (mobile only; table forced to min-width above).
+     Uses a translucent black gradient (not an opaque card-colored one) so it stays visible against the
+     table's own white cells instead of blending away to nothing. position:relative here (not on the
+     base rule) keeps every mobile-only change confined to this media query. */
+  .tt-table-wrap { position: relative; }
+  .tt-table-wrap::after {
+    content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 28px;
+    background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.09));
+    pointer-events: none;
+  }
   .tt-pagination { gap: 8px; flex-direction: column; align-items: stretch; text-align: center; }
   .tt-page-info { font-size: 10.5px; }
-  .tt-page-btn { padding: 4px 8px; font-size: 11px; }
-  .tt-page-num { min-width: 26px; height: 26px; font-size: 11px; }
+  .tt-page-btn { padding: 15px 12px; font-size: 12px; line-height: 1; white-space: nowrap; }
+  .tt-page-num { min-width: 36px; height: 36px; font-size: 12.5px; }
   .tt-page-controls { justify-content: center; }
   /* Summary */
   .summary-card { padding: 14px 14px; }
@@ -887,6 +910,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .bar-track { min-width: 60px; }
   /* Section / groupby */
   .section-row { flex-wrap: wrap; gap: 6px; }
+  .section-title { font-size: 11px; white-space: normal; word-break: break-word; }
+  .section-sub { font-size: 10px; flex-shrink: 0; }
   .groupby-wrap { margin-left: 0; width: 100%; }
   .gb-menu { min-width: 160px; max-width: 90vw; }
   .gb-item { padding: 9px 12px; font-size: 12.5px; }
@@ -917,6 +942,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-blocked-wrap { padding: 13px 12px 16px; }
   .pt-blocked-head { gap: 8px; margin-bottom: 10px; padding-bottom: 10px; }
   .pt-blocked-title { font-size: 13px; }
+  /* Empty state */
+  .empty-sub { white-space: normal; word-break: break-word; }
   /* Auth */
   .auth-box { padding: 28px 24px 24px; }
   .auth-box h2 { font-size: 18px; }
@@ -941,6 +968,44 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .ov-kpi .dash-kpi-value { font-size: 18px; }
   .dash-kpi-value { font-size: 24px; }
 }
+
+/* ── BOTTOM SHEET (mobile) ──
+   Sits outside any media query. Defaults hidden (display:none + pointer-events:none)
+   so it never affects desktop/tablet layout; mobile JS controller toggles visibility
+   only when matchMedia('(max-width: 520px)') is true. z-index kept below #auth-gate (9999). */
+.bs-backdrop {
+  display: none; pointer-events: none;
+  position: fixed; inset: 0; z-index: 9989;
+  background: rgba(0,0,0,0.4);
+  opacity: 0; transition: opacity .2s ease;
+}
+.bs-backdrop.bs-open { display: block; pointer-events: auto; opacity: 1; }
+.bs-sheet {
+  display: none; pointer-events: none;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 9990;
+  max-height: 60vh; overflow-y: auto;
+  background: var(--card);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.18);
+  transform: translateY(calc(100% + 30px));
+  transition: transform .3s ease;
+  padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+.bs-sheet.bs-open { display: block; pointer-events: auto; transform: translateY(0); }
+.bs-handle-row { display: flex; justify-content: center; padding: 8px 0 4px; }
+.bs-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong); }
+.bs-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  padding: 4px 12px 10px; text-transform: uppercase; letter-spacing: .04em;
+}
+.bs-item {
+  padding: 12px 14px; border-radius: 10px; font-size: 14px; font-family: inherit;
+  color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  background: none; border: none; width: 100%; text-align: left;
+}
+.bs-item:active { background: var(--elevated); }
+.bs-item.bs-item-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.bs-item-check { color: var(--accent); font-weight: 700; margin-left: 8px; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -3057,6 +3122,7 @@ async function loadProgressTracker() {
 const _loaded = {}
 
 function switchView(viewId) {
+  window.__closeBottomSheet?.()
   document.querySelectorAll('.sb-nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.view === viewId)
   })
@@ -3166,6 +3232,198 @@ function showApp() {
   loadAll()
   setInterval(loadAll, 5 * 60 * 1000)
 }
+
+// ── BOTTOM SHEET (mobile dropdown interceptor) ──────────────────────────────
+// Single generic controller shared by every existing dropdown pattern:
+//   .tt-dd-btn   (multi-select filter dropdowns; also the Master Ticket
+//                 "group by" control, which reuses .tt-dd-btn/.tt-dd-item but
+//                 is single-select — detected via .tt-dd-wrap[data-fkey="__groupby"])
+//   .gb-trigger  (Epic Breakdown single-select group-by, #gb-trigger/#gb-menu)
+//   .tt-pgsz-btn (single-select page-size dropdown, multiple copies in the DOM)
+// It never reimplements filtering/grouping/paging logic — it only forwards a
+// synthetic click to the real (hidden) menu item so the existing, unmodified
+// per-view handlers do all the actual state updates and re-renders.
+;(function () {
+  const isMobile = () => window.matchMedia('(max-width: 520px)').matches
+
+  const backdrop = document.createElement('div')
+  backdrop.className = 'bs-backdrop'
+  const sheet = document.createElement('div')
+  sheet.className = 'bs-sheet'
+  sheet.innerHTML = '<div class="bs-handle-row"><div class="bs-handle"></div></div><div class="bs-title"></div><div class="bs-list"></div>'
+  document.body.appendChild(backdrop)
+  document.body.appendChild(sheet)
+  const titleEl = sheet.querySelector('.bs-title')
+  const listEl = sheet.querySelector('.bs-list')
+  const handleRow = sheet.querySelector('.bs-handle-row')
+
+  let activeMode = null // 'multi' | 'single'
+  let activeMenuFinder = null // () => real (hidden) menu element, re-queried fresh each time
+  let activeItemSelector = null // CSS selector for real items within that menu
+  let activeSelClasses = null // array of class names marking a "selected" real item (checked in order)
+
+  function isOpen() { return sheet.classList.contains('bs-open') }
+
+  function openSheet(title, mode, menuFinder, itemSelector, selClasses) {
+    activeMode = mode
+    activeMenuFinder = menuFinder
+    activeItemSelector = itemSelector
+    activeSelClasses = selClasses
+    titleEl.textContent = title
+    populateItems()
+    backdrop.classList.add('bs-open')
+    sheet.classList.add('bs-open')
+    document.body.style.overflow = 'hidden'
+  }
+
+  function closeSheet() {
+    backdrop.classList.remove('bs-open')
+    sheet.classList.remove('bs-open')
+    document.body.style.overflow = ''
+    activeMode = null
+    activeMenuFinder = null
+    activeItemSelector = null
+    activeSelClasses = null
+    listEl.innerHTML = ''
+  }
+
+  // Exposed so other unrelated code (e.g. switchView's sidebar nav) can force
+  // the sheet closed without reaching into this IIFE's private state.
+  window.__closeBottomSheet = closeSheet
+
+  function isRealItemSelected(realItem) {
+    if (!activeSelClasses) return false
+    return activeSelClasses.some(cls => realItem.classList.contains(cls))
+  }
+
+  function populateItems() {
+    listEl.innerHTML = ''
+    if (!activeMenuFinder) return
+    const menu = activeMenuFinder()
+    if (!menu) { closeSheet(); return }
+    const realItems = menu.querySelectorAll(activeItemSelector)
+    realItems.forEach((realItem, idx) => {
+      const isSel = isRealItemSelected(realItem)
+      const btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'bs-item' + (isSel ? ' bs-item-sel' : '')
+      btn.dataset.val = String(idx)
+      const label = document.createElement('span')
+      label.textContent = realItem.textContent.trim()
+      btn.appendChild(label)
+      if (isSel) {
+        const check = document.createElement('span')
+        check.className = 'bs-item-check'
+        check.textContent = '✓'
+        btn.appendChild(check)
+      }
+      btn.addEventListener('click', () => onSheetItemTap(idx))
+      listEl.appendChild(btn)
+    })
+  }
+
+  function onSheetItemTap(idx) {
+    if (!activeMenuFinder) return
+    // Re-query the real menu fresh — it may have been replaced via innerHTML
+    // re-render since the sheet was opened (e.g. after a previous multi-select tap).
+    const menu = activeMenuFinder()
+    if (!menu) { closeSheet(); return }
+    const realItems = menu.querySelectorAll(activeItemSelector)
+    const target = realItems[idx]
+    if (!target) { closeSheet(); return }
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    if (activeMode === 'multi') {
+      // Stays open; refresh checkmarks against the (possibly new) real menu.
+      populateItems()
+    } else {
+      closeSheet()
+    }
+  }
+
+  backdrop.addEventListener('click', closeSheet)
+  handleRow.addEventListener('click', closeSheet)
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen()) closeSheet() })
+
+  // Single capture-phase interceptor. Must run (and stop propagation) before
+  // the existing bubble-phase handlers open the absolute-positioned menu —
+  // capture:true is what makes that ordering possible.
+  document.addEventListener('click', e => {
+    if (!isMobile()) return // desktop/tablet: do nothing, let native dropdowns work unmodified
+
+    const pgszBtn = e.target.closest('.tt-pgsz-btn')
+    if (pgszBtn) {
+      e.preventDefault(); e.stopPropagation()
+      const wrap = pgszBtn.closest('.tt-pgsz-wrap')
+      const menuFinder = () => wrap ? wrap.querySelector('.tt-pgsz-menu') : null
+      // 'tt-pgsz-sel' is the canonical selected-state class; 'mt-pgsz-sel' covers
+      // a pre-existing typo in one copy of this markup (Master Ticket table) —
+      // checking both keeps the sheet's checkmark correct without touching that code.
+      openSheet('Rows per page', 'single', menuFinder, '.tt-pgsz-item', ['tt-pgsz-sel', 'mt-pgsz-sel'])
+      return
+    }
+
+    const gbTrigger = e.target.closest('.gb-trigger')
+    if (gbTrigger) {
+      e.preventDefault(); e.stopPropagation()
+      const menuFinder = () => document.getElementById('gb-menu')
+      openSheet('Group by', 'single', menuFinder, '.gb-item', ['gb-item--selected'])
+      return
+    }
+
+    const ddBtn = e.target.closest('.tt-dd-btn')
+    if (ddBtn) {
+      e.preventDefault(); e.stopPropagation()
+      const wrap = ddBtn.closest('.tt-dd-wrap')
+      const isGroupBy = wrap?.dataset.fkey === '__groupby'
+      const menuFinder = () => wrap ? wrap.querySelector('.tt-dd-menu') : null
+      openSheet(isGroupBy ? 'Group by' : 'Filter', isGroupBy ? 'single' : 'multi', menuFinder, '.tt-dd-item', ['tt-dd-sel'])
+      return
+    }
+  }, { capture: true })
+})()
+
+/* ── Collapsible sprint notice (mobile) ── */
+;(function () {
+  const mq = window.matchMedia('(max-width: 520px)')
+
+  document.querySelectorAll('.sprint-notice').forEach(notice => {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'sn-toggle-btn'
+    btn.textContent = 'Show more'
+    btn.style.display = 'none'
+    notice.insertAdjacentElement('afterend', btn)
+
+    let expanded = false
+
+    function applyState() {
+      if (mq.matches) {
+        btn.style.display = 'block'
+        if (expanded) {
+          notice.classList.remove('sn-collapsed')
+          notice.classList.add('sn-expanded')
+          btn.textContent = 'Show less'
+        } else {
+          notice.classList.remove('sn-expanded')
+          notice.classList.add('sn-collapsed')
+          btn.textContent = 'Show more'
+        }
+      } else {
+        // Desktop: never collapse, hide toggle, leave content exactly as-is
+        notice.classList.remove('sn-collapsed', 'sn-expanded')
+        btn.style.display = 'none'
+      }
+    }
+
+    btn.addEventListener('click', () => {
+      expanded = !expanded
+      applyState()
+    })
+
+    mq.addEventListener('change', applyState)
+    applyState()
+  })
+})()
 </script>
 </body>
 </html>
