@@ -1749,8 +1749,12 @@ function initTicketTable(containerId, issues) {
         const fkey = wrap?.dataset.fkey
         const menu = btn.nextElementSibling
         const isOpen = menu.style.display !== 'none'
+        container.querySelectorAll('.tt-dd-menu').forEach(m => {
+          if (m !== menu && m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
+        })
+        st.openMenus.clear()
         if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); st.openMenus.add(fkey) }
-        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false'); st.openMenus.delete(fkey) }
+        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false') }
         return
       }
       const item = e.target.closest('.tt-dd-item[data-fkey]')
@@ -2485,8 +2489,12 @@ function initBlockedTable(containerId, issues) {
         const fkey = wrap?.dataset.fkey
         const menu = btn.nextElementSibling
         const isOpen = menu.style.display !== 'none'
+        container.querySelectorAll('.tt-dd-menu').forEach(m => {
+          if (m !== menu && m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
+        })
+        bst.openMenus.clear()
         if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); bst.openMenus.add(fkey) }
-        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false'); bst.openMenus.delete(fkey) }
+        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false') }
         return
       }
       const item = e.target.closest('.tt-dd-item[data-fkey]')
@@ -2775,8 +2783,12 @@ function initMissingTable(containerId, issues) {
         const fkey = wrap?.dataset.fkey
         const menu = btn.nextElementSibling
         const isOpen = menu.style.display !== 'none'
+        container.querySelectorAll('.tt-dd-menu').forEach(m => {
+          if (m !== menu && m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
+        })
+        mst.openMenus.clear()
         if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); mst.openMenus.add(fkey) }
-        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false'); mst.openMenus.delete(fkey) }
+        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false') }
         return
       }
       const item = e.target.closest('.tt-dd-item[data-fkey]')
