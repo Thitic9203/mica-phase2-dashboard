@@ -2849,8 +2849,8 @@ function initMissingTable(containerId, issues) {
           const par = r.parentKey
             ? `<a class="tt-parent-key" href="https://skilllane.atlassian.net/browse/${r.parentKey}" target="_blank" rel="noopener">${r.parentKey}</a>${r.parentName?`<span class="tt-parent-name">${esc(r.parentName)}</span>`:''}`
             : '<span class="tt-nil">—</span>'
-          const missingTags = r.missing ? `<div style="display:flex;flex-wrap:wrap;gap:5px">${r.missing.split(', ').map(m =>
-            `<span class="tt-badge" style="background:#E8453C33;color:#C0392B;border-color:#E8453C55;font-size:10px">${m}</span>`
+          const missingTags = r.missing ? `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:5px">${r.missing.split(', ').map(m =>
+            `<span class="tt-badge" style="background:#E8453C33;color:#C0392B;border-color:#E8453C55;font-size:10px;white-space:nowrap">${m}</span>`
           ).join('')}</div>` : ''
           return `<tr class="tt-tr">
             <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
@@ -2952,7 +2952,7 @@ function initMissingTable(containerId, issues) {
           <colgroup>
             <col style="width:100px"><col style="width:17%"><col style="width:160px">
             <col style="width:9%"><col style="width:10%"><col style="width:10%">
-            <col style="width:13%"><col>
+            <col style="width:18%"><col style="width:130px">
           </colgroup>
           <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
       </div>
