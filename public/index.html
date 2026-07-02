@@ -3201,7 +3201,7 @@ function renderEmptyEpicLists() {
     ).join('')
     const section = document.createElement('div')
     section.className = 'epic-empty-section'
-    section.innerHTML = `<div class="epic-empty-heading">Epic ที่ไม่มี Ticket (${emptyEpics.length})</div><div class="epic-empty-list">${chips}</div>`
+    section.innerHTML = `<div class="epic-empty-heading">Epics Without Tickets (${emptyEpics.length})</div><div class="epic-empty-list">${chips}</div>`
     group.appendChild(section)
   })
 }
