@@ -146,6 +146,7 @@ body {
 /* ── VIEW PANELS ── */
 .view-panel { padding: 28px 28px 40px; }
 #view-epic-tc.view-panel { padding-top: 14px; }
+#view-progress-tracker.view-panel { padding-top: 14px; }
 
 
 /* ── PAGE HEADER ── */
@@ -1070,39 +1071,34 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       <div class="sprint-notice" style="align-items:stretch;flex-direction:column;gap:0">
         <div style="display:flex;gap:0;flex-wrap:wrap">
           <!-- Left: Data source -->
-          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;min-width:0">
+          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="min-width:0">
-              <div style="font-weight:600;margin-bottom:6px">ข้อมูลในหน้านี้ดึงมาจาก Jira — เฉพาะ ticket ที่มีทั้ง <strong>Epic</strong> และ <strong>Sprint</strong> เท่านั้น ครอบคลุมทั้ง 4 ระบบ<br>(EvMS, ELMS, CBMS, OLS)</div>
-              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
+              <div style="font-weight:600;margin-bottom:3px">ข้อมูลจาก Jira — ticket ที่มี <strong>Epic</strong> + <strong>Sprint</strong> (EvMS, ELMS, CBMS, OLS)</div>
+              <div style="margin-bottom:2px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
               <ul>
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — ELMS, CBMS, EvMS</li>
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — OLS</li>
               </ul>
-              <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(15,118,110,0.12)">
-                <div style="font-weight:500;color:var(--text);margin-bottom:4px">หลักการนับ ticket:</div>
+              <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(15,118,110,0.12)">
+                <div style="font-weight:500;color:var(--text);margin-bottom:2px">หลักการนับ ticket:</div>
                 <ul>
-                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
-                  <li><strong>Sprint:</strong>
-                    <ul style="margin-top:4px">
-                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (future)</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้ว)</li>
-                    </ul>
-                  </li>
-                  <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น — ป้องกัน double count กรณี ticket มีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขใน Jira เมื่อกดลิงก์อาจสูงกว่า เนื่องจาก Jira แสดงทุก ticket ที่ person นั้นเป็น QA owner ไม่ว่าจะเป็น primary หรือไม่)</span></li>
+                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูก Epic (ไม่รวม Sub-task, Epic)</li>
+                  <li><strong>Sprint:</strong> active/future = นับ · Backlog = ไม่นับ</li>
+                  <li><strong>QA Owner:</strong> นับ primary เท่านั้น (ป้องกัน double count)</li>
                 </ul>
               </div>
             </div>
           </div>
           <!-- Right: Jira update checklist -->
-          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
+          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="min-width:0">
-              <div style="font-weight:600;margin-bottom:6px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
+              <div style="font-weight:600;margin-bottom:3px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
               <ul>
-                <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดหมวดหมู่ในแต่ละระบบอย่างถูกต้อง</li>
-                <li><strong>Sprint</strong> — ย้าย ticket เข้า Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้</li>
-                <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง เช่น In Progress, Ready to Test, Done</li>
+                <li><strong>Epic</strong> — ผูก ticket ให้ถูก epic ของระบบ</li>
+                <li><strong>Sprint</strong> — ย้าย ticket เข้า Sprint active หรือ planned</li>
+                <li><strong>Status</strong> — อัปเดตให้ตรงจริง (In Progress / Ready to Test / Done)</li>
                 <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
                 <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
               </ul>
@@ -1143,39 +1139,34 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       <div class="sprint-notice" style="align-items:stretch;flex-direction:column;gap:0">
         <div style="display:flex;gap:0;flex-wrap:wrap">
           <!-- Left: Data source -->
-          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;min-width:0">
+          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="min-width:0">
-              <div style="font-weight:600;margin-bottom:6px">ข้อมูลในหน้านี้ดึงมาจาก Jira — เฉพาะ ticket ที่มีทั้ง <strong>Epic</strong> และ <strong>Sprint</strong> เท่านั้น ครอบคลุมทั้ง 4 ระบบ<br>(EvMS, ELMS, CBMS, OLS)</div>
-              <div style="margin-bottom:4px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
+              <div style="font-weight:600;margin-bottom:3px">ข้อมูลจาก Jira — ticket ที่มี <strong>Epic</strong> + <strong>Sprint</strong> (EvMS, ELMS, CBMS, OLS)</div>
+              <div style="margin-bottom:2px;font-weight:500;color:var(--text)">ที่มาของข้อมูล:</div>
               <ul>
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> — ELMS, CBMS, EvMS</li>
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> — OLS</li>
               </ul>
-              <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(15,118,110,0.12)">
-                <div style="font-weight:500;color:var(--text);margin-bottom:4px">หลักการนับ ticket:</div>
+              <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(15,118,110,0.12)">
+                <div style="font-weight:500;color:var(--text);margin-bottom:2px">หลักการนับ ticket:</div>
                 <ul>
-                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
-                  <li><strong>Sprint:</strong>
-                    <ul style="margin-top:4px">
-                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (future)</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้ว)</li>
-                    </ul>
-                  </li>
-                  <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น — ป้องกัน double count กรณี ticket มีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขใน Jira เมื่อกดลิงก์อาจสูงกว่า เนื่องจาก Jira แสดงทุก ticket ที่ person นั้นเป็น QA owner ไม่ว่าจะเป็น primary หรือไม่)</span></li>
+                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูก Epic (ไม่รวม Sub-task, Epic)</li>
+                  <li><strong>Sprint:</strong> active/future = นับ · Backlog = ไม่นับ</li>
+                  <li><strong>QA Owner:</strong> นับ primary เท่านั้น (ป้องกัน double count)</li>
                 </ul>
               </div>
             </div>
           </div>
           <!-- Right: Jira update checklist -->
-          <div style="flex:1 1 340px;padding:10px 14px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
+          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="min-width:0">
-              <div style="font-weight:600;margin-bottom:6px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
+              <div style="font-weight:600;margin-bottom:3px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
               <ul>
-                <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดหมวดหมู่ในแต่ละระบบอย่างถูกต้อง</li>
-                <li><strong>Sprint</strong> — ย้าย ticket เข้า Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้</li>
-                <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง เช่น In Progress, Ready to Test, Done</li>
+                <li><strong>Epic</strong> — ผูก ticket ให้ถูก epic ของระบบ</li>
+                <li><strong>Sprint</strong> — ย้าย ticket เข้า Sprint active หรือ planned</li>
+                <li><strong>Status</strong> — อัปเดตให้ตรงจริง (In Progress / Ready to Test / Done)</li>
                 <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
                 <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
               </ul>
