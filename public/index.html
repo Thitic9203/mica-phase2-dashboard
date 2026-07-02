@@ -2207,22 +2207,22 @@ async function loadTicketOverview() {
 const PT_SYSTEMS = [
   {
     id: 'OLS', name: 'Open Learning System (OLS)', color: '#4CAF76',
-    jql: () => `project = OLS AND sprint is not EMPTY`,
+    jql: () => { const k = EPICS.filter(e => e.system === 'OLS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818',
   },
   {
     id: 'ELMS', name: 'Extended Learning Management System (ELMS)', color: '#8A78BF',
-    jql: () => `parent in (MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND sprint is not EMPTY`,
+    jql: () => { const k = EPICS.filter(e => e.system === 'ELMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
     id: 'CBMS', name: 'Credit Bank Management System (CBMS)', color: '#C0986A',
-    jql: () => `parent in (MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND sprint is not EMPTY`,
+    jql: () => { const k = EPICS.filter(e => e.system === 'CBMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
     id: 'EvMS', name: 'Evaluation Management System (EvMS)', color: '#4487C5',
-    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636) AND sprint is not EMPTY`,
+    jql: () => { const k = EPICS.filter(e => e.system === 'EvMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
 ]
