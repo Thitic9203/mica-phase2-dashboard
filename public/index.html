@@ -1426,13 +1426,13 @@ function reRenderAllEpics() {
 const STATUS_KEYWORD_COLORS = [
   [['done','closed','resolved','completed','approved','accepted','finish'],   '#4CAF76'],
   [['in progress','in development','progress','development'],                 '#4487C5'],
-  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#8A78BF'],
-  [['code review','in review','review','peer review'],                        '#B07AC0'],
+  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#3BA8A8'],
+  [['code review','in review','review','peer review'],                        '#8A78BF'],
   [['to do','todo','open','backlog','new','ready','selected'],                '#A8A8AD'],
   [['blocked','on hold','hold','waiting','pending'],                          '#C0986A'],
   [['rejected','cancelled','canceled','wont fix',"won't fix",'invalid'],     '#C07A7A'],
 ]
-const FALLBACK_PALETTE = ['#4487C5','#8A78BF','#4CAF76','#C0986A','#AEAEB2','#B07AC0','#C07A7A','#B8A87A']
+const FALLBACK_PALETTE = ['#B07AC0','#B8A87A','#7A9CC0','#9CC07A','#C07AA8','#D4A827','#7A7AC0','#A8B880']
 const _dynamicColorMap = {}
 
 function statusColor(name) {
