@@ -2424,24 +2424,20 @@ function renderPtCard(sys, groups, total, issues) {
     <div class="sbc-legend">${typeLegend}</div>
   </div>`
 
-  // ── Done stat ──
-  const doneIssues = issues.filter(iss => {
-    const s = (iss.fields?.status?.name || '').toLowerCase().trim()
+  // ── Done stat — uses same total/pct as donut legend ──
+  const doneGroups = groups.filter(([name]) => {
+    const s = name.toLowerCase().trim()
     return s === 'done' || s === 'closed' || s === 'resolved'
   })
-  const sbTotal = issues.filter(iss => {
-    const t = (iss.fields?.issuetype?.name || '').toLowerCase()
-    return t === 'story' || t === 'bug' || t === 'task'
-  }).length
-  const donePct = total > 0 ? Math.round(doneIssues.length / total * 100) : 0
-  const doneStatuses = [...new Set(doneIssues.map(i => i.fields?.status?.name || 'Done'))]
-  const doneLabel = doneStatuses.join(' / ') || 'Done'
+  const doneCount = doneGroups.reduce((s, [,c]) => s + c, 0)
+  const donePct = legendTotal > 0 ? Math.round(doneCount / legendTotal * 100) : 0
+  const doneLabel = doneGroups.map(([name]) => name).join(' / ') || 'Done'
   const doneHTML = `<div class="pt-waiting pt-waiting-narrow">
-    <div class="pt-waiting-head">Done <span class="pt-waiting-count">${doneIssues.length}</span></div>
+    <div class="pt-waiting-head">Done <span class="pt-waiting-count">${doneCount}</span></div>
     <div class="pt-done-pill">
       <div class="pt-done-num">${donePct}%</div>
       <div class="pt-done-status">${esc(doneLabel.toUpperCase())}</div>
-      <div class="pt-done-pct">${doneIssues.length} of ${sbTotal} tickets</div>
+      <div class="pt-done-pct">${doneCount} of ${legendTotal} tickets</div>
     </div>
   </div>`
 
