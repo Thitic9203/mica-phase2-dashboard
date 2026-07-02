@@ -1103,7 +1103,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                   <li><strong>Sprint:</strong>
                     <ul style="margin-top:4px">
                       <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (future)</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้วโดยยังไม่ได้ย้ายไป sprint ใหม่)</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้ว)</li>
                     </ul>
                   </li>
                 </ul>
@@ -1175,7 +1175,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                   <li><strong>Sprint:</strong>
                     <ul style="margin-top:4px">
                       <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (future)</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้วโดยยังไม่ได้ย้ายไป sprint ใหม่)</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้ว)</li>
                     </ul>
                   </li>
                 </ul>
@@ -2289,17 +2289,17 @@ const PT_SYSTEMS = [
   },
   {
     id: 'ELMS', name: 'Extended Learning Management System (ELMS)', color: '#8A78BF',
-    jql: () => { const k = EPICS.filter(e => e.system === 'ELMS').map(e => e.key).join(','); return `parent in (${k},MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND ${EPIC_FILTER}` },
+    jql: () => { const k = EPICS.filter(e => e.system === 'ELMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
     id: 'CBMS', name: 'Credit Bank Management System (CBMS)', color: '#C0986A',
-    jql: () => { const k = EPICS.filter(e => e.system === 'CBMS').map(e => e.key).join(','); return `parent in (${k},MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND ${EPIC_FILTER}` },
+    jql: () => { const k = EPICS.filter(e => e.system === 'CBMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
     id: 'EvMS', name: 'Evaluation Management System (EvMS)', color: '#4487C5',
-    jql: () => { const k = EPICS.filter(e => e.system === 'EvMS').map(e => e.key).join(','); return `parent in (${k},MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636) AND ${EPIC_FILTER}` },
+    jql: () => { const k = EPICS.filter(e => e.system === 'EvMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
 ]
@@ -2463,7 +2463,10 @@ function renderPtCard(sys, groups, total, issues) {
   const svg = total > 0 ? buildPtDonut(groups, total) : buildPtDonut([], 0)
 
   // ── Waiting for Dev table ──
-  const devBaseJql = `${sys.jql()} AND status not in ("${PT_EXCLUDED_DEV.map(jqlEscape).join('","')}")`
+  const devExcluded = [...new Set(issues.map(i => i.fields?.status?.name).filter(s => s && ptStatusMatch(s, PT_EXCLUDED_DEV)))]
+  const devBaseJql = devExcluded.length
+    ? `${sys.jql()} AND status not in ("${devExcluded.map(jqlEscape).join('","')}")`
+    : sys.jql()
   const waitingTableHTML = buildPt2DTable(
     issues, 'Waiting for Dev', PT_EXCLUDED_DEV,
     iss => [iss.fields?.assignee?.displayName || 'Unassigned'],
@@ -2519,7 +2522,10 @@ function renderPtCard(sys, groups, total, issues) {
   </div>`
 
   // ── Waiting for QA table ──
-  const qaBaseJql = `${sys.jql()} AND status in ("${PT_INCLUDED_QA.map(jqlEscape).join('","')}")`
+  const qaIncluded = [...new Set(issues.map(i => i.fields?.status?.name).filter(s => s && ptStatusMatch(s, PT_INCLUDED_QA)))]
+  const qaBaseJql = qaIncluded.length
+    ? `${sys.jql()} AND status in ("${qaIncluded.map(jqlEscape).join('","')}")`
+    : ''
   const waitingQAHTML = buildPt2DTable(
     issues, 'Waiting for QA', PT_INCLUDED_QA,
     iss => {
@@ -3273,7 +3279,7 @@ function renderEmptyEpicLists() {
     if (old) old.remove()
     if (!emptyEpics.length) return
     const chips = emptyEpics.map(e =>
-      `<a class="epic-empty-chip" href="${jiraJqlUrl(`parent = ${e.key}`)}" target="_blank" rel="noopener"><span class="chip-key">${e.key}</span><span class="chip-name">${esc(e.name)}</span></a>`
+      `<a class="epic-empty-chip" href="${jiraJqlUrl(`parent = ${e.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener"><span class="chip-key">${e.key}</span><span class="chip-name">${esc(e.name)}</span></a>`
     ).join('')
     const section = document.createElement('div')
     section.className = 'epic-empty-section'
