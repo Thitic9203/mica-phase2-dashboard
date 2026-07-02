@@ -2429,15 +2429,19 @@ function renderPtCard(sys, groups, total, issues) {
     const s = (iss.fields?.status?.name || '').toLowerCase().trim()
     return s === 'done' || s === 'closed' || s === 'resolved'
   })
+  const sbTotal = issues.filter(iss => {
+    const t = (iss.fields?.issuetype?.name || '').toLowerCase()
+    return t === 'story' || t === 'bug' || t === 'task'
+  }).length
   const donePct = total > 0 ? Math.round(doneIssues.length / total * 100) : 0
   const doneStatuses = [...new Set(doneIssues.map(i => i.fields?.status?.name || 'Done'))]
   const doneLabel = doneStatuses.join(' / ') || 'Done'
   const doneHTML = `<div class="pt-waiting pt-waiting-narrow">
     <div class="pt-waiting-head">Done <span class="pt-waiting-count">${doneIssues.length}</span></div>
     <div class="pt-done-pill">
-      <div class="pt-done-num">${doneIssues.length}</div>
+      <div class="pt-done-num">${donePct}%</div>
       <div class="pt-done-status">${esc(doneLabel.toUpperCase())}</div>
-      <div class="pt-done-pct">${donePct}% OF TOTAL</div>
+      <div class="pt-done-pct">${doneIssues.length} of ${sbTotal} tickets</div>
     </div>
   </div>`
 
