@@ -1099,8 +1099,13 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
               <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(15,118,110,0.12)">
                 <div style="font-weight:500;color:var(--text);margin-bottom:4px">หลักการนับ ticket:</div>
                 <ul>
-                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ และมี Sprint ระบุแล้ว</li>
-                  <li>Issue type อื่น (Sub-task, Epic ฯลฯ) และ ticket ที่ยังไม่มี Sprint จะไม่ถูกนับ</li>
+                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
+                  <li><strong>Sprint:</strong>
+                    <ul style="margin-top:4px">
+                      <li><strong>นับมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (future)</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้วโดยยังไม่ได้ย้ายไป sprint ใหม่)</li>
+                    </ul>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -1112,7 +1117,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
               <div style="font-weight:600;margin-bottom:6px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
               <ul>
                 <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดหมวดหมู่ในแต่ละระบบอย่างถูกต้อง</li>
-                <li><strong>Sprint</strong> — กำหนด sprint ให้ทุก ticket (หาก ticket ใดไม่มี sprint จะไม่แสดงในสถิติ)</li>
+                <li><strong>Sprint</strong> — ย้าย ticket เข้า Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (ticket ใน Backlog section หรือ sprint ที่ถูกปิดแล้วจะไม่แสดงในสถิติ)</li>
                 <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง เช่น In Progress, Ready to Test, Done</li>
                 <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
                 <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
@@ -1166,8 +1171,13 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
               <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(15,118,110,0.12)">
                 <div style="font-weight:500;color:var(--text);margin-bottom:4px">หลักการนับ ticket:</div>
                 <ul>
-                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ และมี Sprint ระบุแล้ว</li>
-                  <li>Issue type อื่น (Sub-task, Epic ฯลฯ) และ ticket ที่ยังไม่มี Sprint จะไม่ถูกนับ</li>
+                  <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
+                  <li><strong>Sprint:</strong>
+                    <ul style="margin-top:4px">
+                      <li><strong>นับมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (future)</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้วโดยยังไม่ได้ย้ายไป sprint ใหม่)</li>
+                    </ul>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -1179,17 +1189,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
               <div style="font-weight:600;margin-bottom:6px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
               <ul>
                 <li><strong>Epic</strong> — ทุก ticket ต้องผูกกับ epic ที่ถูกต้องเพื่อจัดหมวดหมู่ในแต่ละระบบอย่างถูกต้อง</li>
-                <li><strong>Sprint</strong> — กำหนด sprint ให้ทุก ticket (หาก ticket ใดไม่มี sprint จะไม่แสดงในสถิติ)</li>
+                <li><strong>Sprint</strong> — ย้าย ticket เข้า Sprint ที่กำลัง active หรือ Sprint ที่วางแผนไว้ (ticket ใน Backlog section หรือ sprint ที่ถูกปิดแล้วจะไม่แสดงในสถิติ)</li>
                 <li><strong>Status</strong> — อัปเดตสถานะให้ตรงกับความเป็นจริง เช่น In Progress, Ready to Test, Done</li>
                 <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
                 <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
               </ul>
-              <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(15,118,110,0.12)">
-                <div style="font-weight:500;color:var(--text);margin-bottom:4px">เงื่อนไขพิเศษ OLS:</div>
-                <ul>
-                  <li>Ticket ที่มี label <strong>backlog</strong> ถูกตัดจากสถิติ OLS ทั้งหมด — งานไว้ทำ<strong>ภายหลัง</strong>ส่งมอบ ไม่ใช่ scope ปัจจุบัน</li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -1376,10 +1380,10 @@ const EPICS = [
   { key: 'MICA2-636', name: 'Exam Room',                       system: 'EvMS' },
 ]
 const ALL_EPIC_KEYS = EPICS.map(e => e.key)
-function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',',MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629,MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653,MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636)})` }
+function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',')})` }
 
 // ── Epic group-by options ──
-const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND sprint is not EMPTY'
+const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints())'
 const GROUP_OPTIONS = [
   {
     key: 'tcStatus', label: 'TC Status',
@@ -2064,9 +2068,10 @@ function initTicketTable(containerId, issues) {
 async function loadTicketOverview() {
   const el = document.getElementById('ticket-overview-content')
   try {
+    const activeJql = `${jqlAllEpics()} AND (sprint in openSprints() OR sprint in futureSprints())`
     const [allTickets, sbTickets] = await Promise.all([
-      fetchIssues(jqlAllEpics(), 'summary,customfield_12127,customfield_12128,customfield_12120,customfield_11013,status,assignee,parent,customfield_10008'),
-      fetchIssues(`${jqlAllEpics()} AND issuetype in (Story, Bug, Task)`, 'status,issuetype,customfield_12120,customfield_11013')
+      fetchIssues(activeJql, 'summary,customfield_12127,customfield_12128,customfield_12120,customfield_11013,status,assignee,parent,customfield_10008'),
+      fetchIssues(`${activeJql} AND issuetype in (Story, Bug, Task)`, 'status,issuetype,customfield_12120,customfield_11013')
     ])
 
     const totalCount = allTickets.length
@@ -2242,27 +2247,27 @@ async function loadTicketOverview() {
         <div class="ov-col ov-col-half">
           <div class="section-row ov-section-row"><span class="section-title">QA Ownership</span></div>
           <div class="dual-pie-grid" style="flex:1">
-            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#88B4DC', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${qaOwnerClause(n)}`), sn)}
-            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#DC8896', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${qaOwnerClause(n)}`), sn)}
+            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#88B4DC', n => jiraJqlUrl(`${activeJql} AND issuetype = Story AND ${qaOwnerClause(n)}`), sn)}
+            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#DC8896', n => jiraJqlUrl(`${activeJql} AND issuetype = Bug AND ${qaOwnerClause(n)}`), sn)}
           </div>
         </div>
         <div class="ov-col ov-col-1 pie-mid">
           <div class="section-row ov-section-row"><span class="section-title">Ticket Details</span></div>
           <div style="flex:1">
-            ${stackedBarCard('Ticket Details', detailGroups, totalCount, '#88B4DC', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12127]', n)}`))}
+            ${stackedBarCard('Ticket Details', detailGroups, totalCount, '#88B4DC', n => jiraJqlUrl(`${activeJql} AND ${fieldClause('cf[12127]', n)}`))}
           </div>
         </div>
         <div class="ov-col ov-col-1 pie-mid">
           <div class="section-row ov-section-row"><span class="section-title">TC Status</span></div>
           <div style="flex:1">
-            ${stackedBarCard('TC Status', tcGroups, totalCount, '#A89ED8', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12128]', n)}`))}
+            ${stackedBarCard('TC Status', tcGroups, totalCount, '#A89ED8', n => jiraJqlUrl(`${activeJql} AND ${fieldClause('cf[12128]', n)}`))}
           </div>
         </div>
         <div class="ov-col ov-col-half pie-mid">
           <div class="section-row ov-section-row"><span class="section-title">Status Breakdown</span></div>
           <div class="dual-pie-grid" style="flex:1">
-            ${(storyStatusGroups.length > 4 ? stackedBarCard : statCard)('User Stories', storyStatusGroups, stories.length, '#88B4DC', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('status', n)}`))}
-            ${(bugStatusGroups.length > 4 ? stackedBarCard : statCard)('Bug Reports', bugStatusGroups, bugs.length, '#DC8896', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('status', n)}`))}
+            ${(storyStatusGroups.length > 4 ? stackedBarCard : statCard)('User Stories', storyStatusGroups, stories.length, '#88B4DC', n => jiraJqlUrl(`${activeJql} AND issuetype = Story AND ${fieldClause('status', n)}`))}
+            ${(bugStatusGroups.length > 4 ? stackedBarCard : statCard)('Bug Reports', bugStatusGroups, bugs.length, '#DC8896', n => jiraJqlUrl(`${activeJql} AND issuetype = Bug AND ${fieldClause('status', n)}`))}
           </div>
         </div>
       </div>
@@ -2302,19 +2307,19 @@ const PT_SYSTEMS = [
 const PT_MISSING_SYSTEMS = [
   {
     id: 'OLS', name: 'OLS', color: '#4CAF76',
-    jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR parent is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR parent is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'ELMS', name: 'ELMS', color: '#8A78BF',
-    jql: () => `parent in (MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `parent in (MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'CBMS', name: 'CBMS', color: '#C0986A',
-    jql: () => `parent in (MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `parent in (MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'EvMS', name: 'EvMS', color: '#4487C5',
-    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636) AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636) AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
 ]
 
@@ -3171,9 +3176,7 @@ async function loadProgressTracker() {
       if (res.status === 'rejected') {
         return `<div class="pt-card"><div class="pt-card-head"><div class="pt-system-name">${esc(sys.name)}</div></div><div class="error-box"><div class="error-text">Failed to load: ${esc(res.reason?.message || 'Unknown error')}</div></div></div>`
       }
-      const issues = (sys.id === 'OLS')
-        ? res.value.filter(iss => !(iss.fields?.labels || []).some(l => l.toLowerCase() === 'backlog'))
-        : res.value
+      const issues = res.value
       const counts = {}
       issues.forEach(iss => {
         const s = iss.fields?.status?.name || 'Unknown'
@@ -3187,10 +3190,7 @@ async function loadProgressTracker() {
     const allIssues = PT_SYSTEMS.flatMap((sys, i) => {
       const res = results[i]
       if (res.status !== 'fulfilled') return []
-      const sysIssues = (sys.id === 'OLS')
-        ? res.value.filter(iss => !(iss.fields?.labels || []).some(l => l.toLowerCase() === 'backlog'))
-        : res.value
-      return sysIssues.map(iss => ({ ...iss, _system: sys.name }))
+      return res.value.map(iss => ({ ...iss, _system: sys.name }))
     })
     const blockedIssues = allIssues.filter(iss => {
       const statusBlocked = (iss.fields?.status?.name || '').toLowerCase().includes('blocked')
