@@ -1089,6 +1089,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                       <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้ว)</li>
                     </ul>
                   </li>
+                  <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น — ป้องกัน double count กรณี ticket มีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขใน Jira เมื่อกดลิงก์อาจสูงกว่า เนื่องจาก Jira แสดงทุก ticket ที่ person นั้นเป็น QA owner ไม่ว่าจะเป็น primary หรือไม่)</span></li>
                 </ul>
               </div>
             </div>
@@ -1161,6 +1162,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                       <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> — ticket อยู่ใน Backlog section (sprint ยังไม่ได้กำหนด หรือ sprint ที่เคยอยู่ถูกปิดแล้ว)</li>
                     </ul>
                   </li>
+                  <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น — ป้องกัน double count กรณี ticket มีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขใน Jira เมื่อกดลิงก์อาจสูงกว่า เนื่องจาก Jira แสดงทุก ticket ที่ person นั้นเป็น QA owner ไม่ว่าจะเป็น primary หรือไม่)</span></li>
                 </ul>
               </div>
             </div>
@@ -2303,7 +2305,7 @@ function renderPtCard(sys, groups, total, issues) {
     issues, 'Waiting for QA', PT_INCLUDED_QA,
     iss => {
       const owners = getQaOwnerUsers(iss).map(u => u.displayName).filter(Boolean)
-      return owners.length > 0 ? owners : ['Unassigned']
+      return owners.length > 0 ? [owners[0]] : ['Unassigned']
     },
     'include',
     { baseJql: qaBaseJql, ownerField: qaOwnerClause },
