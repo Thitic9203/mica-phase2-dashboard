@@ -1184,6 +1184,12 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                 <li><strong>Assignee</strong> — ระบุผู้รับผิดชอบฝั่ง Dev</li>
                 <li><strong>QA Owner</strong> — ระบุผู้รับผิดชอบฝั่ง QA</li>
               </ul>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(15,118,110,0.12)">
+                <div style="font-weight:500;color:var(--text);margin-bottom:4px">เงื่อนไขพิเศษ OLS:</div>
+                <ul>
+                  <li>Ticket ที่มี label <strong>backlog</strong> จะถูกตัดออกจากสถิติ OLS ทั้งหมด แม้จะมี sprint แล้ว — เพราะหมายถึงงานที่ไว้ทำ<em>ภายหลัง</em>การส่งมอบ ไม่ใช่ scope ปัจจุบัน</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -3165,7 +3171,9 @@ async function loadProgressTracker() {
       if (res.status === 'rejected') {
         return `<div class="pt-card"><div class="pt-card-head"><div class="pt-system-name">${esc(sys.name)}</div></div><div class="error-box"><div class="error-text">Failed to load: ${esc(res.reason?.message || 'Unknown error')}</div></div></div>`
       }
-      const issues = res.value
+      const issues = (sys.id === 'OLS')
+        ? res.value.filter(iss => !(iss.fields?.labels || []).some(l => l.toLowerCase() === 'backlog'))
+        : res.value
       const counts = {}
       issues.forEach(iss => {
         const s = iss.fields?.status?.name || 'Unknown'
@@ -3179,7 +3187,10 @@ async function loadProgressTracker() {
     const allIssues = PT_SYSTEMS.flatMap((sys, i) => {
       const res = results[i]
       if (res.status !== 'fulfilled') return []
-      return res.value.map(iss => ({ ...iss, _system: sys.name }))
+      const sysIssues = (sys.id === 'OLS')
+        ? res.value.filter(iss => !(iss.fields?.labels || []).some(l => l.toLowerCase() === 'backlog'))
+        : res.value
+      return sysIssues.map(iss => ({ ...iss, _system: sys.name }))
     })
     const blockedIssues = allIssues.filter(iss => {
       const statusBlocked = (iss.fields?.status?.name || '').toLowerCase().includes('blocked')
