@@ -1441,14 +1441,20 @@ function reRenderAllEpics() {
 }
 
 const STATUS_KEYWORD_COLORS = [
-  [['done','closed','resolved','completed','approved','accepted','finish'],   '#84CC84'],
-  [['in progress','in development','progress','development'],                 '#86BBE0'],
-  [['ready to test','ready for test','pair-test','pair test'],                '#CC9EC8'],
-  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#68C8C8'],
-  [['code review','in review','review','peer review'],                        '#A89ED8'],
-  [['to do','todo','open','backlog','new','ready','selected'],                '#ACACBF'],
-  [['blocked','on hold','hold','waiting','pending'],                          '#D88888'],
-  [['rejected','cancelled','canceled','wont fix',"won't fix",'invalid'],     '#D8A0A8'],
+  [['done','closed','resolved','completed','approved','accepted','finish'],   '#7CC87C'],  // green 120°
+  [['in progress','in development'],                                          '#7AB4D8'],  // sky blue 210°
+  [['ready for development','ready for dev'],                                 '#DCA864'],  // amber 35°
+  [['ready to test','ready for test'],                                        '#B878C8'],  // violet 290°
+  [['pair-test','pair test'],                                                  '#D87898'],  // rose 345°
+  [['solution & design','solution and design'],                                '#6CBCB8'],  // teal 178°
+  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#6CC4A0'],  // mint 155°
+  [['code review','in review','peer review'],                                  '#8C80C8'],  // indigo 250°
+  [['to do','todo','open','backlog','new','selected'],                        '#9898BC'],  // slate 240°
+  [['blocked','on hold','hold','waiting','pending'],                          '#D07070'],  // coral 0°
+  [['rejected','cancelled','canceled','wont fix',"won't fix",'invalid'],     '#B8A880'],  // tan 40°
+  [['progress','development'],                                                  '#7AB4D8'],
+  [['review'],                                                                  '#8C80C8'],
+  [['ready'],                                                                    '#D8C860'],  // yellow 55°
 ]
 const FALLBACK_PALETTE = ['#E89898','#E8B888','#D8D088','#B8D890','#90D4A8','#80CCC0','#88C0DC','#90ACE0','#B098D8','#CC90C4','#DC90B0','#E0989C','#C4D470','#8CCCA8','#B8A8DC','#9CBCD4']
 const _dynamicColorMap = {}
