@@ -1424,15 +1424,15 @@ function reRenderAllEpics() {
 }
 
 const STATUS_KEYWORD_COLORS = [
-  [['done','closed','resolved','completed','approved','accepted','finish'],   '#4CAF76'],
-  [['in progress','in development','progress','development'],                 '#4487C5'],
-  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#3BA8A8'],
-  [['code review','in review','review','peer review'],                        '#8A78BF'],
-  [['to do','todo','open','backlog','new','ready','selected'],                '#A8A8AD'],
-  [['blocked','on hold','hold','waiting','pending'],                          '#C0986A'],
-  [['rejected','cancelled','canceled','wont fix',"won't fix",'invalid'],     '#C07A7A'],
+  [['done','closed','resolved','completed','approved','accepted','finish'],   '#72C5A7'],
+  [['in progress','in development','progress','development'],                 '#86BBE0'],
+  [['qa reviewed','qa review','qa','testing','in testing','test'],            '#68C8C8'],
+  [['code review','in review','review','peer review'],                        '#A89ED8'],
+  [['to do','todo','open','backlog','new','ready','selected'],                '#ACACBF'],
+  [['blocked','on hold','hold','waiting','pending'],                          '#DDB898'],
+  [['rejected','cancelled','canceled','wont fix',"won't fix",'invalid'],     '#D8A0A8'],
 ]
-const FALLBACK_PALETTE = ['#B07AC0','#B8A87A','#7A9CC0','#9CC07A','#C07AA8','#D4A827','#7A7AC0','#A8B880']
+const FALLBACK_PALETTE = ['#BCA6D8','#D4BA88','#90B8E0','#9ACC9C','#D2A0C6','#D8C870','#9090C8','#ABCAA0']
 const _dynamicColorMap = {}
 
 function statusColor(name) {
@@ -1734,8 +1734,8 @@ function renderDualPieView(containerId, storySec, bugSec, title, jiraLink) {
       <div class="view-meta"><a class="summary-link" href="${jiraLink}" target="_blank" rel="noopener">View in Jira ↗</a></div>
     </div>
     <div class="dual-pie-grid">
-      ${renderDualPieSection(storySec.label, storySec.groups, storySec.total, '#3B82F6')}
-      ${renderDualPieSection(bugSec.label, bugSec.groups, bugSec.total, '#EF4444')}
+      ${renderDualPieSection(storySec.label, storySec.groups, storySec.total, '#88B4DC')}
+      ${renderDualPieSection(bugSec.label, bugSec.groups, bugSec.total, '#DC8896')}
     </div>`
 }
 
@@ -2184,27 +2184,27 @@ async function loadTicketOverview() {
         <div class="ov-col ov-col-half">
           <div class="section-row ov-section-row"><span class="section-title">QA Ownership</span></div>
           <div class="dual-pie-grid" style="flex:1">
-            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${qaOwnerClause(n)}`), sn)}
-            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${qaOwnerClause(n)}`), sn)}
+            ${pieCard('Stories by QA Owner', storyOwnerGroups, stories.length, '#88B4DC', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${qaOwnerClause(n)}`), sn)}
+            ${pieCard('Bugs by QA Owner', bugOwnerGroups, bugs.length, '#DC8896', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${qaOwnerClause(n)}`), sn)}
           </div>
         </div>
         <div class="ov-col ov-col-1 pie-mid">
           <div class="section-row ov-section-row"><span class="section-title">Ticket Details</span></div>
           <div style="flex:1">
-            ${stackedBarCard('Ticket Details', detailGroups, totalCount, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12127]', n)}`))}
+            ${stackedBarCard('Ticket Details', detailGroups, totalCount, '#88B4DC', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12127]', n)}`))}
           </div>
         </div>
         <div class="ov-col ov-col-1 pie-mid">
           <div class="section-row ov-section-row"><span class="section-title">TC Status</span></div>
           <div style="flex:1">
-            ${stackedBarCard('TC Status', tcGroups, totalCount, '#8A78BF', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12128]', n)}`))}
+            ${stackedBarCard('TC Status', tcGroups, totalCount, '#A89ED8', n => jiraJqlUrl(`${jqlAllEpics()} AND ${fieldClause('cf[12128]', n)}`))}
           </div>
         </div>
         <div class="ov-col ov-col-half pie-mid">
           <div class="section-row ov-section-row"><span class="section-title">Status Breakdown</span></div>
           <div class="dual-pie-grid" style="flex:1">
-            ${(storyStatusGroups.length > 4 ? stackedBarCard : statCard)('User Stories', storyStatusGroups, stories.length, '#3B82F6', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('status', n)}`))}
-            ${(bugStatusGroups.length > 4 ? stackedBarCard : statCard)('Bug Reports', bugStatusGroups, bugs.length, '#EF4444', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('status', n)}`))}
+            ${(storyStatusGroups.length > 4 ? stackedBarCard : statCard)('User Stories', storyStatusGroups, stories.length, '#88B4DC', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Story AND ${fieldClause('status', n)}`))}
+            ${(bugStatusGroups.length > 4 ? stackedBarCard : statCard)('Bug Reports', bugStatusGroups, bugs.length, '#DC8896', n => jiraJqlUrl(`${jqlAllEpics()} AND issuetype = Bug AND ${fieldClause('status', n)}`))}
           </div>
         </div>
       </div>
