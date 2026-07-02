@@ -2818,6 +2818,11 @@ function initBlockedTable(containerId, issues) {
   }
 
   render()
+  container._btReset = () => {
+    bst.search = ''; bst.sortCol = 'key'; bst.sortDir = 'asc'; bst.page = 1; bst.pageSize = 10
+    bst.filters = Object.fromEntries(BFM.map(f => [f.key, []])); bst.openMenus.clear()
+    render()
+  }
 }
 
 function initMissingTable(containerId, issues) {
@@ -3136,6 +3141,11 @@ function initMissingTable(containerId, issues) {
   }
 
   render()
+  container._mtReset = () => {
+    mst.search = ''; mst.sortCol = 'key'; mst.sortDir = 'asc'; mst.page = 1; mst.pageSize = 10
+    mst.filters = Object.fromEntries(MFM.map(f => [f.key, []])); mst.groupBy = []; mst.openMenus.clear()
+    render()
+  }
 }
 
 async function loadProgressTracker() {
@@ -3203,7 +3213,10 @@ function switchView(viewId) {
   document.querySelectorAll('.view-panel').forEach(el => {
     el.classList.toggle('hidden', el.id !== 'view-' + viewId)
   })
-if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
+  document.getElementById('pp-tbl')?._ttReset?.()
+  document.getElementById('pt-blocked-container')?._btReset?.()
+  document.getElementById('pt-missing-container')?._mtReset?.()
+  if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
     _loaded.progressTracker = true; loadProgressTracker()
   }
 }
