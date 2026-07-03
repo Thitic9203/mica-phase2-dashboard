@@ -494,13 +494,6 @@ body {
 .tt-refresh-btn svg { width: 15px; height: 15px; display: block; }
 .tt-refresh-btn.tt-refreshing svg { animation: tt-spin .7s linear infinite; }
 @keyframes tt-spin { to { transform: rotate(360deg); } }
-.tt-updated-flash {
-  font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap;
-  opacity: 0; transform: translateX(-4px);
-  transition: opacity .2s ease, transform .2s ease;
-}
-.tt-updated-flash.tt-updated-show { opacity: 1; transform: none; }
-.tt-updated-flash.tt-updated-hide { opacity: 0; }
 .view-error { font-size: 12px; color: #991B1B; padding: 32px 0; }
 .sprint-notice {
   display: flex; align-items: center; gap: 9px;
@@ -1545,21 +1538,6 @@ function makePrefetcher(fn) {
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
-
-// Brief "✓ อัปเดต HH:MM:SS" confirmation next to a table's refresh button, so a
-// refresh gives visible feedback even when the data is unchanged.
-function flashUpdated(container) {
-  const grp = container.querySelector('.tt-pageinfo-group')
-  if (!grp) return
-  grp.querySelector('.tt-updated-flash')?.remove()
-  const d = new Date(), p = n => String(n).padStart(2, '0')
-  const span = document.createElement('span')
-  span.className = 'tt-updated-flash'
-  span.textContent = `✓ อัปเดต ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
-  grp.appendChild(span)
-  requestAnimationFrame(() => span.classList.add('tt-updated-show'))
-  setTimeout(() => { span.classList.add('tt-updated-hide'); setTimeout(() => span.remove(), 400) }, 2200)
-}
 
 function groupByStatus(issues) {
   const counts = {}
@@ -2704,7 +2682,6 @@ function initBlockedTable(containerId, issues, refetch) {
         recomputeFilterVals()
       }
       render() // rebuilds the (now idle) button; state in bst is untouched
-      flashUpdated(container)
     } catch (err) {
       if (rb) { rb.classList.remove('tt-refreshing'); rb.disabled = false }
     } finally {
@@ -3066,7 +3043,6 @@ function initMissingTable(containerId, issues, refetch) {
         recomputeFilterVals()
       }
       render()
-      flashUpdated(container)
     } catch (err) {
       if (rb) { rb.classList.remove('tt-refreshing'); rb.disabled = false }
     } finally {
