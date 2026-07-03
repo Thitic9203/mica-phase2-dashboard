@@ -494,6 +494,13 @@ body {
 .tt-refresh-btn svg { width: 15px; height: 15px; display: block; }
 .tt-refresh-btn.tt-refreshing svg { animation: tt-spin .7s linear infinite; }
 @keyframes tt-spin { to { transform: rotate(360deg); } }
+.tt-updated-flash {
+  font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap;
+  opacity: 0; transform: translateX(-4px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.tt-updated-flash.tt-updated-show { opacity: 1; transform: none; }
+.tt-updated-flash.tt-updated-hide { opacity: 0; }
 .view-error { font-size: 12px; color: #991B1B; padding: 32px 0; }
 .sprint-notice {
   display: flex; align-items: center; gap: 9px;
@@ -1494,11 +1501,12 @@ function darkenForBadge(hex) {
   return `#${d(r)}${d(g)}${d(b)}`
 }
 
-async function fetchIssues(jql, fields = 'customfield_12128') {
+async function fetchIssues(jql, fields = 'customfield_12128', opts = {}) {
   const all = []
   let nextPageToken = null
+  const freshParam = opts.fresh ? '&_fresh=1' : '' // manual refresh bypasses the edge cache
   while (true) {
-    let url = `${JIRA_BASE}/search/jql?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100`
+    let url = `${JIRA_BASE}/search/jql?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100${freshParam}`
     if (nextPageToken) url += `&nextPageToken=${encodeURIComponent(nextPageToken)}`
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -1534,6 +1542,23 @@ function makePrefetcher(fn) {
       return Promise.resolve().then(fn)
     },
   }
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+// Brief "✓ อัปเดต HH:MM:SS" confirmation next to a table's refresh button, so a
+// refresh gives visible feedback even when the data is unchanged.
+function flashUpdated(container) {
+  const grp = container.querySelector('.tt-pageinfo-group')
+  if (!grp) return
+  grp.querySelector('.tt-updated-flash')?.remove()
+  const d = new Date(), p = n => String(n).padStart(2, '0')
+  const span = document.createElement('span')
+  span.className = 'tt-updated-flash'
+  span.textContent = `✓ อัปเดต ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
+  grp.appendChild(span)
+  requestAnimationFrame(() => span.classList.add('tt-updated-show'))
+  setTimeout(() => { span.classList.add('tt-updated-hide'); setTimeout(() => span.remove(), 400) }, 2200)
 }
 
 function groupByStatus(issues) {
@@ -2671,12 +2696,15 @@ function initBlockedTable(containerId, issues, refetch) {
     const rb = container.querySelector('#bt-refresh')
     if (rb) { rb.classList.add('tt-refreshing'); rb.disabled = true }
     try {
-      const fresh = await _prefetch.take()
+      // Keep the spinner visible ≥500ms so a fast (cached) response still reads
+      // as a refresh instead of "nothing happened".
+      const [fresh] = await Promise.all([_prefetch.take(), sleep(500)])
       if (Array.isArray(fresh)) {
         dataRows = buildRows(fresh)
         recomputeFilterVals()
       }
       render() // rebuilds the (now idle) button; state in bst is untouched
+      flashUpdated(container)
     } catch (err) {
       if (rb) { rb.classList.remove('tt-refreshing'); rb.disabled = false }
     } finally {
@@ -3030,12 +3058,15 @@ function initMissingTable(containerId, issues, refetch) {
     const rb = container.querySelector('#mt-refresh')
     if (rb) { rb.classList.add('tt-refreshing'); rb.disabled = true }
     try {
-      const fresh = await _prefetch.take()
+      // Keep the spinner visible ≥500ms so a fast (cached) response still reads
+      // as a refresh instead of "nothing happened".
+      const [fresh] = await Promise.all([_prefetch.take(), sleep(500)])
       if (Array.isArray(fresh)) {
         dataRows = buildRows(fresh)
         recomputeFilterVals()
       }
       render()
+      flashUpdated(container)
     } catch (err) {
       if (rb) { rb.classList.remove('tt-refreshing'); rb.disabled = false }
     } finally {
@@ -3064,9 +3095,9 @@ function isBlockedIssue(iss) {
 
 // Re-run only the Blocked Tickets query (all systems) and return the blocked issues.
 // Used by that table's refresh button so it can reload without touching the rest of the view.
-async function ptFetchBlockedIssues() {
+async function ptFetchBlockedIssues(opts = {}) {
   const results = await Promise.allSettled(
-    PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_BLOCKED_FIELDS))
+    PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_BLOCKED_FIELDS, opts))
   )
   if (results.every(r => r.status === 'rejected')) throw new Error('Failed to load blocked tickets')
   const allIssues = PT_SYSTEMS.flatMap((sys, i) => {
@@ -3078,9 +3109,9 @@ async function ptFetchBlockedIssues() {
 }
 
 // Re-run only the Incomplete Fields query (all systems) and return those issues.
-async function ptFetchMissingIssues() {
+async function ptFetchMissingIssues(opts = {}) {
   const results = await Promise.allSettled(
-    PT_MISSING_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_MISSING_FIELDS))
+    PT_MISSING_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_MISSING_FIELDS, opts))
   )
   if (results.every(r => r.status === 'rejected')) throw new Error('Failed to load incomplete-field tickets')
   return PT_MISSING_SYSTEMS.flatMap((sys, i) => {
@@ -3133,8 +3164,10 @@ async function loadProgressTracker() {
     })
 
     el.innerHTML = `<div class="pt-grid">${cards}</div><div class="pt-blocked-wrap" id="pt-blocked-container"></div><div class="pt-blocked-wrap" id="pt-missing-container"></div>`
-    initBlockedTable('pt-blocked-container', blockedIssues, ptFetchBlockedIssues)
-    initMissingTable('pt-missing-container', missingIssues, ptFetchMissingIssues)
+    // Manual refresh forces fresh data (bypasses the 30s edge cache); the initial
+    // load above still uses the cache.
+    initBlockedTable('pt-blocked-container', blockedIssues, () => ptFetchBlockedIssues({ fresh: true }))
+    initMissingTable('pt-missing-container', missingIssues, () => ptFetchMissingIssues({ fresh: true }))
   } catch (err) {
     el.innerHTML = `<div class="view-error">Failed to load progress data: ${esc(err.message)}</div>`
   }

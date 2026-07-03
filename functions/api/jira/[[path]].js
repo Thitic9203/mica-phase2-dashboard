@@ -28,6 +28,11 @@ export async function onRequest(context) {
   const authHeader = raw.startsWith('Basic ') ? raw : `Basic ${raw}`
 
   const url = new URL(request.url)
+  // `_fresh=1` (manual refresh) bypasses the cache read but still refreshes the
+  // shared entry. Strip it before building target/cacheKey so the key stays
+  // canonical and shared with normal (auto-refresh) reads.
+  const bypass = url.searchParams.get('_fresh') === '1'
+  url.searchParams.delete('_fresh')
   const jiraPath = url.pathname.replace(/^\/api\/jira/, '')
   const target = `${JIRA_BASE}${jiraPath}${url.search}`
 
@@ -64,17 +69,20 @@ export async function onRequest(context) {
   const cache = (typeof caches !== 'undefined' && caches.default) ? caches.default : null
   if (request.method === 'GET' && cache) {
     const cacheKey = new Request(target, { method: 'GET' })
-    const hit = await cache.match(cacheKey)
-    if (hit) {
-      const age = Date.now() - Number(hit.headers.get('X-Fetched-At') || 0)
-      if (age < FRESH_MS) return withStatus(hit, 'HIT-fresh')
-      if (age < STALE_MS) {
-        context.waitUntil(fetchAndStore(cache, cacheKey)) // revalidate behind the scenes
-        return withStatus(hit, 'HIT-stale')
+    if (!bypass) {
+      const hit = await cache.match(cacheKey)
+      if (hit) {
+        const age = Date.now() - Number(hit.headers.get('X-Fetched-At') || 0)
+        if (age < FRESH_MS) return withStatus(hit, 'HIT-fresh')
+        if (age < STALE_MS) {
+          context.waitUntil(fetchAndStore(cache, cacheKey)) // revalidate behind the scenes
+          return withStatus(hit, 'HIT-stale')
+        }
       }
     }
+    // Cache miss, expired, or manual force-fresh → hit Jira and refresh the shared entry.
     const fresh = await fetchAndStore(cache, cacheKey)
-    return withStatus(fresh, hit ? 'EXPIRED' : 'MISS')
+    return withStatus(fresh, bypass ? 'BYPASS' : 'MISS')
   }
 
   return fetchAndStore(null, null)
