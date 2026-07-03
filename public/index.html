@@ -1339,23 +1339,23 @@ const SYSTEMS = [
   { id: 'EvMS', name: 'Evaluation Management System (EvMS)' },
 ]
 const EPICS = [
-  // OLS — Open Learning System
-  { key: 'OLS-1',  name: 'Authentication',                     system: 'OLS' },
-  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS' },
+  // OLS — Open Learning System (display order set manually per QA request)
   { key: 'OLS-3',  name: 'Media Management',                   system: 'OLS' },
   { key: 'OLS-4',  name: 'Course Management',                  system: 'OLS' },
   { key: 'OLS-5',  name: 'Learning Path Management',           system: 'OLS' },
   { key: 'OLS-6',  name: 'Media List and View',                system: 'OLS' },
   { key: 'OLS-7',  name: 'Profile Page',                       system: 'OLS' },
-  { key: 'OLS-8',  name: 'Social Interaction',                 system: 'OLS' },
+  { key: 'OLS-17', name: 'Content Management',                 system: 'OLS' },
   { key: 'OLS-9',  name: 'User Moderation',                    system: 'OLS' },
-  { key: 'OLS-10', name: 'Live Streaming',                     system: 'OLS' },
-  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS' },
+  { key: 'OLS-8',  name: 'Social Interaction',                 system: 'OLS' },
   { key: 'OLS-12', name: 'Recommendation System',              system: 'OLS' },
+  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS' },
+  { key: 'OLS-1',  name: 'Authentication',                     system: 'OLS' },
+  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS' },
+  { key: 'OLS-10', name: 'Live Streaming',                     system: 'OLS' },
   { key: 'OLS-13', name: 'Achievement/Badge System',           system: 'OLS' },
   { key: 'OLS-14', name: 'Backoffice CMS',                     system: 'OLS' },
   { key: 'OLS-15', name: 'Report/Stat/Dashboard',              system: 'OLS' },
-  { key: 'OLS-17', name: 'Content Management',                 system: 'OLS' },
   // ELMS — Extended Learning Management System
   { key: 'MICA2-125', name: 'AI Integration',                  system: 'ELMS' },
   { key: 'MICA2-626', name: 'Google Docs',                     system: 'ELMS' },
@@ -1814,6 +1814,17 @@ function sn(name) { return (name || '').replace(/\s*\([^)]*\)/g, '').trim() }
 function fn(name) { return sn(name).split(/\s+/)[0] || name }
 function getQaOwnerUsers(iss) { return iss.fields?.customfield_12120 || iss.fields?.customfield_11013 || [] }
 
+// Sprint field (customfield_10008) is an array — a ticket can belong to several
+// sprints at once (e.g. a closed one it started in plus a future one it moved to).
+// The board only counts work in an active or future sprint; a ticket whose sprints
+// are all closed (or has none) is Backlog. Returns the relevant sprint (active
+// preferred, then future) or null when the ticket is Backlog.
+function activeFutureSprint(iss) {
+  const arr = iss.fields?.customfield_10008 || []
+  const st = s => (s?.state || '').toLowerCase() // Jira returns lowercase; guard against casing drift
+  return arr.find(s => st(s) === 'active') || arr.find(s => st(s) === 'future') || null
+}
+
 function initTicketTable(containerId, issues) {
   const container = document.getElementById(containerId)
   if (!container) return
@@ -1822,7 +1833,7 @@ function initTicketTable(containerId, issues) {
     const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName) || 'Empty').filter(Boolean)
     const pk = iss.fields?.parent?.key || ''
     const pn = iss.fields?.parent?.fields?.summary || ''
-    const sprintName = (iss.fields?.customfield_10008 || [])[0]?.name || ''
+    const sprintName = activeFutureSprint(iss)?.name || ''
     return {
       key: iss.key,
       summary: iss.fields?.summary || '',
@@ -2705,10 +2716,11 @@ function initMissingTable(containerId, issues, refetch) {
     const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
     const pk = iss.fields?.parent?.key || ''
     const pn = iss.fields?.parent?.fields?.summary || ''
-    const sprintArr = iss.fields?.customfield_10008 || []
-    const sprintName = sprintArr.length ? sprintArr[0]?.name || '' : ''
+    const afSprint = activeFutureSprint(iss)
+    const sprintName = afSprint?.name || ''
     const missing = []
-    if (!sprintName) missing.push('Sprint')
+    // Backlog (no active/future sprint — closed-only or none) counts as Missing Sprint.
+    if (!afSprint) missing.push('Sprint')
     if (!pk) missing.push('Epic')
     if (!iss.fields?.assignee) missing.push('Assignee')
     if (!owners.length) missing.push('QA Owner')
@@ -2739,7 +2751,7 @@ function initMissingTable(containerId, issues, refetch) {
     { value: 'QA Owner', label: 'Missing QA Owner' },
     { value: 'Assignee', label: 'Missing Assignee' },
     { value: 'Epic', label: 'Missing Epic' },
-    { value: 'Sprint', label: 'Missing Sprint' },
+    { value: 'Sprint', label: 'Missing Sprint/Backlog' },
   ]
   const MCOLS = [
     { key:'key',       label:'Key' },
