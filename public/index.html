@@ -1366,7 +1366,7 @@ const EPICS = [
   { key: 'MICA2-636', name: 'Exam Room',                       system: 'EvMS' },
 ]
 const ALL_EPIC_KEYS = EPICS.map(e => e.key)
-function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',')})` }
+function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',',MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629,MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653,MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-636)})` }
 
 // ── Epic group-by options ──
 const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints())'
@@ -2065,17 +2065,17 @@ const PT_SYSTEMS = [
   },
   {
     id: 'ELMS', name: 'Extended Learning Management System (ELMS)', color: '#8A78BF',
-    jql: () => { const k = EPICS.filter(e => e.system === 'ELMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
+    jql: () => { const k = EPICS.filter(e => e.system === 'ELMS').map(e => e.key).join(','); return `parent in (${k},MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
     id: 'CBMS', name: 'Credit Bank Management System (CBMS)', color: '#C0986A',
-    jql: () => { const k = EPICS.filter(e => e.system === 'CBMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
+    jql: () => { const k = EPICS.filter(e => e.system === 'CBMS').map(e => e.key).join(','); return `parent in (${k},MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
   {
     id: 'EvMS', name: 'Evaluation Management System (EvMS)', color: '#4487C5',
-    jql: () => { const k = EPICS.filter(e => e.system === 'EvMS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
+    jql: () => { const k = EPICS.filter(e => e.system === 'EvMS').map(e => e.key).join(','); return `parent in (${k},MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-636) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180',
   },
 ]
