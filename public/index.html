@@ -1511,6 +1511,31 @@ async function fetchIssues(jql, fields = 'customfield_12128') {
   return all
 }
 
+// Warm a refetch on hover/focus so the click reuses an in-flight or just-settled
+// result instead of starting the round-trip only after the click lands.
+// Cheap because the proxy edge-caches GETs; a warmed result is reused for up to 8s.
+function makePrefetcher(fn) {
+  let pending = null, at = 0
+  const fresh = () => Date.now() - at < 8000
+  return {
+    warm() {
+      if (typeof fn !== 'function' || (pending && fresh())) return
+      at = Date.now()
+      const p = Promise.resolve().then(fn)
+      pending = p
+      // Drop a failed warm so a later click refetches instead of reusing the rejection.
+      // Guard `pending === p` so we never wipe a newer warm.
+      p.catch(() => { if (pending === p) pending = null })
+    },
+    take() {
+      if (typeof fn !== 'function') return Promise.reject(new Error('no refetch'))
+      if (pending && fresh()) { const p = pending; pending = null; return p }
+      pending = null
+      return Promise.resolve().then(fn)
+    },
+  }
+}
+
 function groupByStatus(issues) {
   const counts = {}
   issues.forEach(issue => {
@@ -2615,7 +2640,10 @@ function initBlockedTable(containerId, issues, refetch) {
       if(bst.sortCol===col) bst.sortDir=bst.sortDir==='asc'?'desc':'asc'; else{bst.sortCol=col;bst.sortDir='asc'}
       render()
     }))
-    g('bt-refresh')?.addEventListener('click', doRefresh)
+    const btRefreshBtn = g('bt-refresh')
+    btRefreshBtn?.addEventListener('click', doRefresh)
+    btRefreshBtn?.addEventListener('pointerenter', () => _prefetch.warm())
+    btRefreshBtn?.addEventListener('focus', () => _prefetch.warm())
     g('bt-prv')?.addEventListener('click',()=>{if(bst.page>1){bst.page--;render()}})
     g('bt-nxt')?.addEventListener('click',()=>{if(bst.page<totalPages){bst.page++;render()}})
     container.querySelectorAll('.tt-page-num[data-page]').forEach(btn=>btn.addEventListener('click',()=>{bst.page=parseInt(btn.dataset.page);render()}))
@@ -2635,6 +2663,7 @@ function initBlockedTable(containerId, issues, refetch) {
 
   // Refresh: re-pull this table's data from Jira, keeping every current
   // selection (search, filters, sort, page, page size) — like Jira's filter refresh.
+  const _prefetch = makePrefetcher(refetch)
   let refreshing = false
   async function doRefresh() {
     if (refreshing || typeof refetch !== 'function') return
@@ -2642,7 +2671,7 @@ function initBlockedTable(containerId, issues, refetch) {
     const rb = container.querySelector('#bt-refresh')
     if (rb) { rb.classList.add('tt-refreshing'); rb.disabled = true }
     try {
-      const fresh = await refetch()
+      const fresh = await _prefetch.take()
       if (Array.isArray(fresh)) {
         dataRows = buildRows(fresh)
         recomputeFilterVals()
@@ -2970,7 +2999,10 @@ function initMissingTable(containerId, issues, refetch) {
       if(mst.sortCol===col) mst.sortDir=mst.sortDir==='asc'?'desc':'asc'; else{mst.sortCol=col;mst.sortDir='asc'}
       render()
     }))
-    g('mt-refresh')?.addEventListener('click', doRefresh)
+    const mtRefreshBtn = g('mt-refresh')
+    mtRefreshBtn?.addEventListener('click', doRefresh)
+    mtRefreshBtn?.addEventListener('pointerenter', () => _prefetch.warm())
+    mtRefreshBtn?.addEventListener('focus', () => _prefetch.warm())
     g('mt-prv')?.addEventListener('click',()=>{if(mst.page>1){mst.page--;render()}})
     g('mt-nxt')?.addEventListener('click',()=>{if(mst.page<totalPages){mst.page++;render()}})
     container.querySelectorAll('.tt-page-num[data-page]').forEach(btn=>btn.addEventListener('click',()=>{mst.page=parseInt(btn.dataset.page);render()}))
@@ -2990,6 +3022,7 @@ function initMissingTable(containerId, issues, refetch) {
 
   // Refresh: re-pull this table's data from Jira, keeping every current
   // selection (search, filters, group-by, sort, page, page size).
+  const _prefetch = makePrefetcher(refetch)
   let refreshing = false
   async function doRefresh() {
     if (refreshing || typeof refetch !== 'function') return
@@ -2997,7 +3030,7 @@ function initMissingTable(containerId, issues, refetch) {
     const rb = container.querySelector('#mt-refresh')
     if (rb) { rb.classList.add('tt-refreshing'); rb.disabled = true }
     try {
-      const fresh = await refetch()
+      const fresh = await _prefetch.take()
       if (Array.isArray(fresh)) {
         dataRows = buildRows(fresh)
         recomputeFilterVals()
