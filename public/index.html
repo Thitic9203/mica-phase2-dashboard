@@ -481,6 +481,19 @@ body {
 }
 .tt-pgsz-item:hover { background: var(--elevated); }
 .tt-pgsz-item.tt-pgsz-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.tt-pageinfo-group { display: flex; align-items: center; gap: 8px; }
+.tt-refresh-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0; flex-shrink: 0;
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  background: var(--card); color: var(--muted); cursor: pointer;
+  transition: border-color .12s, color .12s, background .12s;
+}
+.tt-refresh-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: var(--elevated); }
+.tt-refresh-btn:disabled { cursor: default; opacity: .55; }
+.tt-refresh-btn svg { width: 15px; height: 15px; display: block; }
+.tt-refresh-btn.tt-refreshing svg { animation: tt-spin .7s linear infinite; }
+@keyframes tt-spin { to { transform: rotate(360deg); } }
 .view-error { font-size: 12px; color: #991B1B; padding: 32px 0; }
 .sprint-notice {
   display: flex; align-items: center; gap: 9px;
@@ -2341,11 +2354,11 @@ function renderPtCard(sys, groups, total, issues) {
   </div>`
 }
 
-function initBlockedTable(containerId, issues) {
+function initBlockedTable(containerId, issues, refetch) {
   const container = document.getElementById(containerId)
   if (!container) return
 
-  const dataRows = issues.map(iss => {
+  const buildRows = list => list.map(iss => {
     const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
     const pk = iss.fields?.parent?.key || ''
     const pn = iss.fields?.parent?.fields?.summary || ''
@@ -2360,13 +2373,16 @@ function initBlockedTable(containerId, issues) {
       remark: iss.fields?.customfield_11049 || ''
     }
   })
+  let dataRows = buildRows(issues)
 
   const uniqFlat = fn => [...new Set(dataRows.flatMap(fn).filter(Boolean))].sort()
   const BFM = [
-    { key: 'assignee',  label: 'Assignee',  vals: uniqFlat(r => [r.assignee]) },
-    { key: 'qaOwner',   label: 'QA Owner',  vals: uniqFlat(r => r.qaOwners) },
-    { key: 'parentKey', label: 'Epic',      vals: uniqFlat(r => [r.parentKey]) }
+    { key: 'assignee',  label: 'Assignee',  map: r => [r.assignee] },
+    { key: 'qaOwner',   label: 'QA Owner',  map: r => r.qaOwners },
+    { key: 'parentKey', label: 'Epic',      map: r => [r.parentKey] }
   ]
+  const recomputeFilterVals = () => BFM.forEach(f => { f.vals = uniqFlat(f.map) })
+  recomputeFilterVals()
   const BCOLS = [
     { key:'key',       label:'Key' },
     { key:'summary',   label:'Summary' },
@@ -2532,7 +2548,7 @@ function initBlockedTable(containerId, issues) {
       container.innerHTML = `
         <div class="section-row" style="margin-top:0">
           <span class="section-title">🚫 Blocked Tickets</span>
-          <span class="section-sub">${dataRows.length} tickets</span>
+          <span class="section-sub" id="bt-count">${dataRows.length} tickets</span>
           <button class="tt-clear-btn" id="bt-clr" style="visibility:hidden;margin-left:auto">✕ Clear</button>
         </div>
         <div class="tt-toolbar" id="bt-toolbar">
@@ -2550,6 +2566,7 @@ function initBlockedTable(containerId, issues) {
     const g = id => container.querySelector('#'+id)
     const clrBtn = g('bt-clr')
     clrBtn.style.visibility = hasF ? 'visible' : 'hidden'
+    const cntEl = g('bt-count'); if (cntEl) cntEl.textContent = `${dataRows.length} tickets`
 
     g('bt-filters').innerHTML = filtersHTML
     for (const fkey of bst.openMenus) {
@@ -2571,7 +2588,12 @@ function initBlockedTable(containerId, issues) {
           <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
       </div>
       <div class="tt-pagination">
-        <span class="tt-page-info">${pageInfo}</span>
+        <div class="tt-pageinfo-group">
+          <span class="tt-page-info">${pageInfo}</span>
+          <button class="tt-refresh-btn" id="bt-refresh" type="button" title="Refresh data" aria-label="Refresh data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </div>
         <div class="tt-page-controls">
           <button class="tt-page-btn" id="bt-prv" ${bst.page<=1?'disabled':''}>← Prev</button>
           <div style="display:flex;align-items:center;gap:2px">${pnHTML}</div>
@@ -2593,6 +2615,7 @@ function initBlockedTable(containerId, issues) {
       if(bst.sortCol===col) bst.sortDir=bst.sortDir==='asc'?'desc':'asc'; else{bst.sortCol=col;bst.sortDir='asc'}
       render()
     }))
+    g('bt-refresh')?.addEventListener('click', doRefresh)
     g('bt-prv')?.addEventListener('click',()=>{if(bst.page>1){bst.page--;render()}})
     g('bt-nxt')?.addEventListener('click',()=>{if(bst.page<totalPages){bst.page++;render()}})
     container.querySelectorAll('.tt-page-num[data-page]').forEach(btn=>btn.addEventListener('click',()=>{bst.page=parseInt(btn.dataset.page);render()}))
@@ -2610,6 +2633,28 @@ function initBlockedTable(containerId, issues) {
     }))
   }
 
+  // Refresh: re-pull this table's data from Jira, keeping every current
+  // selection (search, filters, sort, page, page size) — like Jira's filter refresh.
+  let refreshing = false
+  async function doRefresh() {
+    if (refreshing || typeof refetch !== 'function') return
+    refreshing = true
+    const rb = container.querySelector('#bt-refresh')
+    if (rb) { rb.classList.add('tt-refreshing'); rb.disabled = true }
+    try {
+      const fresh = await refetch()
+      if (Array.isArray(fresh)) {
+        dataRows = buildRows(fresh)
+        recomputeFilterVals()
+      }
+      render() // rebuilds the (now idle) button; state in bst is untouched
+    } catch (err) {
+      if (rb) { rb.classList.remove('tt-refreshing'); rb.disabled = false }
+    } finally {
+      refreshing = false
+    }
+  }
+
   render()
   container._btReset = () => {
     bst.search = ''; bst.sortCol = 'key'; bst.sortDir = 'asc'; bst.page = 1; bst.pageSize = 10
@@ -2618,11 +2663,11 @@ function initBlockedTable(containerId, issues) {
   }
 }
 
-function initMissingTable(containerId, issues) {
+function initMissingTable(containerId, issues, refetch) {
   const container = document.getElementById(containerId)
   if (!container) return
 
-  const dataRows = issues.map(iss => {
+  const buildRows = list => list.map(iss => {
     const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName)).filter(Boolean)
     const pk = iss.fields?.parent?.key || ''
     const pn = iss.fields?.parent?.fields?.summary || ''
@@ -2647,11 +2692,14 @@ function initMissingTable(containerId, issues) {
       remark: iss.fields?.customfield_11049 || ''
     }
   })
+  let dataRows = buildRows(issues)
 
   const uniqFlat = fn => [...new Set(dataRows.flatMap(fn).filter(Boolean))].sort()
   const MFM = [
-    { key: 'system',   label: 'System',   vals: uniqFlat(r => [r.system]) }
+    { key: 'system',   label: 'System',   map: r => [r.system] }
   ]
+  const recomputeFilterVals = () => MFM.forEach(f => { f.vals = uniqFlat(f.map) })
+  recomputeFilterVals()
   const MGROUP_OPTIONS = [
     { value: '', label: 'All Missing Fields' },
     { value: 'QA Owner', label: 'Missing QA Owner' },
@@ -2841,7 +2889,7 @@ function initMissingTable(containerId, issues) {
       container.innerHTML = `
         <div class="section-row" style="margin-top:0">
           <span class="section-title">⚠️ Tickets with Incomplete Fields</span>
-          <span class="section-sub">${dataRows.length} tickets</span>
+          <span class="section-sub" id="mt-count">${dataRows.length} tickets</span>
           <button class="tt-clear-btn" id="mt-clr" style="visibility:hidden;margin-left:auto">✕ Clear</button>
         </div>
         <div class="tt-toolbar" id="mt-toolbar">
@@ -2860,6 +2908,7 @@ function initMissingTable(containerId, issues) {
     const g = id => container.querySelector('#'+id)
     const clrBtn = g('mt-clr')
     clrBtn.style.visibility = hasF ? 'visible' : 'hidden'
+    const cntEl = g('mt-count'); if (cntEl) cntEl.textContent = `${dataRows.length} tickets`
 
     g('mt-filters').innerHTML = filtersHTML
     const gbActive = mst.groupBy.length > 0
@@ -2894,7 +2943,12 @@ function initMissingTable(containerId, issues) {
           <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
       </div>
       <div class="tt-pagination">
-        <span class="tt-page-info">${pageInfo}</span>
+        <div class="tt-pageinfo-group">
+          <span class="tt-page-info">${pageInfo}</span>
+          <button class="tt-refresh-btn" id="mt-refresh" type="button" title="Refresh data" aria-label="Refresh data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </div>
         <div class="tt-page-controls">
           <button class="tt-page-btn" id="mt-prv" ${mst.page<=1?'disabled':''}>← Prev</button>
           <div style="display:flex;align-items:center;gap:2px">${pnHTML}</div>
@@ -2916,6 +2970,7 @@ function initMissingTable(containerId, issues) {
       if(mst.sortCol===col) mst.sortDir=mst.sortDir==='asc'?'desc':'asc'; else{mst.sortCol=col;mst.sortDir='asc'}
       render()
     }))
+    g('mt-refresh')?.addEventListener('click', doRefresh)
     g('mt-prv')?.addEventListener('click',()=>{if(mst.page>1){mst.page--;render()}})
     g('mt-nxt')?.addEventListener('click',()=>{if(mst.page<totalPages){mst.page++;render()}})
     container.querySelectorAll('.tt-page-num[data-page]').forEach(btn=>btn.addEventListener('click',()=>{mst.page=parseInt(btn.dataset.page);render()}))
@@ -2933,6 +2988,28 @@ function initMissingTable(containerId, issues) {
     }))
   }
 
+  // Refresh: re-pull this table's data from Jira, keeping every current
+  // selection (search, filters, group-by, sort, page, page size).
+  let refreshing = false
+  async function doRefresh() {
+    if (refreshing || typeof refetch !== 'function') return
+    refreshing = true
+    const rb = container.querySelector('#mt-refresh')
+    if (rb) { rb.classList.add('tt-refreshing'); rb.disabled = true }
+    try {
+      const fresh = await refetch()
+      if (Array.isArray(fresh)) {
+        dataRows = buildRows(fresh)
+        recomputeFilterVals()
+      }
+      render()
+    } catch (err) {
+      if (rb) { rb.classList.remove('tt-refreshing'); rb.disabled = false }
+    } finally {
+      refreshing = false
+    }
+  }
+
   render()
   container._mtReset = () => {
     mst.search = ''; mst.sortCol = 'key'; mst.sortDir = 'asc'; mst.page = 1; mst.pageSize = 10
@@ -2941,16 +3018,55 @@ function initMissingTable(containerId, issues) {
   }
 }
 
+// Field sets shared by the initial Progress Tracker load and the per-table
+// refresh buttons — kept in one place so the queries never drift apart.
+const PT_BLOCKED_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049'
+const PT_MISSING_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049,customfield_10008'
+
+function isBlockedIssue(iss) {
+  const statusBlocked = (iss.fields?.status?.name || '').toLowerCase().includes('blocked')
+  const labelBlocked = (iss.fields?.labels || []).some(l => l.toLowerCase().includes('blocked'))
+  return statusBlocked || labelBlocked
+}
+
+// Re-run only the Blocked Tickets query (all systems) and return the blocked issues.
+// Used by that table's refresh button so it can reload without touching the rest of the view.
+async function ptFetchBlockedIssues() {
+  const results = await Promise.allSettled(
+    PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_BLOCKED_FIELDS))
+  )
+  if (results.every(r => r.status === 'rejected')) throw new Error('Failed to load blocked tickets')
+  const allIssues = PT_SYSTEMS.flatMap((sys, i) => {
+    const res = results[i]
+    if (res.status !== 'fulfilled') return []
+    return res.value.map(iss => ({ ...iss, _system: sys.name }))
+  })
+  return allIssues.filter(isBlockedIssue)
+}
+
+// Re-run only the Incomplete Fields query (all systems) and return those issues.
+async function ptFetchMissingIssues() {
+  const results = await Promise.allSettled(
+    PT_MISSING_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_MISSING_FIELDS))
+  )
+  if (results.every(r => r.status === 'rejected')) throw new Error('Failed to load incomplete-field tickets')
+  return PT_MISSING_SYSTEMS.flatMap((sys, i) => {
+    const res = results[i]
+    if (res.status !== 'fulfilled') return []
+    return res.value.map(iss => ({ ...iss, _system: sys.name }))
+  })
+}
+
 async function loadProgressTracker() {
   const el = document.getElementById('pt-content')
   el.innerHTML = '<div class="view-loading"><span class="view-loading-text">Loading ticket data…</span><span class="view-loading-sub">Fetching from Jira</span></div>'
   try {
     const [results, missingResults] = await Promise.all([
       Promise.allSettled(
-        PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049'))
+        PT_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_BLOCKED_FIELDS))
       ),
       Promise.allSettled(
-        PT_MISSING_SYSTEMS.map(sys => fetchIssues(sys.jql(), 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049,customfield_10008'))
+        PT_MISSING_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_MISSING_FIELDS))
       )
     ])
     const cards = PT_SYSTEMS.map((sys, i) => {
@@ -2974,11 +3090,7 @@ async function loadProgressTracker() {
       if (res.status !== 'fulfilled') return []
       return res.value.map(iss => ({ ...iss, _system: sys.name }))
     })
-    const blockedIssues = allIssues.filter(iss => {
-      const statusBlocked = (iss.fields?.status?.name || '').toLowerCase().includes('blocked')
-      const labelBlocked = (iss.fields?.labels || []).some(l => l.toLowerCase().includes('blocked'))
-      return statusBlocked || labelBlocked
-    })
+    const blockedIssues = allIssues.filter(isBlockedIssue)
 
     // ── Tickets with Incomplete Fields (all systems combined) ──
     const missingIssues = PT_MISSING_SYSTEMS.flatMap((sys, i) => {
@@ -2988,8 +3100,8 @@ async function loadProgressTracker() {
     })
 
     el.innerHTML = `<div class="pt-grid">${cards}</div><div class="pt-blocked-wrap" id="pt-blocked-container"></div><div class="pt-blocked-wrap" id="pt-missing-container"></div>`
-    initBlockedTable('pt-blocked-container', blockedIssues)
-    initMissingTable('pt-missing-container', missingIssues)
+    initBlockedTable('pt-blocked-container', blockedIssues, ptFetchBlockedIssues)
+    initMissingTable('pt-missing-container', missingIssues, ptFetchMissingIssues)
   } catch (err) {
     el.innerHTML = `<div class="view-error">Failed to load progress data: ${esc(err.message)}</div>`
   }
