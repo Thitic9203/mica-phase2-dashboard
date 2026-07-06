@@ -1389,8 +1389,10 @@ const GROUP_OPTIONS = [
   {
     key: 'tcStatus', label: 'TC Status',
     fields: 'customfield_12128',
+    // TC Status counts Story only (same base filter as tab 1 donut, narrowed to Story)
+    filterIssues: issues => issues.filter(iss => (iss.fields?.issuetype?.name || '').toLowerCase() === 'story'),
     extract: iss => [iss.fields?.customfield_12128?.value || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12128]', val)}`,
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND issuetype = Story AND ${fieldClause('cf[12128]', val)}`,
   },
   {
     key: 'status', label: 'Status',
@@ -1451,8 +1453,9 @@ function reRenderAllEpics() {
   EPICS.forEach(epic => {
     const issues = epicIssuesStore[epic.key]
     if (issues) {
-      const groups = groupByField(issues, groupOpt)
-      renderCard(epic, groups, issues.length, groupOpt)
+      const scoped = groupOpt.filterIssues ? groupOpt.filterIssues(issues) : issues
+      const groups = groupByField(scoped, groupOpt)
+      renderCard(epic, groups, scoped.length, groupOpt)
     }
   })
   renderEmptyEpicLists()
@@ -3237,8 +3240,9 @@ async function loadEpic(epic) {
     const issues = await fetchIssues(`parent = ${epic.key} AND ${EPIC_FILTER}`, ALL_EPIC_FIELDS)
     epicIssuesStore[epic.key] = issues
     const groupOpt = getActiveGroupOpt()
-    const groups = groupByField(issues, groupOpt)
-    renderCard(epic, groups, issues.length, groupOpt)
+    const scoped = groupOpt.filterIssues ? groupOpt.filterIssues(issues) : issues
+    const groups = groupByField(scoped, groupOpt)
+    renderCard(epic, groups, scoped.length, groupOpt)
   } catch (err) {
     renderError(epic, err)
   }
