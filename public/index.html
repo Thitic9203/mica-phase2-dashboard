@@ -1067,6 +1067,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-day:nth-child(7n){ border-right: none; }
 .rt-day.pad{ background: var(--bg); }
 .rt-day.weekend{ background: #FAFAFB; }
+.rt-day.holiday{ background: #F1F1F5; }
+.rt-holi { margin-top: 7px; display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700; color: var(--muted); background: var(--elevated);
+  border: 1px solid var(--border-strong); border-radius: 7px; padding: 4px 8px 4px 7px; line-height: 1.25; }
+.rt-holi::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #9CA3AF; flex: 0 0 auto; }
 .rt-day .rt-n{ font-size: 15px; font-weight: 600; color: var(--dim); line-height: 1;
   display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; }
 .rt-day.has .rt-n{ color: var(--text); font-weight: 800; }
@@ -3289,7 +3294,13 @@ function buildRegressionTimeline() {
   const DOW = ['SUN','MON','TUE','WED','THU','FRI','SAT']
   const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   // Thai public holidays in the timeline window (source: KU Library / Sprout Solutions 2569)
-  const TH_HOLIDAYS = new Set(['2026-07-28','2026-07-29','2026-07-30','2026-08-12'])
+  const HOLI_NAMES = {
+    '2026-07-28': 'วันเฉลิมพระชนมพรรษา ร.10',
+    '2026-07-29': 'วันอาสาฬหบูชา',
+    '2026-07-30': 'วันเข้าพรรษา',
+    '2026-08-12': 'วันแม่แห่งชาติ',
+  }
+  const TH_HOLIDAYS = new Set(Object.keys(HOLI_NAMES))
   const _t = new Date()
   const TODAY = `${_t.getFullYear()}-${String(_t.getMonth()+1).padStart(2,'0')}-${String(_t.getDate()).padStart(2,'0')}`
   const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))
@@ -3327,8 +3338,10 @@ function buildRegressionTimeline() {
       const key = iso(y,m,d)
       const evs = MS.filter(e=>e.date===key)
       const dlv = DELIV[key]
-      const has = (evs.length || dlv) ? 'has' : ''
+      const holi = HOLI_NAMES[key]
+      const has = (evs.length || dlv || holi) ? 'has' : ''
       const today = key===TODAY ? 'today' : ''
+      const holiHTML = holi ? `<div class="rt-holi">${esc(holi)}</div>` : ''
       const blocks = evs.map(e =>
         `<div class="rt-ev ${e.color}"><div class="rt-ev-sys">${e.sys}</div>`+
         `<ul>${e.modules.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')
@@ -3337,7 +3350,7 @@ function buildRegressionTimeline() {
         const items = dlv.map(x => `<li><span class="rt-tc-sys ${x.color}">${x.sys}</span> regression ${fmtShort(x.reg)}</li>`).join('')
         deliv = `<div class="rt-tc"><div class="rt-tc-h">SKL · นำส่ง TC</div><ul>${items}</ul><div class="rt-tc-f">ภายใน 18:00 น.</div></div>`
       }
-      cells += `<div class="rt-day ${we} ${has} ${today}"><span class="rt-n">${d}</span>${blocks}${deliv}</div>`
+      cells += `<div class="rt-day ${we} ${has} ${today} ${holi?'holiday':''}"><span class="rt-n">${d}</span>${holiHTML}${blocks}${deliv}</div>`
     }
     const n = readyDates.size
     const note = `${n} test-ready ${n===1?'date':'dates'}`
