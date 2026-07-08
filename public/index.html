@@ -1039,6 +1039,25 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-intro { margin-bottom: 16px; }
 .rt-intro h3 { font-size: 16px; font-weight: 800; letter-spacing: -.02em; color: var(--text); }
 .rt-intro p { font-size: 12.5px; color: var(--muted); margin-top: 4px; max-width: 70ch; }
+/* top header: intro (left) + QA Owner (right) */
+.rt-head { display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; margin-bottom: 18px; }
+.rt-head .rt-intro { flex: 1 1 400px; margin-bottom: 0; }
+.rt-qa { flex: 1 1 500px; background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15);
+  border-radius: 12px; padding: 12px 14px; }
+.rt-qa-title { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px; }
+.rt-qa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.rt-qa-card { background: var(--card); border: 1px solid rgba(15,118,110,0.12); border-radius: 10px; padding: 9px 11px; }
+.rt-qa-sys { font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 5px; }
+.rt-qa-card.elms .rt-qa-sys { color: var(--rt-elms); }
+.rt-qa-card.cbms .rt-qa-sys { color: var(--rt-cbms); }
+.rt-qa-card.evms .rt-qa-sys { color: var(--rt-evms); }
+.rt-qa-card.ols  .rt-qa-sys { color: var(--rt-ols); }
+.rt-qa ul { list-style: none; margin: 0; padding: 0; }
+.rt-qa li { font-size: 11px; color: var(--text); line-height: 1.5; padding: 1.5px 0 1.5px 12px; position: relative; }
+.rt-qa li::before { content: ""; position: absolute; left: 2px; top: 7px; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--accent); opacity: .5; }
+@media (max-width: 600px) { .rt-qa-grid { grid-template-columns: 1fr; } }
 /* legend */
 .rt-legend { display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 20px; border: 1px solid var(--border);
   border-radius: var(--radius); overflow: hidden; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
@@ -1250,10 +1269,21 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 
     <!-- View: Regression Testing Timeline -->
     <div id="view-regression-timeline" class="view-panel hidden">
-      <div class="rt-intro">
-        <h3>Regression Test Readiness Timeline</h3>
-        <p>วันที่แต่ละระบบพร้อมให้เริ่ม Regression Test ครอบคลุมทั้ง 4 ระบบ (ELMS, CBMS, EvMS, OLS) — แต่ละกล่องสีคือโมดูลที่พร้อมทดสอบในวันนั้น</p>
-        <p style="margin-top:6px"><span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#1a8f4c;padding:2px 5px;border-radius:5px;vertical-align:middle">TC</span> SKL · นำส่ง TC = วันที่ นำส่ง Test Case ให้ HI เข้ามา regression <strong>ก่อนวัน regression 2 วันทำการ</strong> (ไม่นับเสาร์–อาทิตย์ และวันหยุดนักขัตฤกษ์ไทย) <strong>ภายใน 6 PM</strong></p>
+      <div class="rt-head">
+        <div class="rt-intro">
+          <h3>Regression Test Readiness Timeline</h3>
+          <p>วันที่แต่ละระบบพร้อมให้เริ่ม Regression Test ครอบคลุมทั้ง 4 ระบบ (ELMS, CBMS, EvMS, OLS) — แต่ละกล่องสีคือโมดูลที่พร้อมทดสอบในวันนั้น</p>
+          <p style="margin-top:6px"><span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#1a8f4c;padding:2px 5px;border-radius:5px;vertical-align:middle">TC</span> SKL · นำส่ง TC = วันที่ นำส่ง Test Case ให้ HI เข้ามา regression <strong>ก่อนวัน regression 2 วันทำการ</strong> (ไม่นับเสาร์–อาทิตย์ และวันหยุดนักขัตฤกษ์ไทย) <strong>ภายใน 6 PM</strong></p>
+        </div>
+        <div class="rt-qa">
+          <div class="rt-qa-title">QA Owner</div>
+          <div class="rt-qa-grid">
+            <div class="rt-qa-card elms"><div class="rt-qa-sys">ELMS</div><ul><li>Pasit (Kim)</li><li>Papawarin (Maple)</li><li>Chayakorn (Korn)</li></ul></div>
+            <div class="rt-qa-card cbms"><div class="rt-qa-sys">CBMS</div><ul><li>Pasit (Kim)</li><li>Duangsamon (Noon)</li><li>Chayakorn (Korn)</li></ul></div>
+            <div class="rt-qa-card evms"><div class="rt-qa-sys">EvMS</div><ul><li>Oran (Oran)</li><li>Nipit (Mark)</li><li>Makkawan (Moss)</li><li>Chalawadee (Nene)</li></ul></div>
+            <div class="rt-qa-card ols"><div class="rt-qa-sys">OLS</div><ul><li>Samorn (Mapraw)</li><li>Sujaree (Manoi)</li><li>Wasana (Preaw)</li></ul></div>
+          </div>
+        </div>
       </div>
       <div class="rt-legend">
         <div class="rt-idx elms"><div class="rt-sw"></div><div><div class="rt-sys">ELMS</div><div class="rt-when">22 Jul 2026</div></div></div>
