@@ -1106,8 +1106,6 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-tc-f { font-size: 10.5px; font-weight: 700; color: #2F7D4E; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #C7E8D2; }
 /* Group-by toolbar + filter modes */
 .rt-toolbar { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 16px; }
-#regression-calendar.rt-mode-tc .rt-ev { display: none; }
-#regression-calendar.rt-mode-ready .rt-tc { display: none; }
 /* "Ready to test for HI-QA" tag above each system block */
 .rt-ev-tag { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .01em;
   color: #fff; background: var(--evc); padding: 2.5px 7px; border-radius: 6px; line-height: 1.25; margin-bottom: 8px; }
@@ -1252,8 +1250,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
     <div id="view-regression-timeline" class="view-panel hidden">
       <div class="rt-intro">
         <h3>Regression Test Readiness Timeline</h3>
-        <p>วันที่แต่ละระบบพร้อมให้เริ่ม Regression Test ครอบคลุมทั้ง 4 ระบบ (ELMS, CBMS, EvMS, OLS) — แต่ละบล็อกสีคือโมดูลที่พร้อมทดสอบในวันนั้น</p>
-        <p style="margin-top:6px"><span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#64748B;padding:2px 5px;border-radius:5px;vertical-align:middle">TC</span> บล็อกวันนำส่ง TC = SKL นำส่ง Test Case ให้ HI เข้ามา regression <strong>ก่อนวัน regression 2 วันทำการ</strong> (ไม่นับเสาร์–อาทิตย์ และวันหยุดนักขัตฤกษ์ไทย) <strong>ภายใน 18:00 น.</strong></p>
+        <p>วันที่แต่ละระบบพร้อมให้เริ่ม Regression Test ครอบคลุมทั้ง 4 ระบบ (ELMS, CBMS, EvMS, OLS) — แต่ละกล่องสีคือโมดูลที่พร้อมทดสอบในวันนั้น</p>
+        <p style="margin-top:6px"><span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#1a8f4c;padding:2px 5px;border-radius:5px;vertical-align:middle">TC</span> SKL · นำส่ง TC = วันที่ นำส่ง Test Case ให้ HI เข้ามา regression <strong>ก่อนวัน regression 2 วันทำการ</strong> (ไม่นับเสาร์–อาทิตย์ และวันหยุดนักขัตฤกษ์ไทย) <strong>ภายใน 6 PM</strong></p>
       </div>
       <div class="rt-legend">
         <div class="rt-idx elms"><div class="rt-sw"></div><div><div class="rt-sys">ELMS</div><div class="rt-when">22 Jul 2026</div></div></div>
@@ -1266,11 +1264,15 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <span class="groupby-label">Group by</span>
           <div class="gb-dropdown">
             <button class="gb-trigger" id="rt-gb-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
-              <span class="gb-trigger-label" id="rt-gb-label">System</span>
+              <span class="gb-trigger-label" id="rt-gb-label">All activities</span>
               <svg class="gb-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <ul class="gb-menu" id="rt-gb-menu" role="listbox">
-              <li class="gb-item gb-item--selected" role="option" data-value="all">System</li>
+              <li class="gb-item gb-item--selected" role="option" data-value="all">All activities</li>
+              <li class="gb-item" role="option" data-value="elms">Activities of ELMS</li>
+              <li class="gb-item" role="option" data-value="cbms">Activities of CBMS</li>
+              <li class="gb-item" role="option" data-value="evms">Activities of EvMS</li>
+              <li class="gb-item" role="option" data-value="ols">Activities of OLS</li>
               <li class="gb-item" role="option" data-value="tc">SKL นำส่ง TC</li>
               <li class="gb-item" role="option" data-value="ready">Ready to test for HI-QA</li>
             </ul>
@@ -3350,7 +3352,10 @@ function buildRegressionTimeline() {
     const dd = backBiz(e.date, 2)
     ;(DELIV[dd] = DELIV[dd] || []).push({ sys: e.sys, color: e.color, reg: e.date })
   })
-  function buildMonth(y,m,label){
+  // mode: 'all' | 'elms' | 'cbms' | 'evms' | 'ols' | 'tc' | 'ready'
+  const showEv = (e, mode) => mode==='tc' ? false : (mode==='all' || mode==='ready') ? true : e.color===mode
+  const pickDlv = (list, mode) => mode==='ready' ? [] : (mode==='all' || mode==='tc') ? list : list.filter(x => x.color===mode)
+  function buildMonth(y,m,label,mode){
     const first = new Date(y,m,1).getDay(), dim = new Date(y,m+1,0).getDate()
     let cells = ''
     for(let i=0;i<first;i++) cells += '<div class="rt-day pad"></div>'
@@ -3358,10 +3363,10 @@ function buildRegressionTimeline() {
       const dow = new Date(y,m,d).getDay()
       const we = (dow===0||dow===6) ? 'weekend' : ''
       const key = iso(y,m,d)
-      const evs = MS.filter(e=>e.date===key)
-      const dlv = DELIV[key]
+      const evs = MS.filter(e=>e.date===key && showEv(e, mode))
+      const dlv = pickDlv(DELIV[key] || [], mode)
       const holi = HOLI_NAMES[key]
-      const has = (evs.length || dlv || holi) ? 'has' : ''
+      const has = (evs.length || dlv.length || holi) ? 'has' : ''
       const today = key===TODAY ? 'today' : ''
       const holiHTML = holi ? `<div class="rt-holi">${esc(holi)}</div>` : ''
       const blocks = evs.map(e =>
@@ -3369,9 +3374,9 @@ function buildRegressionTimeline() {
         `<div class="rt-ev-sys">${e.sys}</div>`+
         `<ul>${e.modules.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')
       let deliv = ''
-      if (dlv) {
+      if (dlv.length) {
         const items = dlv.map(x => `<li><span class="rt-tc-sys ${x.color}">${x.sys}</span> regression ${fmtShort(x.reg)}</li>`).join('')
-        deliv = `<div class="rt-tc"><div class="rt-tc-h">SKL · นำส่ง TC</div><ul>${items}</ul><div class="rt-tc-f">ภายใน 18:00 น.</div></div>`
+        deliv = `<div class="rt-tc"><div class="rt-tc-h">SKL · นำส่ง TC</div><ul>${items}</ul><div class="rt-tc-f">ภายใน 6 PM</div></div>`
       }
       cells += `<div class="rt-day ${we} ${has} ${today} ${holi?'holiday':''}"><span class="rt-n">${d}</span>${holiHTML}${blocks}${deliv}</div>`
     }
@@ -3381,11 +3386,13 @@ function buildRegressionTimeline() {
       `<div class="rt-dow">${DOW.map(d=>`<div>${d}</div>`).join('')}</div>`+
       `<div class="rt-days">${cells}</div></div>`
   }
-  host.innerHTML = buildMonth(2026,6,'July 2026') + buildMonth(2026,7,'August 2026')
-  host.classList.add('rt-mode-all')
+  const render = mode => {
+    host.innerHTML = buildMonth(2026,6,'July 2026',mode) + buildMonth(2026,7,'August 2026',mode)
+  }
+  render('all')
   host.dataset.built = '1'
 
-  // Group-by filter dropdown (same themed component as the Epic tab)
+  // Group-by filter dropdown (same themed component as the Epic tab); re-renders both months
   const gbTrig = document.getElementById('rt-gb-trigger')
   const gbMenu = document.getElementById('rt-gb-menu')
   const gbLabel = document.getElementById('rt-gb-label')
@@ -3401,8 +3408,7 @@ function buildRegressionTimeline() {
         gbMenu.querySelectorAll('.gb-item').forEach(i => i.classList.remove('gb-item--selected'))
         item.classList.add('gb-item--selected')
         gbLabel.textContent = item.textContent
-        host.classList.remove('rt-mode-all', 'rt-mode-tc', 'rt-mode-ready')
-        host.classList.add('rt-mode-' + item.dataset.value)
+        render(item.dataset.value)
         closeGb()
       })
     })
