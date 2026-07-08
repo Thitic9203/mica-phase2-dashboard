@@ -1070,13 +1070,13 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 @media (max-width: 560px) { .rt-qa-grid { grid-template-columns: 1fr; } }
 /* legend */
 .rt-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 20px; }
-.rsc-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); display: flex; flex-direction: column; }
+.rsc-card { background: var(--rc-bg, var(--card)); border: 1px solid var(--rc-bd, var(--border)); border-radius: var(--radius); padding: 16px 18px 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); display: flex; flex-direction: column; }
 .rsc-head { display: flex; align-items: center; gap: 8px; }
 .rsc-dot { width: 11px; height: 11px; border-radius: 4px; flex: 0 0 auto; background: var(--rc); }
 .rsc-sys { font-weight: 800; font-size: 15px; letter-spacing: -.01em; line-height: 1; color: var(--rc); }
 .rsc-ready { margin-top: 9px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
 .rsc-ready-lbl { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .01em; color: #fff; background: var(--rc); padding: 2.5px 7px; border-radius: 6px; line-height: 1.25; }
-.rsc-ready-date { font-size: 13px; font-weight: 700; color: var(--text); }
+.rsc-ready-date { font-size: 15px; font-weight: 800; letter-spacing: -.01em; color: var(--text); }
 .rsc-title { margin-top: 14px; font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; color: var(--text); }
 .rsc-total { margin-top: 2px; font-size: 11.5px; color: var(--muted); font-weight: 500; }
 .rsc-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; margin-top: 6px; background: var(--elevated); }
@@ -3386,11 +3386,13 @@ const RT_SKL_STATUS_META = [
 // `counts` below is the fallback snapshot (8 Jul 2026); live-refreshed from the sheet
 // on load via loadRegressionStatusLive(). `gid` = each system's "Summary" tab.
 const RT_SKL_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pub'
+// color = system accent; tint/line = same fill/border the calendar uses for that
+// system's "Ready to test for HI-QA" cell (--rt-<sys>-t / --rt-<sys>-l).
 const RT_SKL = [
-  { id: 'ELMS', color: '#6a4bce', ready: '22 Jul 2026',      gid: '533644237',  counts: { 'NOT STARTED': 6 } },
-  { id: 'CBMS', color: '#b06a12', ready: '27 & 30 Jul 2026', gid: '2040053581', counts: { 'NOT STARTED': 11 } },
-  { id: 'EvMS', color: '#12857a', ready: '3 Aug 2026',       gid: '550278191',  counts: { 'NOT STARTED': 6 } },
-  { id: 'OLS',  color: '#1a8f4c', ready: '3 & 7 Aug 2026',   gid: '1115838130', counts: { 'NOT STARTED': 16 } },
+  { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  counts: { 'NOT STARTED': 6 } },
+  { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', counts: { 'NOT STARTED': 11 } },
+  { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  counts: { 'NOT STARTED': 6 } },
+  { id: 'OLS',  color: '#1a8f4c', tint: '#eef8f1', line: '#d3ead9', ready: '3 & 7 Aug 2026',   gid: '1115838130', counts: { 'NOT STARTED': 16 } },
 ]
 
 function buildRegressionStatus() {
@@ -3418,7 +3420,7 @@ function buildRegressionStatus() {
     const legend = entries.map(([k, n]) =>
       `<li><span class="dot" style="background:${colorOf(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
     ).join('') || '<li class="n">No data</li>'
-    return `<div class="rsc-card" style="--rc:${sys.color}">
+    return `<div class="rsc-card" style="--rc:${sys.color};--rc-bg:${sys.tint};--rc-bd:${sys.line}">
       <div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>
       <div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(sys.ready)}</span></div>
       <div class="rsc-title">SKL Regression Testing Status</div>
