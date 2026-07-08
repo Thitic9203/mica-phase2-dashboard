@@ -1031,7 +1031,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 
 /* ══ Regression Testing Timeline tab ══ */
 #view-regression-timeline {
-  --rt-ols:#1a8f4c;  --rt-ols-t:#eef8f1; --rt-ols-l:#d3ead9;
+  --rt-ols:#2b4b80;  --rt-ols-t:#eef1f8; --rt-ols-l:#d5dded;
   --rt-evms:#12857a; --rt-evms-t:#e9f5f3; --rt-evms-l:#cbe6e1;
   --rt-cbms:#b06a12; --rt-cbms-t:#f8f1e4; --rt-cbms-l:#ecdfc7;
   --rt-elms:#6a4bce; --rt-elms-t:#efedfb; --rt-elms-l:#ddd4f4;
@@ -2313,7 +2313,7 @@ function initTicketTable(containerId, issues) {
 // ── Progress Tracker ──
 const PT_SYSTEMS = [
   {
-    id: 'OLS', name: 'Open Learning System (OLS)', color: '#4CAF76',
+    id: 'OLS', name: 'Open Learning System (OLS)', color: '#2b4b80',
     jql: () => { const k = EPICS.filter(e => e.system === 'OLS').map(e => e.key).join(','); return `parent in (${k}) AND ${EPIC_FILTER}` },
     jiraLink: 'https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818',
   },
@@ -2336,7 +2336,7 @@ const PT_SYSTEMS = [
 
 const PT_MISSING_SYSTEMS = [
   {
-    id: 'OLS', name: 'OLS', color: '#4CAF76',
+    id: 'OLS', name: 'OLS', color: '#2b4b80',
     jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR parent is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
   {
@@ -3392,7 +3392,7 @@ const RT_SKL = [
   { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  counts: { 'NOT STARTED': 6 } },
   { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', counts: { 'NOT STARTED': 11 } },
   { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  counts: { 'NOT STARTED': 6 } },
-  { id: 'OLS',  color: '#1a8f4c', tint: '#eef8f1', line: '#d3ead9', ready: '3 & 7 Aug 2026',   gid: '1115838130', counts: { 'NOT STARTED': 16 } },
+  { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', ready: '3 & 7 Aug 2026',   gid: '1115838130', counts: { 'NOT STARTED': 16 } },
 ]
 
 function buildRegressionStatus() {
