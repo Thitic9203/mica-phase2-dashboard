@@ -3286,9 +3286,9 @@ function buildRegressionTimeline() {
       modules:['หน้าจอจัดการหลักสูตรธนาคารหน่วยกิต','รายการและรายละเอียดวิชาที่เปิดสอนภายใต้ธนาคารหน่วยกิต','การลงทะเบียนรายวิชาที่เปิดสอนภายใต้ธนาคารหน่วยกิต','หน้าจอรายชื่อนักเรียนที่ลงทะเบียนรายวิชา, ที่ทำการสอบและวัดผล','หน้าจอการเปิดคำร้องขอเทียบโอนหน่วยกิต','หน้าจอพิจารณาคำร้องขอเทียบโอนหน่วยกิต','หน้าจอหน่วยกิตของฉัน'] },
     { sys:'EvMS', color:'evms', date:'2026-08-03',
       modules:['คลังข้อสอบ Exam Bank/Question Bank','ตารางสอบ Timtable','การสอบ Exam Room','การคุมสอบ Exam Session','การตรวจข้อสอบ Exam Grading','รายงานผลการสอบ Report /Evaluation'] },
-    { sys:'OLS', color:'ols', date:'2026-08-03',
+    { sys:'OLS', color:'ols', date:'2026-08-03', deliver:'2026-07-30',
       modules:['Media Management','Course Management','Learning Path Management','Media List and View','Profile Page','Content Management','User Moderation','Social Interaction','Recommendation System'] },
-    { sys:'OLS', color:'ols', date:'2026-08-07',
+    { sys:'OLS', color:'ols', date:'2026-08-07', deliver:'2026-08-05',
       modules:['Integration NDLP (Media)','Authentication','User Management','Live Streaming','Achievement/badge System','Backoffice CMS','Report/Stat/Dashboard'] },
   ]
   const DOW = ['SUN','MON','TUE','WED','THU','FRI','SAT']
@@ -3321,10 +3321,11 @@ function buildRegressionTimeline() {
     }
     return key2(dt)
   }
-  // TC delivery = 2 business days before each regression date; group by delivery date
+  // TC delivery: explicit `deliver` from the tracker when set (OLS), otherwise 2 business
+  // days before the regression date (skip weekends + Thai holidays). Grouped by delivery date.
   const DELIV = {}
   MS.forEach(e => {
-    const dd = backBiz(e.date, 2)
+    const dd = e.deliver || backBiz(e.date, 2)
     ;(DELIV[dd] = DELIV[dd] || []).push({ sys: e.sys, color: e.color, reg: e.date })
   })
   function buildMonth(y,m,label){
