@@ -1091,19 +1091,26 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-ev li::before { content: ""; position: absolute; left: 2px; top: 8px; width: 5px; height: 5px;
   border-radius: 1.5px; background: var(--evc); opacity: .85; }
 /* TC delivery (handoff) block */
-.rt-tc { margin-top: 9px; border: 1px dashed #C3CCD6; border-left: 3px solid #64748B;
-  background: #F6F8FA; border-radius: 10px; padding: 8px 11px 9px; }
+.rt-tc { margin-top: 9px; border: 1px solid #BBE3C9; border-left: 3px solid #1a8f4c;
+  background: #E9F7EF; border-radius: 10px; padding: 8px 11px 9px; }
 .rt-ev + .rt-tc, .rt-tc + .rt-ev, .rt-tc + .rt-tc { margin-top: 8px; }
-.rt-tc-h { font-size: 11.5px; font-weight: 800; color: #475569; letter-spacing: -.01em; line-height: 1;
-  padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px dashed #D3DAE2; display: flex; align-items: center; gap: 6px; }
-.rt-tc-h::before { content: "TC"; font-size: 8.5px; font-weight: 800; color: #fff; background: #64748B;
+.rt-tc-h { font-size: 11.5px; font-weight: 800; color: #0E6A34; letter-spacing: -.01em; line-height: 1;
+  padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px dashed #C7E8D2; display: flex; align-items: center; gap: 6px; }
+.rt-tc-h::before { content: "TC"; font-size: 8.5px; font-weight: 800; color: #fff; background: #1a8f4c;
   padding: 2px 5px; border-radius: 5px; line-height: 1; }
 .rt-tc ul { list-style: none; margin: 0; padding: 0; }
 .rt-tc li { font-size: 11px; line-height: 1.45; color: var(--text); padding: 2px 0; display: flex; align-items: center; gap: 6px; }
 .rt-tc-sys { font-size: 9px; font-weight: 800; padding: 1.5px 6px; border-radius: 999px; color: #fff; flex: 0 0 auto; letter-spacing: .01em; }
 .rt-tc-sys.ols{background:var(--rt-ols)} .rt-tc-sys.evms{background:var(--rt-evms)}
 .rt-tc-sys.cbms{background:var(--rt-cbms)} .rt-tc-sys.elms{background:var(--rt-elms)}
-.rt-tc-f { font-size: 10.5px; font-weight: 700; color: #475569; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #D3DAE2; }
+.rt-tc-f { font-size: 10.5px; font-weight: 700; color: #2F7D4E; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #C7E8D2; }
+/* Group-by toolbar + filter modes */
+.rt-toolbar { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 16px; }
+#regression-calendar.rt-mode-tc .rt-ev { display: none; }
+#regression-calendar.rt-mode-ready .rt-tc { display: none; }
+/* "Ready to test for HI-QA" tag above each system block */
+.rt-ev-tag { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .01em;
+  color: #fff; background: var(--evc); padding: 2.5px 7px; border-radius: 6px; line-height: 1.25; margin-bottom: 8px; }
 @media (max-width: 820px) {
   .rt-day { min-height: 68px; padding: 6px; }
   .rt-ev-sys { font-size: 14px; }
@@ -1253,6 +1260,22 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
         <div class="rt-idx cbms"><div class="rt-sw"></div><div><div class="rt-sys">CBMS</div><div class="rt-when">27 &amp; 30 Jul 2026</div></div></div>
         <div class="rt-idx evms"><div class="rt-sw"></div><div><div class="rt-sys">EvMS</div><div class="rt-when">3 Aug 2026</div></div></div>
         <div class="rt-idx ols"><div class="rt-sw"></div><div><div class="rt-sys">OLS</div><div class="rt-when">3 &amp; 7 Aug 2026</div></div></div>
+      </div>
+      <div class="rt-toolbar">
+        <div class="groupby-wrap">
+          <span class="groupby-label">Group by</span>
+          <div class="gb-dropdown">
+            <button class="gb-trigger" id="rt-gb-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="gb-trigger-label" id="rt-gb-label">System</span>
+              <svg class="gb-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="gb-menu" id="rt-gb-menu" role="listbox">
+              <li class="gb-item gb-item--selected" role="option" data-value="all">System</li>
+              <li class="gb-item" role="option" data-value="tc">SKL นำส่ง TC</li>
+              <li class="gb-item" role="option" data-value="ready">Ready to test for HI-QA</li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div id="regression-calendar"></div>
     </div>
@@ -3329,7 +3352,6 @@ function buildRegressionTimeline() {
   })
   function buildMonth(y,m,label){
     const first = new Date(y,m,1).getDay(), dim = new Date(y,m+1,0).getDate()
-    const readyDates = new Set(MS.filter(e=>e.date.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).map(e=>e.date))
     let cells = ''
     for(let i=0;i<first;i++) cells += '<div class="rt-day pad"></div>'
     for(let d=1;d<=dim;d++){
@@ -3343,7 +3365,8 @@ function buildRegressionTimeline() {
       const today = key===TODAY ? 'today' : ''
       const holiHTML = holi ? `<div class="rt-holi">${esc(holi)}</div>` : ''
       const blocks = evs.map(e =>
-        `<div class="rt-ev ${e.color}"><div class="rt-ev-sys">${e.sys}</div>`+
+        `<div class="rt-ev ${e.color}"><div class="rt-ev-tag">Ready to test for HI-QA</div>`+
+        `<div class="rt-ev-sys">${e.sys}</div>`+
         `<ul>${e.modules.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')
       let deliv = ''
       if (dlv) {
@@ -3352,17 +3375,40 @@ function buildRegressionTimeline() {
       }
       cells += `<div class="rt-day ${we} ${has} ${today} ${holi?'holiday':''}"><span class="rt-n">${d}</span>${holiHTML}${blocks}${deliv}</div>`
     }
-    const n = readyDates.size
-    const note = `${n} test-ready ${n===1?'date':'dates'}`
     const [mn,yr] = label.split(' ')
     return `<div class="rt-month"><div class="rt-mhead">`+
-      `<div class="rt-mname">${mn}<span class="rt-yr">${yr}</span></div>`+
-      `<div class="rt-mnote">${note}</div></div>`+
+      `<div class="rt-mname">${mn}<span class="rt-yr">${yr}</span></div></div>`+
       `<div class="rt-dow">${DOW.map(d=>`<div>${d}</div>`).join('')}</div>`+
       `<div class="rt-days">${cells}</div></div>`
   }
   host.innerHTML = buildMonth(2026,6,'July 2026') + buildMonth(2026,7,'August 2026')
+  host.classList.add('rt-mode-all')
   host.dataset.built = '1'
+
+  // Group-by filter dropdown (same themed component as the Epic tab)
+  const gbTrig = document.getElementById('rt-gb-trigger')
+  const gbMenu = document.getElementById('rt-gb-menu')
+  const gbLabel = document.getElementById('rt-gb-label')
+  if (gbTrig && gbMenu && gbLabel) {
+    const closeGb = () => { gbMenu.classList.remove('gb-open'); gbTrig.setAttribute('aria-expanded', 'false') }
+    gbTrig.addEventListener('click', e => {
+      e.stopPropagation()
+      const open = gbMenu.classList.toggle('gb-open')
+      gbTrig.setAttribute('aria-expanded', open ? 'true' : 'false')
+    })
+    gbMenu.querySelectorAll('.gb-item').forEach(item => {
+      item.addEventListener('click', () => {
+        gbMenu.querySelectorAll('.gb-item').forEach(i => i.classList.remove('gb-item--selected'))
+        item.classList.add('gb-item--selected')
+        gbLabel.textContent = item.textContent
+        host.classList.remove('rt-mode-all', 'rt-mode-tc', 'rt-mode-ready')
+        host.classList.add('rt-mode-' + item.dataset.value)
+        closeGb()
+      })
+    })
+    document.addEventListener('click', closeGb)
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGb() })
+  }
 }
 
 function switchView(viewId) {
