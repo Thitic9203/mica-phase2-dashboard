@@ -1068,17 +1068,23 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   border-radius: 50%; background: var(--accent); opacity: .5; }
 @media (max-width: 600px) { .rt-qa-grid { grid-template-columns: 1fr; } }
 /* legend */
-.rt-legend { display: flex; flex-wrap: wrap; gap: 0; margin: 0 0 20px; border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-.rt-idx { flex: 1 1 0; min-width: 150px; display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-right: 1px solid var(--border); }
-.rt-idx:last-child { border-right: none; }
-.rt-idx .rt-sw { width: 11px; height: 34px; border-radius: 4px; flex: 0 0 auto; }
-.rt-idx .rt-sys { font-weight: 800; font-size: 15px; letter-spacing: -.01em; line-height: 1; }
-.rt-idx .rt-when { font-size: 13px; color: var(--text); font-weight: 700; margin-top: 4px; }
-.rt-idx.ols  .rt-sw{background:var(--rt-ols)}  .rt-idx.ols  .rt-sys{color:var(--rt-ols)}
-.rt-idx.evms .rt-sw{background:var(--rt-evms)} .rt-idx.evms .rt-sys{color:var(--rt-evms)}
-.rt-idx.cbms .rt-sw{background:var(--rt-cbms)} .rt-idx.cbms .rt-sys{color:var(--rt-cbms)}
-.rt-idx.elms .rt-sw{background:var(--rt-elms)} .rt-idx.elms .rt-sys{color:var(--rt-elms)}
+.rt-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 20px; }
+.rsc-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); display: flex; flex-direction: column; }
+.rsc-head { display: flex; align-items: center; gap: 8px; }
+.rsc-dot { width: 11px; height: 11px; border-radius: 4px; flex: 0 0 auto; background: var(--rc); }
+.rsc-sys { font-weight: 800; font-size: 15px; letter-spacing: -.01em; line-height: 1; color: var(--rc); }
+.rsc-ready { margin-top: 8px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 7px; }
+.rsc-ready-lbl { font-size: 10.5px; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
+.rsc-ready-date { font-size: 13px; font-weight: 700; color: var(--text); }
+.rsc-total { margin-top: 13px; font-size: 12px; color: var(--muted); font-weight: 500; }
+.rsc-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; margin-top: 6px; background: var(--elevated); }
+.rsc-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; min-width: 0; overflow: hidden; white-space: nowrap; }
+.rsc-legend { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rsc-legend li { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text); }
+.rsc-legend .dot { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
+.rsc-legend .n { color: var(--muted); font-weight: 600; }
+@media (max-width: 900px) { .rt-legend { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .rt-legend { grid-template-columns: 1fr; } }
 /* month */
 .rt-month { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: 0 1px 2px rgba(0,0,0,0.04); overflow: clip; margin-bottom: 22px; }
@@ -1162,7 +1168,6 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .rt-ev-sys { font-size: 14px; }
   .rt-ev li { font-size: 11px; }
   .rt-dow div { font-size: 9px; letter-spacing: .05em; padding: 8px 6px; }
-  .rt-idx { min-width: 50%; }
   .rt-dow, .rt-days { grid-template-columns: 34px repeat(5,1fr) 34px; }
 }
   </style>
@@ -1319,12 +1324,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           </div>
         </div>
       </div>
-      <div class="rt-legend">
-        <div class="rt-idx elms"><div class="rt-sw"></div><div><div class="rt-sys">ELMS</div><div class="rt-when">22 Jul 2026</div></div></div>
-        <div class="rt-idx cbms"><div class="rt-sw"></div><div><div class="rt-sys">CBMS</div><div class="rt-when">27 &amp; 30 Jul 2026</div></div></div>
-        <div class="rt-idx evms"><div class="rt-sw"></div><div><div class="rt-sys">EvMS</div><div class="rt-when">3 Aug 2026</div></div></div>
-        <div class="rt-idx ols"><div class="rt-sw"></div><div><div class="rt-sys">OLS</div><div class="rt-when">3 &amp; 7 Aug 2026</div></div></div>
-      </div>
+      <div class="rt-legend" id="rt-legend"></div>
       <div class="rt-toolbar">
         <div class="groupby-wrap">
           <span class="groupby-label">Group by</span>
@@ -3364,6 +3364,109 @@ async function loadProgressTracker() {
 // ── View switching ──
 const _loaded = {}
 
+// ── SKL-QA: Regression Testing Status (per-system summary cards) ──
+// Source: "Regression Testing – Progress Tracker" Google Sheet, each system's "Summary" tab
+//   https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pubhtml
+// Snapshot synced: 8 Jul 2026. `counts` = number of modules per SKL-QA status.
+// To update: change the counts below (add status keys as the sheet's statuses change).
+const RT_SKL_STATUS_META = [
+  { key: 'NOT STARTED',   color: '#9AA0A6' },
+  { key: 'TO DO',         color: '#B7BCC4' },
+  { key: 'IN PROGRESS',   color: '#4F97D6' },
+  { key: 'BLOCKED',       color: '#E0655F' },
+  { key: 'READY TO TEST', color: '#E0A64E' },
+  { key: 'REVIEWING',     color: '#B98BD4' },
+  { key: 'PASSED',        color: '#4FB07A' },
+  { key: 'DONE',          color: '#3F9C63' },
+  { key: 'FAILED',        color: '#D8483F' },
+]
+// `counts` below is the fallback snapshot (8 Jul 2026); live-refreshed from the sheet
+// on load via loadRegressionStatusLive(). `gid` = each system's "Summary" tab.
+const RT_SKL_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pub'
+const RT_SKL = [
+  { id: 'ELMS', color: '#6a4bce', ready: '22 Jul 2026',      gid: '533644237',  counts: { 'NOT STARTED': 6 } },
+  { id: 'CBMS', color: '#b06a12', ready: '27 & 30 Jul 2026', gid: '2040053581', counts: { 'NOT STARTED': 11 } },
+  { id: 'EvMS', color: '#12857a', ready: '3 Aug 2026',       gid: '550278191',  counts: { 'NOT STARTED': 6 } },
+  { id: 'OLS',  color: '#1a8f4c', ready: '3 & 7 Aug 2026',   gid: '1115838130', counts: { 'NOT STARTED': 16 } },
+]
+
+function buildRegressionStatus() {
+  const host = document.getElementById('rt-legend')
+  if (!host) return
+  const order = RT_SKL_STATUS_META.map(m => m.key)
+  const rank = k => { const i = order.indexOf(k); return i < 0 ? 999 : i }
+  const colorOf = k => (RT_SKL_STATUS_META.find(m => m.key === k) || {}).color || '#9AA0A6'
+  host.innerHTML = RT_SKL.map(sys => {
+    const entries = Object.entries(sys.counts)
+      .filter(([, n]) => n > 0)
+      .sort((a, b) => rank(a[0]) - rank(b[0]))
+    const total = entries.reduce((a, [, n]) => a + n, 0)
+    const segs = entries.map(([k, n]) => {
+      const w = total ? (n / total * 100) : 0
+      const pct = Math.round(w)
+      return `<span class="rsc-seg" style="width:${w}%;background:${colorOf(k)}" title="${esc(k)} — ${n} (${pct}%)">${pct >= 8 ? pct + '%' : ''}</span>`
+    }).join('')
+    const legend = entries.map(([k, n]) =>
+      `<li><span class="dot" style="background:${colorOf(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
+    ).join('') || '<li class="n">No data</li>'
+    return `<div class="rsc-card" style="--rc:${sys.color}">
+      <div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>
+      <div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(sys.ready)}</span></div>
+      <div class="rsc-total">${total} module${total !== 1 ? 's' : ''} total</div>
+      <div class="rsc-bar">${segs}</div>
+      <ul class="rsc-legend">${legend}</ul>
+    </div>`
+  }).join('')
+}
+
+// Minimal RFC-4180 CSV parser (handles quoted fields, embedded commas/newlines).
+function rtParseCSV(text) {
+  const rows = []; let row = [], field = '', q = false
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++ } else q = false }
+      else field += c
+    } else if (c === '"') q = true
+    else if (c === ',') { row.push(field); field = '' }
+    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = '' }
+    else if (c !== '\r') field += c
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row) }
+  return rows
+}
+
+// Live SKL-QA status counts from a system's "Summary" tab (published CSV).
+async function rtFetchSklCounts(gid) {
+  const url = `${RT_SKL_CSV_BASE}?gid=${gid}&single=true&output=csv`
+  const res = await fetch(url, { cache: 'no-store' })
+  if (!res.ok) throw new Error('HTTP ' + res.status)
+  const rows = rtParseCSV(await res.text())
+  if (!rows.length) throw new Error('empty sheet')
+  // Match the status column by its header start — NOT a loose /SKL-QA/ test: an
+  // earlier column ("...after passed test by SKL-QA") also contains that substring.
+  const col = rows[0].findIndex(h => /^\s*SKL-QA/i.test(h))
+  if (col < 0) throw new Error('no SKL-QA column')
+  const counts = {}
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i]
+    if (!r || !(r[0] || '').trim()) continue        // skip rows without a module name
+    const v = ((r[col] || '').trim() || 'NOT STARTED').toUpperCase()
+    counts[v] = (counts[v] || 0) + 1
+  }
+  if (!Object.keys(counts).length) throw new Error('no module rows')
+  return counts
+}
+
+// Refresh every card from the sheet; each system falls back to its snapshot on failure.
+async function loadRegressionStatusLive() {
+  await Promise.all(RT_SKL.map(async sys => {
+    try { sys.counts = await rtFetchSklCounts(sys.gid) }
+    catch (e) { console.warn('SKL-QA live fetch failed for', sys.id, '-', e.message, '(using snapshot)') }
+  }))
+  buildRegressionStatus()
+}
+
 // ── Regression Testing Timeline calendar ──
 function buildRegressionTimeline() {
   const host = document.getElementById('regression-calendar')
@@ -3619,6 +3722,8 @@ function showApp() {
     }
   })()
   initGrid()
+  buildRegressionStatus()
+  loadRegressionStatusLive()
   buildRegressionTimeline()
   _loaded.progressTracker = true; loadProgressTracker()
   loadAll()
