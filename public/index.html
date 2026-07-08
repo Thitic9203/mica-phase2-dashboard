@@ -3548,7 +3548,9 @@ function buildRegressionTimeline() {
       const dlv = pickDlv(DELIV[key] || [], mode)
       const holi = HOLI_NAMES[key]
       const isToday = key === TODAY
-      const has = (evs.length || dlv.length || holi) ? 'has' : ''
+      // holiday alone doesn't count as "has" — a holiday-only day stays the short
+      // (:not(.has)) height so weeks with only a public holiday collapse.
+      const has = (evs.length || dlv.length) ? 'has' : ''
       const today = isToday ? 'today' : ''
       const todayTag = isToday ? '<span class="rt-today-tag">Today</span>' : ''
       const holiHTML = holi ? `<div class="rt-holi">${esc(holi)}</div>` : ''
