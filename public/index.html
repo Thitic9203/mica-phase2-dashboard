@@ -1055,30 +1055,33 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   border-radius: 12px; padding: 12px 14px; }
 .rt-qa-title { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 10px; }
-.rt-qa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.rt-qa-card { background: var(--card); border: 1px solid rgba(15,118,110,0.12); border-radius: 10px; padding: 9px 11px; }
+.rt-qa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.rt-qa-card { background: var(--card); border: 1px solid rgba(15,118,110,0.12); border-radius: 10px; padding: 9px 10px; min-width: 0; }
 .rt-qa-sys { font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 5px; }
 .rt-qa-card.elms .rt-qa-sys { color: var(--rt-elms); }
 .rt-qa-card.cbms .rt-qa-sys { color: var(--rt-cbms); }
 .rt-qa-card.evms .rt-qa-sys { color: var(--rt-evms); }
 .rt-qa-card.ols  .rt-qa-sys { color: var(--rt-ols); }
 .rt-qa ul { list-style: none; margin: 0; padding: 0; }
-.rt-qa li { font-size: 11px; color: var(--text); line-height: 1.5; padding: 1.5px 0 1.5px 12px; position: relative; }
+.rt-qa li { font-size: 11px; color: var(--text); line-height: 1.5; padding: 1.5px 0 1.5px 12px; position: relative; white-space: nowrap; }
 .rt-qa li::before { content: ""; position: absolute; left: 2px; top: 7px; width: 4px; height: 4px;
   border-radius: 50%; background: var(--accent); opacity: .5; }
-@media (max-width: 600px) { .rt-qa-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) { .rt-qa-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .rt-qa-grid { grid-template-columns: 1fr; } }
 /* legend */
 .rt-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 20px; }
 .rsc-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px 15px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); display: flex; flex-direction: column; }
 .rsc-head { display: flex; align-items: center; gap: 8px; }
 .rsc-dot { width: 11px; height: 11px; border-radius: 4px; flex: 0 0 auto; background: var(--rc); }
 .rsc-sys { font-weight: 800; font-size: 15px; letter-spacing: -.01em; line-height: 1; color: var(--rc); }
-.rsc-ready { margin-top: 8px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 7px; }
-.rsc-ready-lbl { font-size: 10.5px; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
+.rsc-ready { margin-top: 9px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.rsc-ready-lbl { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .01em; color: #fff; background: var(--rc); padding: 2.5px 7px; border-radius: 6px; line-height: 1.25; }
 .rsc-ready-date { font-size: 13px; font-weight: 700; color: var(--text); }
-.rsc-total { margin-top: 13px; font-size: 12px; color: var(--muted); font-weight: 500; }
+.rsc-title { margin-top: 14px; font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; color: var(--text); }
+.rsc-total { margin-top: 2px; font-size: 11.5px; color: var(--muted); font-weight: 500; }
 .rsc-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; margin-top: 6px; background: var(--elevated); }
-.rsc-seg { display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; min-width: 0; overflow: hidden; white-space: nowrap; }
+.rsc-seg { height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0 4px; box-sizing: border-box; }
+.rsc-seg-lbl { font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; text-shadow: 0 1px 2px rgba(0,0,0,.35); overflow: hidden; text-overflow: clip; }
 .rsc-legend { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .rsc-legend li { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text); }
 .rsc-legend .dot { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
@@ -3401,10 +3404,16 @@ function buildRegressionStatus() {
       .filter(([, n]) => n > 0)
       .sort((a, b) => rank(a[0]) - rank(b[0]))
     const total = entries.reduce((a, [, n]) => a + n, 0)
+    // Match the bar in other tabs (.sbc-bar): each segment gets a minimum visual
+    // width so it stays visible, widths are normalised to sum 100%, but the % LABEL
+    // is always the true share (count/total) — never the boosted width.
+    const totalW = entries.reduce((s, [, n]) => s + Math.max(total ? n / total * 100 : 0, 18), 0)
     const segs = entries.map(([k, n]) => {
-      const w = total ? (n / total * 100) : 0
-      const pct = Math.round(w)
-      return `<span class="rsc-seg" style="width:${w}%;background:${colorOf(k)}" title="${esc(k)} — ${n} (${pct}%)">${pct >= 8 ? pct + '%' : ''}</span>`
+      const pct = total ? Math.round(n / total * 100) : 0
+      const rawW = Math.max(total ? n / total * 100 : 0, 18)
+      const nw = totalW ? rawW / totalW * 100 : 0
+      const lbl = pct >= 1 ? `<span class="rsc-seg-lbl">${pct}%</span>` : ''
+      return `<span class="rsc-seg" style="width:${nw}%;background:${colorOf(k)}" title="${esc(k)} — ${n} (${pct}%)">${lbl}</span>`
     }).join('')
     const legend = entries.map(([k, n]) =>
       `<li><span class="dot" style="background:${colorOf(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
@@ -3412,6 +3421,7 @@ function buildRegressionStatus() {
     return `<div class="rsc-card" style="--rc:${sys.color}">
       <div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>
       <div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(sys.ready)}</span></div>
+      <div class="rsc-title">SKL Regression Testing Status</div>
       <div class="rsc-total">${total} module${total !== 1 ? 's' : ''} total</div>
       <div class="rsc-bar">${segs}</div>
       <ul class="rsc-legend">${legend}</ul>
