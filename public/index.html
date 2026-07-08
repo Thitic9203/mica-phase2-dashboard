@@ -3483,6 +3483,15 @@ function buildRegressionTimeline() {
     })
     document.addEventListener('click', closeGb)
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGb() })
+    // reset to the default option (first item = "All activities") on tab switch
+    const gbDef = gbMenu.querySelector('.gb-item')
+    gbTrig._gbReset = () => {
+      gbMenu.querySelectorAll('.gb-item').forEach(i => i.classList.remove('gb-item--selected'))
+      gbDef.classList.add('gb-item--selected')
+      gbLabel.textContent = gbDef.textContent
+      render(gbDef.dataset.value)
+      closeGb()
+    }
   }
 }
 
@@ -3497,6 +3506,9 @@ function switchView(viewId) {
   document.getElementById('pp-tbl')?._ttReset?.()
   document.getElementById('pt-blocked-container')?._btReset?.()
   document.getElementById('pt-missing-container')?._mtReset?.()
+  // every tab's selections go back to default when switching tabs
+  document.getElementById('gb-trigger')?._gbReset?.()
+  document.getElementById('rt-gb-trigger')?._gbReset?.()
   if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
     _loaded.progressTracker = true; loadProgressTracker()
   }
@@ -3595,6 +3607,16 @@ function showApp() {
     })
     document.addEventListener('click', close)
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close() })
+    // reset to the default option (first item = "Status") on tab switch
+    const def = menu.querySelector('.gb-item')
+    trigger._gbReset = () => {
+      menu.querySelectorAll('.gb-item').forEach(i => i.classList.remove('gb-item--selected'))
+      def.classList.add('gb-item--selected')
+      label.textContent = def.textContent
+      hidden.value = def.dataset.value
+      hidden.dispatchEvent(new Event('change'))
+      close()
+    }
   })()
   initGrid()
   buildRegressionTimeline()
