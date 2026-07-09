@@ -2337,7 +2337,8 @@ const PT_SYSTEMS = [
 const PT_MISSING_SYSTEMS = [
   {
     id: 'OLS', name: 'OLS', color: '#2b4b80',
-    jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR parent is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    // OLS tickets don't require a QA Owner, so no QA-owner clause here.
+    jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR parent is EMPTY OR assignee is EMPTY) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'ELMS', name: 'ELMS', color: '#8A78BF',
@@ -2926,7 +2927,8 @@ function initMissingTable(containerId, issues, refetch) {
     if (!afSprint) missing.push('Sprint')
     if (!pk) missing.push('Epic')
     if (!iss.fields?.assignee) missing.push('Assignee')
-    if (!owners.length) missing.push('QA Owner')
+    // OLS tickets don't require a QA Owner — not counted as missing.
+    if (!owners.length && iss._system !== 'OLS') missing.push('QA Owner')
     return {
       key: iss.key,
       summary: iss.fields?.summary || '',
