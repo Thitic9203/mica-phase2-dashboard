@@ -3314,7 +3314,11 @@ async function ptFetchMissingIssues(opts = {}) {
   })
 }
 
+// Bumped on every call so a slow earlier load (e.g. from a quick tab bounce)
+// can't repaint over the results of the load that superseded it.
+let _ptRun = 0
 async function loadProgressTracker() {
+  const run = ++_ptRun
   const el = document.getElementById('pt-content')
   el.innerHTML = '<div class="view-loading"><span class="view-loading-text">Loading ticket data…</span><span class="view-loading-sub">Fetching from Jira</span></div>'
   try {
@@ -3326,6 +3330,7 @@ async function loadProgressTracker() {
         PT_MISSING_SYSTEMS.map(sys => fetchIssues(sys.jql(), PT_MISSING_FIELDS))
       )
     ])
+    if (run !== _ptRun) return // a newer load already owns #pt-content
     const cards = PT_SYSTEMS.map((sys, i) => {
       const res = results[i]
       if (res.status === 'rejected') {
@@ -3361,13 +3366,47 @@ async function loadProgressTracker() {
     // load above still uses the cache.
     initBlockedTable('pt-blocked-container', blockedIssues, () => ptFetchBlockedIssues({ fresh: true }))
     initMissingTable('pt-missing-container', missingIssues, () => ptFetchMissingIssues({ fresh: true }))
+    stampData('progress-tracker')
   } catch (err) {
+    if (run !== _ptRun) return
     el.innerHTML = `<div class="view-error">Failed to load progress data: ${esc(err.message)}</div>`
   }
 }
 
-// ── View switching ──
-const _loaded = {}
+// ── Header "Updated Date" ──
+// One timestamp per view, recorded only when that view's own data lands. It must
+// never come from the wall clock at render time: a label that ticks while the
+// data underneath it is frozen is what hid a converted Task→Story for hours.
+const _dataAt = {}
+const _UPDATED_SUB = {
+  'epic-tc': 'Auto-refresh from Jira every 5 minutes',
+  'progress-tracker': 'Refreshes each time you open this tab',
+  'regression-timeline': 'Refreshes each time you open this tab',
+}
+function activeViewId() {
+  return document.querySelector('.sb-nav-item.active')?.dataset.view || ''
+}
+function fmtUpdatedAt(ts) {
+  const d = new Date(ts)
+  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]
+  const dd = String(d.getDate()).padStart(2,'0')
+  const m = String(d.getMinutes()).padStart(2,'0')
+  const h = d.getHours(), ampm = h >= 12 ? 'PM' : 'AM', h12 = String(h % 12 || 12).padStart(2,'0')
+  return `${dd}/${mo}/${d.getFullYear()} ${h12}:${m} ${ampm}`
+}
+function renderUpdatedLabel() {
+  const el = document.getElementById('last-updated')
+  if (!el) return
+  const view = activeViewId()
+  const ts = _dataAt[view]
+  el.innerHTML = `Updated Date: ${ts ? fmtUpdatedAt(ts) : '—'}` +
+    `<br><span style="font-size:11px;opacity:.65">${_UPDATED_SUB[view] || ''}</span>`
+}
+// Call only after a fetch for `view` actually succeeded.
+function stampData(view) {
+  _dataAt[view] = Date.now()
+  if (activeViewId() === view) renderUpdatedLabel()
+}
 
 // ── SKL-QA: Regression Testing Status (per-system summary cards) ──
 // Source: "Regression Testing – Progress Tracker" Google Sheet, each system's "Summary" tab
@@ -3474,11 +3513,14 @@ async function rtFetchSklCounts(gid) {
 
 // Refresh every card from the sheet; each system falls back to its snapshot on failure.
 async function loadRegressionStatusLive() {
+  let live = 0
   await Promise.all(RT_SKL.map(async sys => {
-    try { sys.counts = await rtFetchSklCounts(sys.gid) }
+    try { sys.counts = await rtFetchSklCounts(sys.gid); live++ }
     catch (e) { console.warn('SKL-QA live fetch failed for', sys.id, '-', e.message, '(using snapshot)') }
   }))
   buildRegressionStatus()
+  // Snapshot-only renders leave the timestamp alone — it must not claim a fetch that failed.
+  if (live) stampData('regression-timeline')
 }
 
 // ── Regression Testing Timeline calendar ──
@@ -3614,6 +3656,7 @@ function buildRegressionTimeline() {
   }
 }
 
+// ── View switching ──
 function switchView(viewId) {
   window.__closeBottomSheet?.()
   document.querySelectorAll('.sb-nav-item').forEach(el => {
@@ -3628,9 +3671,12 @@ function switchView(viewId) {
   // every tab's selections go back to default when switching tabs
   document.getElementById('gb-trigger')?._gbReset?.()
   document.getElementById('rt-gb-trigger')?._gbReset?.()
-  if (viewId === 'progress-tracker' && !_loaded.progressTracker) {
-    _loaded.progressTracker = true; loadProgressTracker()
-  }
+  // Repaint the header for the view we just entered, then refetch its data.
+  // These views have no interval of their own, so opening the tab IS the refresh —
+  // without it the tab keeps serving whatever it fetched on first page load.
+  renderUpdatedLabel()
+  if (viewId === 'progress-tracker') loadProgressTracker()
+  if (viewId === 'regression-timeline') loadRegressionStatusLive()
 }
 
 // ── App ──
@@ -3651,15 +3697,9 @@ function initGrid() {
 }
 
 async function loadAll() {
-  const _now = new Date()
-  const _mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][_now.getMonth()]
-  const _dd = String(_now.getDate()).padStart(2,'0')
-  const _h = _now.getHours(), _m = String(_now.getMinutes()).padStart(2,'0')
-  const _ampm = _h >= 12 ? 'PM' : 'AM', _h12 = String(_h % 12 || 12).padStart(2,'0')
-  document.getElementById('last-updated').innerHTML =
-    `Updated Date: ${_dd}/${_mo}/${_now.getFullYear()} ${_h12}:${_m} ${_ampm}<br><span style="font-size:11px;opacity:.65">Auto-refresh from Jira every 5 minutes</span>`
-  await Promise.allSettled(EPICS.map(e => loadEpic(e)))
+  const rs = await Promise.allSettled(EPICS.map(e => loadEpic(e)))
   renderEmptyEpicLists()
+  if (rs.some(r => r.status === 'fulfilled')) stampData('epic-tc')
 }
 
 function renderEmptyEpicLists() {
@@ -3738,10 +3778,11 @@ function showApp() {
     }
   })()
   initGrid()
+  renderUpdatedLabel()
   buildRegressionStatus()
   loadRegressionStatusLive()
   buildRegressionTimeline()
-  _loaded.progressTracker = true; loadProgressTracker()
+  loadProgressTracker()
   loadAll()
   setInterval(loadAll, 5 * 60 * 1000)
 }
