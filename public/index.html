@@ -377,8 +377,10 @@ body {
 .tt-filter:focus { border-color: var(--accent); outline: none; }
 /* Custom dropdown */
 /* Without a floor these collapse to a bare arrow (the label shrank to 2px at
-   640px) because .tt-search claims 3 flex shares. The ≤520px rules override it. */
-.tt-dd-wrap { flex: 1 1 130px; min-width: 130px; position: relative; }
+   640px) because .tt-search claims 3 flex shares. min-width alone leaves the
+   flex-basis — and so every wider layout — exactly as it was. The ≤520px rules
+   override it where the row is stacked instead. */
+.tt-dd-wrap { flex: 1; min-width: 130px; position: relative; }
 .tt-dd-btn {
   width: 100%; padding: 7px 10px; border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm); font-size: 11.5px; font-family: inherit;
@@ -1736,8 +1738,8 @@ function statusColor(name) {
 // exact numbers are spelled out in the legend beside every bar, so nothing is
 // lost. `visibility` (not `display`) keeps the box measurable on the next pass.
 // Sub-pixel rounding reports a 1px overflow on labels that render whole, so a
-// slice has to be at least 2px before the label is dropped.
-const SEG_LBL_SLICE_PX = 2
+// slice has to exceed that before the label is dropped.
+const SEG_LBL_SLICE_PX = 1
 function fitBarLabels(root = document) {
   root.querySelectorAll('.sbc-seg-lbl, .rsc-seg-lbl').forEach(lbl => {
     lbl.classList.remove('seg-lbl-clipped')

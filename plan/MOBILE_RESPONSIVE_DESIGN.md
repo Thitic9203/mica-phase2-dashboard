@@ -211,3 +211,36 @@ simulation** (จำลอง DOM structure จริงแล้วรัน in
 - ถ้า deploy แล้วพังบน desktop → `git revert <commit>` ได้ทันทีทั้งก้อน
 - ไม่มี migration หรือ external dependency ที่ต้อง rollback แยก
 - ทุก CSS change อยู่ใน `@media` → revert commit = desktop กลับ 100%
+
+---
+
+## Audit รอบที่ 2 — 10 Jul 2026 (หลังเพิ่ม Bugs by Priority donut)
+
+วิธีตรวจ: build harness ที่ stub Firebase auth + mock Jira/Sheet API แล้วเปิดด้วย Chromium จริง
+วัด 3 views × 11 ความกว้าง (320/360/375/390/430/520/640/768/900/1024/1280) หา
+horizontal overflow, ข้อความที่ถูกตัด, element ที่ยื่นพ้น viewport และ console error
+ยืนยันด้วย screenshot ทุกจุด + pixel-diff เทียบ desktop 1280px ก่อน/หลัง
+
+### ปัญหาที่เจอและแก้แล้ว (ทั้งหมดเป็น bug เดิม ไม่ใช่ regression จาก donut ใหม่)
+
+| # | จุด | อาการ | ช่วงที่พัง | Root cause | Fix |
+|---|-----|-------|-----------|------------|-----|
+| 1 | Regression calendar | ครึ่งขวาของทุกสัปดาห์ (พฤ–อา) หายไปเงียบ ๆ ไม่มี scrollbar + หัวตารางวันไม่ตรงกับช่องวันที่ | ≤ 700px | `.rt-days` ใช้ track `1fr` ซึ่ง floor ที่ min-content ของข้อความไทย (token ยาวไม่มีช่องว่าง) → grid กว้าง 690px แต่ `.rt-month` มี `overflow: clip` | ≤820px ให้ `.rt-month` เลื่อนแนวนอน + `.rt-mtop/.rt-dow/.rt-days` ใช้ `min-width: 700px` เท่ากันเพื่อให้คอลัมน์ตรงกัน + ปิด sticky (scroll container เป็น scrollport ของตัวเอง sticky จึงไม่มีวันทำงาน) |
+| 2 | Pagination (Blocked / Incomplete Fields) | ทั้งหน้าเลื่อนแนวนอนได้ 35–103px | ≤ 430px | `.tt-pagination` wrap ได้ แต่ลูกข้างใน (`.tt-page-controls`) wrap ไม่ได้ | ≤520px ให้ inner group wrap + จัดกึ่งกลาง |
+| 3 | Top nav | `.tn-right` (วันที่ + Sign out) ถูกดันพ้นจอ 71px | 769–1023px | `.tn-tabs` ได้ `overflow-x: auto` เฉพาะ ≤768px ช่วงกลางจึงไม่มีอะไรให้หด | ย้าย `min-width: 0` + `overflow-x: auto` ขึ้นมาที่ base |
+| 4 | Donut legend (Progress Tracker) | "DEPLOYING TO PRE-PROD" ทับตัวเลขและ % | 769–1100px | `.pt-legend-name` เป็น `nowrap` โดยไม่มี ellipsis/wrap | ให้ wrap ได้ (ไม่ตัดข้อความ ตาม preference "no truncation") |
+| 5 | Regression status cards | `.rsc-card` ยื่นพ้น grid 108–244px | 520px, 900–1024px | `.rt-legend` ใช้ `1fr` ซึ่ง floor ที่ min-content | เปลี่ยนเป็น `minmax(0, 1fr)` ทุก breakpoint |
+| 6 | Filter dropdown | ปุ่ม "All System" ยุบเหลือ 2px เห็นแค่ลูกศร | 521–768px | `.tt-dd-wrap { min-width: 0 }` ขณะที่ `.tt-search` กิน 3 flex shares | `min-width: 130px` (คง `flex: 1` ไว้ → สัดส่วน desktop ไม่เปลี่ยน) |
+| 7 | Stacked bar % labels | `%` ถูกตัดครึ่งตัวอักษร ("10⁵") | 520px, 1024px | segment แคบกว่าป้ายของตัวเอง | `fitBarLabels()` วัดจริงว่าล้นเกิน 1px หรือไม่ แล้วซ่อนเฉพาะอันนั้น (ตัวเลขจริงอยู่ใน legend ข้างล่างอยู่แล้ว) — ไม่ใช้ threshold คงที่เพราะ `10%` แคบกว่า `20%` |
+
+### ผลหลังแก้
+- horizontal overflow = **0px ทุก view ทุกความกว้าง** (เดิม 35–103px)
+- ไม่มี element ยื่นพ้น viewport, ไม่มีข้อความถูกตัด, ไม่มี console error
+- pixel-diff desktop 1280px: Progress Tracker และ Epic Breakdown ต่างเฉพาะตัวเลขนาฬิกา `#last-updated`
+  (x 942–1162, y 14–39) → layout ไม่ขยับเลย; Regression Timeline ต่างที่ `.rt-legend` ซึ่งคือ fix #5 โดยตั้งใจ
+
+### ข้อแลกเปลี่ยนที่รับไว้
+- ปฏิทิน ≤820px ต้องเลื่อนแนวนอน (5 คอลัมน์วันทำการ + ข้อความไทยต้องการ ~126px/คอลัมน์)
+  ทางเลือกที่บีบให้พอดีจอถูกทดลองแล้ว — `minmax(0,1fr)` + `overflow-wrap: anywhere` ทำให้ไทยหักทีละตัวอักษร
+  เดือนเดียวยาว 6,400px ใช้ไม่ได้
+- ≤820px หัวเดือนไม่ sticky (x-scroll container เป็น scrollport ของตัวเอง sticky จึงไม่ pin กับ viewport อยู่ดี)
