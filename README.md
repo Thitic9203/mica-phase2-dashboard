@@ -8,7 +8,7 @@ Built the same way as the OLS dashboard ([mica-ols-phase2](https://github.com/Th
 
 ## What it tracks
 
-Epics from three MICA2 subsystems (OLS is excluded — it has its own dashboard):
+Epics from four subsystems. OLS lives in its own Jira project (`OLS-*`); the other three are `MICA2-*`:
 
 | System | What | Epics |
 |--------|------|-------|
@@ -16,9 +16,22 @@ Epics from three MICA2 subsystems (OLS is excluded — it has its own dashboard)
 | **ELMS** | Extended Learning Management | AI Integration, Google Docs/Meet/Drive/Connect (5) |
 | **CBMS** | Credit Bank Management | Activation, Curriculum, Course, Credit Transfer (Learner/Staff), My Credit (6) |
 
-Each epic shows a donut of its child tickets, grouped by **TC Status / Status / Ticket Details Status / Issue Type / QA Owner / Assignee**. A second tab ("Ticket Overview") rolls up Story/Bug counts, QA ownership, and a searchable ticket table across all tracked epics.
+Each epic shows a donut of its child tickets, grouped by **TC Status / Status / Ticket Details Status / Issue Type / QA Owner / Assignee**. A **Progress Tracker** tab rolls up per-system status, blocked tickets, and tickets with incomplete fields.
 
 Tickets are pulled per epic with `parent = <EPIC-KEY>` (e.g. `parent = MICA2-630`). **Any unfilled value (TC Status, QA Owner, etc.) is shown as `Empty` and still counted normally** — keep epic links and fields up to date in Jira for accurate charts.
+
+### Gotcha: custom-field ids differ per Jira project
+
+`OLS` and `MICA2` are separate Jira projects, so the **same** logical field has a **different** `customfield_*` id in each. An issue only ever carries the id belonging to its own project.
+
+| Field | OLS | MICA2 |
+|---|---|---|
+| TC Status | `cf[12128]` | `cf[11735]` |
+| Ticket Detail Status | `cf[12127]` | `cf[12130]` |
+| QA Owner | `cf[12120]` | `cf[11013]` |
+| Remark | `cf[12121]` | `cf[11049]` |
+
+Reading the wrong id **does not error** — Jira silently omits the field, so everything buckets as `Empty`, and a `cf[<wrong-id>] is EMPTY` drill-down matches *every* issue in that project and looks correct. The readers (`tcStatusValue`, `tdStatusValue`, `remarkValue`, `getQaOwnerUsers`) and the JQL builders (`tcStatusClause`, `tdStatusClause`, `qaOwnerClause`) each coalesce both ids. To confirm an id, call `getJiraIssue(key, fields: ["*all"], expand: "names")` and read the `names` map.
 
 ## Architecture
 
