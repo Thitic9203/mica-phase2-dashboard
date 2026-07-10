@@ -694,6 +694,10 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
 .pt-legend-bar { margin-top: 4px; height: 3px; border-radius: 99px; background: var(--elevated); overflow: hidden; }
 .pt-legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
 .pt-pie-side { display: flex; flex-direction: row; align-items: center; gap: 12px; }
+.pt-bug-priority { border-top: 1px solid var(--border); padding-top: 12px; }
+.ptp-donut { width: 112px; height: 112px; }
+.ptp-donut .pt-donut-total { font-size: 1.15rem; }
+.ptp-donut .pt-donut-lbl { font-size: 9px; }
 .pt-right-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; border-left: 1px solid var(--border); padding-left: 14px; }
 .pt-waiting { min-width: 0; border-left: none; padding: 0; overflow: hidden; }
 .pt-right-col > .pt-waiting:nth-child(2) { border-top: 1px solid var(--border); padding-top: 14px; }
@@ -946,6 +950,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-pie-side { flex-direction: column; align-items: center; gap: 10px; }
   .pt-donut-wrap { width: 100px; height: 100px; }
   .pt-donut-total { font-size: 0.7rem; }
+  .ptp-donut .pt-donut-total { font-size: 0.7rem; }
   .pt-legend-name { font-size: 10.5px; }
   .pt-legend-count { font-size: 11px; }
   .pt-legend-pct { font-size: 9.5px; }
@@ -984,6 +989,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-card { padding: 10px 10px 8px; }
   .pt-donut-wrap { width: 80px; height: 80px; }
   .pt-donut-total { font-size: 0.56rem; }
+  .ptp-donut .pt-donut-total { font-size: 0.56rem; }
   .pie-section-card { padding: 8px 10px 10px; }
   .summary-card { padding: 10px 10px; }
   .tt-dd-wrap { flex: 1 1 100%; }
@@ -1763,7 +1769,7 @@ function arcPath(cx, cy, ro, ri, s, e) {
   return `M${f(p1.x)} ${f(p1.y)} A${ro} ${ro} 0 ${lg} 1 ${f(p2.x)} ${f(p2.y)} L${f(p3.x)} ${f(p3.y)} A${ri} ${ri} 0 ${lg} 0 ${f(p4.x)} ${f(p4.y)}Z`
 }
 
-function buildDonut(groups, total, sz = 210) {
+function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
   const CX = sz/2, CY = sz/2
   const RO = Math.round(sz * 0.429), RI = Math.round(sz * 0.22)
   const GAP = groups.length > 1 ? 2.5 : 0
@@ -1775,7 +1781,7 @@ function buildDonut(groups, total, sz = 210) {
     </svg>`
   }
   if (groups.length === 1) {
-    const color = statusColor(groups[0][0])
+    const color = colorFn(groups[0][0])
     const rm = (RO+RI)/2, sw = RO-RI
     const lbl_sz = Math.round(sz * 0.073)
     return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
@@ -1804,7 +1810,7 @@ function buildDonut(groups, total, sz = 210) {
     const span = adj - GAP
     if (span <= 0) { cur += adj; return }
     const s = cur + GAP / 2, e = s + span, mid = (s + e) / 2
-    const color = statusColor(name)
+    const color = colorFn(name)
     paths += `<path d="${arcPath(CX, CY, RO, RI, s, e)}" fill="${color}"/>`
     const lr = (RO + RI) / 2
     const lp = polar(CX, CY, lr, mid)
@@ -2354,8 +2360,86 @@ const PT_MISSING_SYSTEMS = [
   },
 ]
 
-function buildPtDonut(groups, total) {
-  return buildDonut(groups, total, 260)
+function buildPtDonut(groups, total, colorFn = statusColor) {
+  return buildDonut(groups, total, 260, colorFn)
+}
+
+// Bugs-by-priority donut. Legend is ordered by severity (Highest → Lowest),
+// never by count, so the same priority always sits in the same row across systems.
+const PRIORITY_ORDER = ['highest', 'high', 'medium', 'low', 'lowest']
+const PRIORITY_COLORS = {
+  'highest': '#D9534F', 'high': '#E8883A', 'medium': '#E3B32A',
+  'low': '#7FB6DD', 'lowest': '#AAB0BA',
+}
+const PRIORITY_NONE_COLOR = '#8E93A1'
+function priorityColor(name) {
+  return PRIORITY_COLORS[name.toLowerCase().trim()] || PRIORITY_NONE_COLOR
+}
+function priorityRank(name) {
+  const i = PRIORITY_ORDER.indexOf(name.toLowerCase().trim())
+  return i === -1 ? PRIORITY_ORDER.length : i
+}
+
+function isBugIssue(iss) {
+  return (iss.fields?.issuetype?.name || '').toLowerCase() === 'bug'
+}
+
+// `sys.jql()` already restricts to open + future sprints (see EPIC_FILTER),
+// so narrowing it to Bug is all this chart needs — no extra Jira query.
+function buildPtBugPriority(sys, issues) {
+  const bugs = issues.filter(isBugIssue)
+  const bugJql = `${sys.jql()} AND issuetype = Bug`
+  const headHref = jiraJqlUrl(bugJql)
+  const head = `<div class="pt-waiting-head">Bugs by Priority <span class="pt-waiting-count"><a href="${esc(headHref)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${bugs.length}</a></span></div>`
+
+  if (bugs.length === 0) {
+    return `<div class="pt-waiting pt-bug-priority">
+      ${head}
+      <div class="empty-state" style="padding:18px 0">
+        <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
+        <div class="empty-title">No bugs</div>
+        <div class="empty-sub">No bugs in the open or future sprints</div>
+      </div>
+    </div>`
+  }
+
+  const counts = {}
+  bugs.forEach(iss => {
+    const p = iss.fields?.priority?.name || 'None'
+    counts[p] = (counts[p] || 0) + 1
+  })
+  const groups = Object.entries(counts).sort((a, b) => {
+    const ra = priorityRank(a[0]), rb = priorityRank(b[0])
+    if (ra !== rb) return ra - rb
+    return b[1] - a[1] // unranked values (e.g. "None") fall back to count
+  })
+
+  const svg = buildPtDonut(groups, bugs.length, priorityColor)
+  const legendHTML = groups.map(([name, count]) => {
+    const pct = Math.round(count / bugs.length * 100)
+    const color = priorityColor(name)
+    const clause = name === 'None' ? 'priority is EMPTY' : `priority = "${jqlEscape(name)}"`
+    const href = jiraJqlUrl(`${bugJql} AND ${clause}`)
+    return `<a class="pt-legend-item" href="${esc(href)}" target="_blank" rel="noopener" title="View ${esc(name)} priority bugs in Jira">
+      <span class="pt-legend-dot" style="background:${color}"></span>
+      <div class="pt-legend-info">
+        <div class="pt-legend-row">
+          <span class="pt-legend-name" title="${esc(name)}">${esc(name)}</span>
+          <span class="pt-legend-count">${count}</span>
+          <span class="pt-legend-pct">${pct}%</span>
+        </div>
+        <div class="pt-legend-bar"><div class="pt-legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+    </a>`
+  }).join('')
+
+  return `<div class="pt-waiting pt-bug-priority">
+    ${head}
+    <div class="pt-pie-side">
+      <div class="pt-donut-wrap ptp-donut">${svg}<div class="pt-donut-center"><span class="pt-donut-total">${bugs.length}</span><span class="pt-donut-lbl">${bugs.length === 1 ? 'bug' : 'bugs'}</span></div></div>
+      <div class="pt-legend">${legendHTML}</div>
+    </div>
+  </div>`
 }
 
 const ISSUE_TYPE_COLORS = {
@@ -2569,6 +2653,9 @@ function renderPtCard(sys, groups, total, issues) {
     'QA OWNER'
   )
 
+  // ── Bugs by Priority (open + future sprints, same base JQL as the donut above) ──
+  const bugPriorityHTML = buildPtBugPriority(sys, issues)
+
   const body = total > 0
     ? `<div class="pt-body">
         <div class="pt-left-col">
@@ -2580,6 +2667,7 @@ function renderPtCard(sys, groups, total, issues) {
             ${doneHTML}
             ${totalTicketsHTML}
           </div>
+          ${bugPriorityHTML}
         </div>
         <div class="pt-right-col">
           ${waitingTableHTML}
@@ -3277,7 +3365,7 @@ function initMissingTable(containerId, issues, refetch) {
 
 // Field sets shared by the initial Progress Tracker load and the per-table
 // refresh buttons — kept in one place so the queries never drift apart.
-const PT_BLOCKED_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049'
+const PT_BLOCKED_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049,priority'
 const PT_MISSING_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049,customfield_10008'
 
 function isBlockedIssue(iss) {
