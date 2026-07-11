@@ -111,9 +111,10 @@
 }
 .tn-theme:hover { color: var(--accent); border-color: var(--accent); background: var(--hover); }
 .tn-theme svg { width: 15px; height: 15px; display: block; }
-.tn-theme .icon-sun { display: none; }
-:root[data-theme="dark"] .tn-theme .icon-moon { display: none; }
-:root[data-theme="dark"] .tn-theme .icon-sun { display: block; }
+/* icon shows the CURRENT mode: light → sun, dark → moon */
+.tn-theme .icon-moon { display: none; }
+:root[data-theme="dark"] .tn-theme .icon-sun { display: none; }
+:root[data-theme="dark"] .tn-theme .icon-moon { display: block; }
 @media (max-width: 520px) { .tn-theme { width: 28px; height: 28px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -146,9 +147,10 @@ body {
 @keyframes authIn { from{opacity:0;transform:translateY(20px) scale(.98)} to{opacity:1;transform:none} }
 .auth-icon {
   width: 60px; height: 60px; border-radius: 16px;
-  background: var(--accent); margin: 0 auto 20px;
+  /* pinned to the favicon's brand green (not --accent) so it matches the tab icon in both themes */
+  background: #0F766E; margin: 0 auto 20px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(var(--accent-rgb),0.28);
+  box-shadow: 0 4px 16px rgba(15,118,110,0.28);
 }
 .auth-icon svg { width: 36px; height: 36px; }
 .auth-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -.02em; }
