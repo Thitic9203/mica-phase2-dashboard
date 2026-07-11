@@ -1,4 +1,14 @@
+import { verifyFirebaseIdToken } from '../../_lib/firebase-auth.js'
+
 const JIRA_BASE = 'https://skilllane.atlassian.net/rest/api/3'
+
+// Callers must present a valid Firebase ID token from this project (the same
+// Google Sign-In the UI uses), restricted to the company domain. Without this the
+// proxy is an open, unauthenticated gateway to Jira using the server credential —
+// anyone could `curl /api/jira/...`. These values are the public firebaseConfig
+// from the client, safe to hardcode.
+const FIREBASE_PROJECT_ID = 'pluton-dashboard'
+const ALLOWED_DOMAIN = 'skilllane.com'
 
 // Edge-cache tuning (ms). GET reads are served from Cloudflare's edge cache so
 // repeated / concurrent refreshes don't each pay a full Jira round-trip.
@@ -15,6 +25,29 @@ const STALE_MS = 120_000
 // NEVER hardcode the token here — this repo is public.
 export async function onRequest(context) {
   const { request, env } = context
+
+  // The dashboard only ever reads (GET). Refuse write verbs so the shared
+  // JIRA_AUTH credential can never be driven to mutate Jira through this proxy.
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json', 'Allow': 'GET, HEAD' },
+    })
+  }
+
+  // Authenticate the caller before touching the cache or Jira.
+  const authz = request.headers.get('Authorization') || ''
+  const idToken = authz.startsWith('Bearer ') ? authz.slice(7) : ''
+  const verdict = await verifyFirebaseIdToken(idToken, {
+    projectId: FIREBASE_PROJECT_ID,
+    allowedDomain: ALLOWED_DOMAIN,
+  })
+  if (!verdict.ok) {
+    return new Response(JSON.stringify({ error: 'Unauthorized', reason: verdict.reason }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   const raw = env.JIRA_AUTH
   if (!raw) {
@@ -43,9 +76,11 @@ export async function onRequest(context) {
       headers: { 'Authorization': authHeader, 'Accept': 'application/json' },
     })
     const body = await res.text()
+    // No Access-Control-Allow-Origin: the dashboard calls this from the same
+    // origin (/api/jira), so it needs no CORS grant — and omitting it stops any
+    // other website from reading Jira data through a visitor's browser.
     const headers = {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
     }
     if (cache && res.ok) {
       const stored = new Response(body, {
@@ -92,6 +127,6 @@ export async function onRequest(context) {
 function withStatus(res, status) {
   const h = new Headers(res.headers)
   h.set('X-Cache', status)
-  h.set('Access-Control-Allow-Origin', '*')
+  h.delete('Access-Control-Allow-Origin')
   return new Response(res.body, { status: res.status, headers: h })
 }

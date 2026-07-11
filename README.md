@@ -40,10 +40,12 @@ public/index.html              all-in-one app (HTML + CSS + vanilla JS, SVG char
 public/_headers                cache-control: no-store
 public/_redirects              note only (the Function handles /api/jira/*)
 functions/api/jira/[[path]].js Jira REST v3 proxy — injects auth from env (NOT hardcoded)
+functions/_lib/firebase-auth.js Firebase ID-token verifier (Web Crypto, no deps) used by the proxy
 functions/__/auth/[[path]].js  Firebase auth proxy (pluton-dashboard)
 ```
 
 - **Auth:** Google Sign-In via Firebase (`pluton-dashboard`), restricted to `skilllane.com` + email whitelist (shared with the OLS dashboard).
+- **Proxy auth (server-side):** the Jira proxy is **not** an open endpoint. Every `/api/jira/*` request must carry `Authorization: Bearer <Firebase ID token>`; the proxy verifies the token's RS256 signature against Google's public keys and checks `aud`/`iss`/`exp`/`email_verified` and the `@skilllane.com` domain before using the `JIRA_AUTH` credential. It also refuses non-GET verbs and sends no CORS grant (same-origin only). The client attaches the token in `fetchIssues` via `getIdToken()`.
 - **Data:** fetched client-side through the proxy; cached in memory; auto-refreshes every 30 minutes.
 
 ## Deploy (Cloudflare Pages — free tier)

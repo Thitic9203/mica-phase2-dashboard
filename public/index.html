@@ -61,7 +61,7 @@ body {
 }
 .auth-icon svg { width: 36px; height: 36px; }
 .auth-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -.02em; }
-.auth-box-sub { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+
 .btn-google {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; padding: 13px;
@@ -143,8 +143,8 @@ body {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column;
 }
-.main-topbar { display: none; }
-.live-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+
+
 
 /* ── VIEW PANELS ── */
 .view-panel { padding: 28px 28px 40px; }
@@ -153,12 +153,9 @@ body {
 
 
 /* ── PAGE HEADER ── */
-.view-header { margin-bottom: 24px; }
-.view-title {
-  font-size: 22px; font-weight: 700; color: var(--text);
-  letter-spacing: -.03em; line-height: 1.2;
-}
-.view-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+
+
 
 /* ── SECTION LABELS ── */
 .section-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
@@ -241,14 +238,11 @@ body {
 .donut-lbl { font-size: 9px; color: var(--muted); margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
 
 /* ── DONUT (large — pie views) ── */
-.donut-wrap-lg {
-  position: relative; width: 200px; height: 200px;
-  flex-shrink: 0;
-}
-.donut-wrap-lg svg { width: 100%; height: 100%; overflow: visible; }
-.donut-wrap-lg .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-.donut-wrap-lg .donut-total { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-size: 2.2rem; font-weight: 500; color: var(--text); line-height: 1; }
-.donut-wrap-lg .donut-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: .04em; text-transform: uppercase; }
+
+
+
+
+
 
 /* ── LEGEND ── */
 .legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -261,75 +255,49 @@ body {
 }
 .legend-link { color: inherit; text-decoration: none; cursor: pointer; }
 .legend-link:hover { text-decoration: underline; }
-.legend-count { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; font-weight: 500; color: var(--text); }
-.legend-pct { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 10px; color: var(--dim); min-width: 34px; text-align: right; }
+
+
 
 /* ── LEGEND (large) ── */
-.legend-lg { display: flex; flex-direction: column; gap: 0; min-width: 260px; flex: 1; max-width: 420px; }
-.legend-lg .legend-item {
-  gap: 12px; padding: 10px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
-  align-items: flex-start;
-}
-.legend-lg .legend-item:last-child { border-bottom: none; }
-.legend-lg .legend-dot { width: 10px; height: 10px; border-radius: 3px; margin-top: 3px; }
-.legend-lg .legend-name { font-size: 12.5px; min-width: 0; flex: 1; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .045em; }
-.legend-lg .legend-count { font-size: 14px; font-weight: 600; color: var(--text); }
-.legend-lg .legend-pct { font-size: 11.5px; min-width: 38px; color: var(--muted); font-weight: 400; }
-.legend-lg .legend-row-top { display: flex; align-items: center; gap: 12px; width: 100%; }
-.legend-lg .legend-bar-track {
-  margin-top: 6px; height: 4px; border-radius: 99px;
-  background: var(--elevated); overflow: hidden; flex: 1;
-}
-.legend-lg .legend-bar-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+
+
+
+
+
+
+
+
+
+
 
 /* ── DIVIDER ── */
-.legend-divider { width: 100%; height: 1px; background: var(--border); margin: 4px 0; }
+
 
 /* ── PIE VIEW LAYOUT ── */
-.pie-view-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px 28px;
-  display: flex; align-items: flex-start; gap: 32px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
-}
-.pie-view-meta { margin-bottom: 20px; }
-.pie-view-filter-link { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .8; }
-.pie-view-filter-link:hover { opacity: 1; text-decoration: underline; }
+
+
+
+
 
 /* ── DUAL PIE SECTIONS ── */
-.dual-pie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.pie-section-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 10px 16px 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
-}
-.pie-section-head { margin-bottom: 8px; }
-.pie-section-type {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.02em;
-  margin-bottom: 3px;
-}
-.pie-section-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
-.pie-section-meta { font-size: 12px; color: var(--muted); padding-left: 16px; }
-.pie-section-body { display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; justify-content: center; }
-.detail-readiness .pie-section-body { justify-content: center; align-items: center; gap: 32px; }
-.detail-readiness .pie-section-head { text-align: left; margin-bottom: 20px; }
-.detail-readiness .pie-section-type { justify-content: flex-start; }
-.detail-readiness .pie-section-card { padding: 10px 16px 12px; }
-.detail-readiness .donut-wrap-md { width: 120px; height: 120px; }
-.donut-wrap-md {
-  position: relative; width: 110px; height: 110px; flex-shrink: 0;
-}
-.donut-wrap-md svg { width: 100%; height: 100%; overflow: visible; }
-.donut-wrap-md .donut-center {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  pointer-events: none;
-}
-.donut-wrap-md .donut-total { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-size: 1.8rem; font-weight: 500; color: var(--text); line-height: 1; }
-.donut-wrap-md .donut-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; letter-spacing: .04em; text-transform: uppercase; }
-@media (max-width: 900px) { .dual-pie-grid { grid-template-columns: 1fr; } }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .view-loading {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 16px; padding: 64px 0; text-align: center;
@@ -363,18 +331,8 @@ body {
   transition: border-color .12s, box-shadow .12s;
 }
 .tt-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
-.tt-filter {
-  flex: 1; min-width: 0;
-  padding: 7px 26px 7px 9px; border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm); font-size: 11.5px; font-family: inherit;
-  background: var(--card); color: var(--text); cursor: pointer; outline: none;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  appearance: none; -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23AEAEB2'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 9px center;
-}
-.tt-filter:focus { border-color: var(--accent); outline: none; }
+
+
 /* Custom dropdown */
 /* Without a floor these collapse to a bare arrow (the label shrank to 2px at
    640px) because .tt-search claims 3 flex shares. min-width alone leaves the
@@ -402,9 +360,7 @@ body {
   box-shadow: 0 8px 24px rgba(0,0,0,0.13), 0 2px 6px rgba(0,0,0,0.06);
   max-height: 220px; overflow-y: auto;
 }
-.tt-toolbar-row .tt-dd-wrap:last-of-type .tt-dd-menu,
-.tt-toolbar-row .tt-dd-wrap:nth-last-of-type(2) .tt-dd-menu,
-.tt-toolbar-row .tt-dd-wrap:nth-last-of-type(3) .tt-dd-menu { right: 0; left: auto; }
+.tt-toolbar-row .tt-dd-wrap:last-of-type .tt-dd-menu, .tt-toolbar-row .tt-dd-wrap:nth-last-of-type(2) .tt-dd-menu, .tt-toolbar-row .tt-dd-wrap:nth-last-of-type(3) .tt-dd-menu { right: 0; left: auto; }
 .tt-dd-item {
   padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: inherit;
   cursor: pointer; color: var(--text); white-space: nowrap; transition: background .1s;
@@ -421,15 +377,15 @@ body {
 .tt-clear-btn:hover { background: var(--elevated); color: var(--text); }
 .tt-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
 .tt-table { width: 100%; min-width: 1200px; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
-.tt-col-key { width: 72px; }
-.tt-col-summary { width: 12%; }
-.tt-col-tdstatus { width: 17%; }
-.tt-col-status { width: 8%; }
-.tt-col-tcstatus { width: 10%; }
-.tt-col-assignee { width: 7%; }
-.tt-col-qaowner { width: 6%; }
-.tt-col-epic { width: 16%; }
-.tt-col-sprint { width: 10%; }
+
+
+
+
+
+
+
+
+
 .tt-th {
   padding: 10px 14px; text-align: left;
   font-size: 10px; font-weight: 700; color: var(--dim);
@@ -511,29 +467,16 @@ body {
 .sprint-notice svg { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
 .sprint-notice ul { margin: 0; padding: 0 0 0 14px; list-style: disc; }
 .sprint-notice ul li { margin: 0; }
-.info-panel {
-  display: grid; grid-template-columns: 1fr auto 1fr;
-  background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15);
-  border-radius: 10px; margin-bottom: 14px; font-size: 11.5px; color: var(--muted); line-height: 1.5;
-}
-.info-panel-col { padding: 10px 14px; }
-.info-panel-head { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 11.5px; color: var(--text); margin-bottom: 6px; }
-.info-panel-head svg { flex-shrink: 0; color: var(--accent); }
-.info-panel-block { margin-top: 3px; }
-.info-panel-block ul { margin: 0; padding: 0 0 0 14px; list-style: disc; }
-.info-panel-block ul li { margin: 0; }
-.info-panel-divider { width: 1px; background: rgba(15,118,110,0.15); margin: 8px 0; }
-@media (max-width: 660px) {
-  .info-panel { grid-template-columns: 1fr; }
-  .info-panel-divider { width: auto; height: 1px; margin: 0 8px; }
-  .info-panel-col { font-size: 11px; padding: 10px 14px; }
-  .info-panel-head { font-size: 11px; margin-bottom: 5px; }
-}
-@media (max-width: 520px) {
-  .info-panel-col { padding: 8px 12px; font-size: 10.5px; }
-  .info-panel-head { font-size: 10.5px; gap: 5px; }
-  .info-panel-block { margin-top: 4px; }
-}
+
+
+
+
+
+
+
+
+
+
 
 /* ── STATES ── */
 .card-skeleton {
@@ -554,7 +497,7 @@ body {
 .hidden { display: none !important; }
 
 /* ── SUMMARY SECTION ── */
-.summary-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05); }
+
 .groupby-wrap { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 .groupby-label { font-size: 10.5px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: .07em; }
 .gb-dropdown { position: relative; }
@@ -598,32 +541,32 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230F766E' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: center;
 }
-.summary-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
-.summary-title { font-size: 13px; font-weight: 700; color: var(--text); }
-.summary-link { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .8; font-weight: 500; }
-.summary-link:hover { opacity: 1; text-decoration: underline; }
-.summary-table { width: 100%; border-collapse: collapse; }
-.summary-table th { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; padding: 0 0 10px; text-align: left; border-bottom: 1px solid var(--border); }
-.summary-table th:nth-child(3), .summary-table th:nth-child(4) { text-align: right; }
-.summary-table td { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.04); vertical-align: middle; }
-.summary-table tr:last-child td { border-bottom: none; }
-.td-name { font-size: 12px; font-weight: 600; color: var(--text); width: 150px; padding-right: 16px; white-space: nowrap; }
-.td-dot { display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 8px; flex-shrink: 0; vertical-align: middle; position: relative; top: -1px; }
-.td-bar { padding-right: 16px; }
-.bar-track { height: 8px; background: var(--elevated); border-radius: 99px; overflow: hidden; min-width: 80px; }
-.bar-fill { height: 100%; border-radius: 99px; }
-.td-pct { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 12px; font-weight: 600; color: var(--text); text-align: right; width: 44px; padding-right: 12px; white-space: nowrap; }
-.td-count { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--muted); text-align: right; width: 60px; white-space: nowrap; }
-.summary-loading { font-size: 12px; color: var(--muted); padding: 12px 0; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── DASHBOARD ── */
-.dash-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-.dash-kpi-card { background: var(--elevated); border-radius: var(--radius-sm); padding: 20px 22px; }
-.dash-kpi-label { font-size: 14px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-.dash-kpi-value { font-size: 48px; font-weight: 700; color: var(--text); line-height: 1; }
-.dash-kpi-sub { font-size: 15px; color: var(--muted); margin-top: 6px; }
-.dash-stacked { height: 24px; border-radius: 8px; overflow: hidden; display: flex; margin-bottom: 8px; }
-.dash-stacked-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.95); min-width: 0; }
+
+
+
+
+
+
+
 /* Stacked bar card */
 .sbc-wrap { position: relative; margin-bottom: 10px; }
 .sbc-bar { height: 44px; border-radius: 8px; overflow: hidden; display: flex; }
@@ -632,41 +575,41 @@ body {
 /* Set by fitBarLabels() on the labels that would render a sliced glyph. Keeps its
    box so the label can be measured again after a resize. */
 .seg-lbl-clipped { visibility: hidden; }
-.sbc-labels { display: none; }
+
 .sbc-legend { display: flex; flex-direction: column; gap: 6px; }
 .sbc-legend-item { display: flex; align-items: center; gap: 7px; text-decoration: none; color: inherit; cursor: pointer; }
 .sbc-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 .sbc-link { font-size: 11.5px; color: var(--text); text-decoration: none; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; letter-spacing: .04em; font-weight: 500; }
 .sbc-link:hover { color: var(--accent); text-decoration: underline; }
 /* Stat card (for User Stories & Bug Reports) */
-.stc-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.stc-pill { flex: 1 1 calc(50% - 4px); background: var(--surface2,#f5f5f5); border-radius: 10px; padding: 10px 12px; text-align: center; text-decoration: none; display: block; transition: background .15s; }
-.stc-pill:hover { background: var(--surface3,#ececec); }
-.stc-num { font-size: 22px; font-weight: 700; line-height: 1; color: var(--text); }
-.stc-lbl { font-size: 9.5px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
-.stc-lbl.stc-lbl-status { font-weight: 700; }
-.dash-link { text-align: right; margin-bottom: 12px; }
-.dash-link a { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .8; font-weight: 500; }
-.dash-link a:hover { opacity: 1; text-decoration: underline; }
+
+
+
+
+
+
+
+
+
 
 /* ── OVERVIEW DASHBOARD GRID ── */
-.ov-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 14px; }
-.ov-col { display: flex; flex-direction: column; padding: 0 6px; }
-.ov-col-half { grid-column: span 2; }
-.ov-col-1 { grid-column: span 1; }
-.ov-kpi { grid-template-columns: 1fr 1fr; flex: 1; grid-auto-rows: 1fr; gap: 8px; margin-bottom: 0; }
-.ov-kpi .dash-kpi-card { padding: 12px 14px; }
-.ov-kpi .dash-kpi-card:nth-child(5) { grid-column: 1 / -1; }
-.ov-kpi .dash-kpi-label { font-size: 11px; margin-bottom: 4px; }
-.ov-kpi .dash-kpi-value { font-size: 24px; }
-.ov-kpi .dash-kpi-sub { font-size: 11px; margin-top: 4px; }
-.ov-section-row { margin-bottom: 8px; padding-bottom: 8px; }
-.dash-qa-bars { display: flex; flex-direction: column; gap: 8px; }
-.dash-qa-row { display: flex; align-items: center; gap: 8px; }
-.dash-qa-name { font-size: 11px; color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
-.dash-qa-track { flex: 1; min-width: 40px; height: 18px; background: var(--elevated); border-radius: 6px; overflow: hidden; }
-.dash-qa-fill { height: 100%; border-radius: 6px; }
-.dash-qa-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--muted); flex: 0 0 auto; text-align: right; white-space: nowrap; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── PROGRESS TRACKER ── */
 .pt-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
@@ -741,7 +684,7 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
   vertical-align: middle;
 }
 .pt-td-status { text-align: left; font-size: 11.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; display: flex; align-items: center; gap: 7px; }
-.pt-status-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+
 .pt-td-total { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-weight: 700; color: var(--text); }
 .pt-grand-total { color: var(--accent); }
 .pt-tfoot-label { text-align: left; font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
@@ -754,14 +697,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   border-radius: var(--radius); padding: 13px 24px 24px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
 }
-.pt-blocked-head {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 14px; padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-}
-.pt-blocked-title {
-  font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -.01em;
-}
+
+
 .pt-done-pill {
   background: var(--elevated); border-radius: 12px;
   padding: 14px 18px; text-align: center; margin-top: 4px;
@@ -773,20 +710,20 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 /* ── RESPONSIVE ── */
 @media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 800px)  { .epic-grid-inner { grid-template-columns: 1fr; } }
-@media (max-width: 900px)  { .dual-pie-grid { grid-template-columns: 1fr; } }
+
 /* ── iPad / tablet (portrait) ── */
 @media (max-width: 1024px) {
   .view-panel { padding: 20px 20px 32px; }
     #view-epic-tc.view-panel { padding-top: 10px; }
-  .pie-view-card { flex-direction: column; gap: 16px; padding: 16px 20px; }
-  .donut-wrap-lg { width: 160px; height: 160px; align-self: center; }
-  .legend-lg { min-width: 0; max-width: none; }
+  
+  
+  
   .tt-search { flex: 3 1 150px; }
-  .summary-card { padding: 16px 18px; }
-  .td-name { width: 120px; }
-  .ov-grid { grid-template-columns: 1fr 1fr; }
-  .ov-col-half { grid-column: span 2; }
-  .ov-col-1 { grid-column: span 1; }
+  
+  
+  
+  
+  
 }
 
 /* ── Small tablet / large phone (landscape) ── */
@@ -807,7 +744,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   /* Blocked section */
   .pt-blocked-wrap { padding: 13px 16px 18px; }
   /* KPI */
-  .dash-kpi { grid-template-columns: repeat(2, 1fr); }
+  
 }
 
 /* ── Mobile ── */
@@ -826,8 +763,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   /* Panels */
   .view-panel { padding: 12px 10px 28px; }
     #view-epic-tc.view-panel { padding-top: 8px; }
-  .view-title { font-size: 18px; }
-  .view-meta { font-size: 11px; }
+  
+  
   /* Sprint notice */
   .sprint-notice { font-size: 10.5px; padding: 0; border-radius: 8px; }
   .sprint-notice > div { flex-direction: column !important; }
@@ -847,14 +784,14 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
     padding: 4px 0 2px; margin: 0;
   }
   /* Overview grid → single column */
-  .ov-grid { grid-template-columns: 1fr; }
-  .ov-col-half, .ov-col-1 { grid-column: span 1; }
-  .ov-col { padding: 0; }
-  .ov-kpi { grid-template-columns: 1fr 1fr; gap: 6px; }
-  .ov-kpi .dash-kpi-card { padding: 10px 12px; }
-  .ov-kpi .dash-kpi-value { font-size: 20px; }
-  .ov-kpi .dash-kpi-label { font-size: 10px; }
-  .ov-kpi .dash-kpi-sub { font-size: 10px; }
+  
+  
+  
+  
+  
+  
+  
+  
   /* Epic grid + cards */
   .epic-grid-inner { grid-template-columns: 1fr; }
   .epic-card { min-height: auto; padding: 12px 14px; }
@@ -864,32 +801,32 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .donut-lbl { font-size: 6px; }
   .epic-name { font-size: 12px; margin-bottom: 6px; }
   .legend-name { font-size: 9.5px; }
-  .legend-count { font-size: 10px; }
-  .legend-pct { font-size: 9px; min-width: 28px; }
+  
+  
   .legend-dot { width: 6px; height: 6px; }
   .legend { gap: 4px; }
   /* Pie / donut (overview) */
-  .dual-pie-grid { grid-template-columns: 1fr; gap: 12px; }
-  .pie-view-card { flex-direction: column; gap: 12px; padding: 12px 14px; }
-  .donut-wrap-lg { width: 120px; height: 120px; align-self: center; }
-  .donut-wrap-lg .donut-total { font-size: 1.4rem; }
-  .donut-wrap-lg .donut-lbl { font-size: 9px; }
-  .donut-wrap-md { width: 80px; height: 80px; }
-  .donut-wrap-md .donut-total { font-size: 1.2rem; }
-  .donut-wrap-md .donut-lbl { font-size: 9px; }
-.pie-section-card { padding: 10px 12px 12px; }
-  .pie-section-type { font-size: 13px; gap: 5px; }
-  .pie-section-dot { width: 7px; height: 7px; }
-  .pie-section-meta { font-size: 11px; padding-left: 12px; }
-  .pie-section-body { gap: 10px; }
-  .detail-readiness .pie-section-body { flex-direction: column; }
-  .detail-readiness .donut-wrap-md { width: 90px; height: 90px; }
-  .legend-lg { min-width: 0; max-width: none; }
-  .legend-lg .legend-item { gap: 8px; padding: 6px 0; }
-  .legend-lg .legend-dot { width: 8px; height: 8px; }
-  .legend-lg .legend-name { font-size: 10.5px; }
-  .legend-lg .legend-count { font-size: 12px; }
-  .legend-lg .legend-pct { font-size: 10px; }
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   /* Stacked bar */
   .sbc-bar { height: 32px; }
   .sbc-seg-lbl { font-size: 9px; }
@@ -897,23 +834,23 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .sbc-dot { width: 7px; height: 7px; }
   .sbc-legend { gap: 4px; }
   /* Stat card */
-  .stc-grid { gap: 6px; }
-  .stc-pill { padding: 8px 10px; border-radius: 8px; }
-  .stc-num { font-size: 18px; }
-  .stc-lbl { font-size: 8.5px; }
+  
+  
+  
+  
   /* Dashboard stacked bar */
-  .dash-stacked { height: 20px; }
-  .dash-stacked-seg { font-size: 9px; }
+  
+  
   /* QA bars */
-  .dash-qa-name { font-size: 10px; }
-  .dash-qa-track { height: 14px; }
-  .dash-qa-val { font-size: 10px; }
+  
+  
+  
   /* KPI (epic tab) */
-  .dash-kpi { grid-template-columns: repeat(2, 1fr); }
-  .dash-kpi-card { padding: 14px 14px; }
-  .dash-kpi-value { font-size: 28px; }
-  .dash-kpi-label { font-size: 11px; }
-  .dash-kpi-sub { font-size: 12px; }
+  
+  
+  
+  
+  
   /* Toolbar + search */
   .tt-search { flex: 1 1 100%; min-width: 0; }
   .tt-toolbar-row { flex-wrap: wrap; gap: 6px; }
@@ -941,10 +878,10 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .tt-page-num { min-width: 36px; height: 36px; font-size: 12.5px; }
   .tt-page-controls { justify-content: center; }
   /* Summary */
-  .summary-card { padding: 14px 14px; }
-  .summary-head { flex-direction: column; gap: 6px; align-items: flex-start; }
-  .td-name { width: auto; white-space: normal; padding-right: 8px; font-size: 11px; }
-  .bar-track { min-width: 60px; }
+  
+  
+  
+  
   /* Section / groupby */
   .section-row { flex-wrap: wrap; gap: 6px; }
   .section-title { font-size: 11px; white-space: normal; word-break: break-word; }
@@ -984,8 +921,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-done-num { font-size: 1.5rem; }
   /* Blocked section */
   .pt-blocked-wrap { padding: 13px 12px 16px; }
-  .pt-blocked-head { gap: 8px; margin-bottom: 10px; padding-bottom: 10px; }
-  .pt-blocked-title { font-size: 13px; }
+  
+  
   /* Empty state */
   .empty-sub { white-space: normal; word-break: break-word; }
   /* Auth */
@@ -1008,11 +945,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .pt-donut-wrap { width: 80px; height: 80px; }
   .pt-donut-total { font-size: 0.56rem; }
   .ptp-donut .pt-donut-total { font-size: 0.56rem; }
-  .pie-section-card { padding: 8px 10px 10px; }
-  .summary-card { padding: 10px 10px; }
+  
+  
   .tt-dd-wrap { flex: 1 1 100%; }
-  .ov-kpi .dash-kpi-value { font-size: 18px; }
-  .dash-kpi-value { font-size: 24px; }
+  
+  
 }
 
 /* ── BOTTOM SHEET (mobile) ──
@@ -1125,7 +1062,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-mhead { display: flex; align-items: baseline; justify-content: space-between; padding: 18px 22px 14px; }
 .rt-mname { font-size: 14px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: var(--text); }
 .rt-mname .rt-yr { color: var(--dim); font-weight: 600; margin-left: 8px; letter-spacing: .06em; }
-.rt-mnote { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); font-weight: 700; }
+
 .rt-dow { display: grid; grid-template-columns: 52px repeat(5,1fr) 52px; border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border); background: var(--bg); }
 .rt-dow div { padding: 9px 8px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; color: var(--dim); }
@@ -1134,18 +1071,18 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   padding: 9px 9px 12px; position: relative; background: var(--card); }
 /* empty days (no event / deliver / holiday) shrink so blank weeks don't waste vertical space */
 .rt-day:not(.has) { min-height: 52px; }
-.rt-day:nth-child(7n){ border-right: none; }
-.rt-day.pad{ background: var(--bg); }
-.rt-day.weekend{ background: #FAFAFB; }
-.rt-day.holiday{ background: #F1F1F5; }
+.rt-day:nth-child(7n) { border-right: none; }
+.rt-day.pad { background: var(--bg); }
+.rt-day.weekend { background: #FAFAFB; }
+.rt-day.holiday { background: #F1F1F5; }
 .rt-holi { margin-left: 6px; vertical-align: middle; display: inline-flex; align-items: center; gap: 5px;
   font-size: 10px; font-weight: 700; color: var(--muted); background: var(--elevated);
   border: 1px solid var(--border-strong); border-radius: 7px; padding: 4px 8px 4px 7px; line-height: 1.25; }
 .rt-holi::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #9CA3AF; flex: 0 0 auto; }
-.rt-day .rt-n{ font-size: 15px; font-weight: 600; color: var(--dim); line-height: 1;
+.rt-day .rt-n { font-size: 15px; font-weight: 600; color: var(--dim); line-height: 1;
   display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; vertical-align: middle; }
-.rt-day.has .rt-n{ color: var(--text); font-weight: 800; }
-.rt-day.today .rt-n{ background: var(--accent); color: #fff; border-radius: 50%; box-shadow: 0 3px 9px rgba(15,118,110,.4); }
+.rt-day.has .rt-n { color: var(--text); font-weight: 800; }
+.rt-day.today .rt-n { background: var(--accent); color: #fff; border-radius: 50%; box-shadow: 0 3px 9px rgba(15,118,110,.4); }
 .rt-day.today { box-shadow: inset 0 0 0 2px var(--accent); background: rgba(15,118,110,0.045); }
 .rt-today-tag { position: absolute; top: 9px; right: 9px; z-index: 1; font-size: 8.5px; font-weight: 800;
   letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--accent);
@@ -1153,11 +1090,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 /* event block */
 .rt-ev { margin-top: 9px; border: 1px solid var(--evl); border-left: 3px solid var(--evc);
   background: var(--evt); border-radius: 10px; padding: 9px 11px 10px; }
-.rt-ev + .rt-ev{ margin-top: 8px; }
+.rt-ev + .rt-ev { margin-top: 8px; }
 .rt-ev.ols {--evc:var(--rt-ols); --evt:var(--rt-ols-t); --evl:var(--rt-ols-l)}
-.rt-ev.evms{--evc:var(--rt-evms);--evt:var(--rt-evms-t);--evl:var(--rt-evms-l)}
-.rt-ev.cbms{--evc:var(--rt-cbms);--evt:var(--rt-cbms-t);--evl:var(--rt-cbms-l)}
-.rt-ev.elms{--evc:var(--rt-elms);--evt:var(--rt-elms-t);--evl:var(--rt-elms-l)}
+.rt-ev.evms {--evc:var(--rt-evms);--evt:var(--rt-evms-t);--evl:var(--rt-evms-l)}
+.rt-ev.cbms {--evc:var(--rt-cbms);--evt:var(--rt-cbms-t);--evl:var(--rt-cbms-l)}
+.rt-ev.elms {--evc:var(--rt-elms);--evt:var(--rt-elms-t);--evl:var(--rt-elms-l)}
 .rt-ev-sys { font-size: 16px; font-weight: 800; letter-spacing: -.01em; color: var(--evc); line-height: 1;
   padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--evl); }
 .rt-ev ul { list-style: none; margin: 0; padding: 0; }
@@ -1177,8 +1114,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-tc ul { list-style: none; margin: 0; padding: 0; }
 .rt-tc li { font-size: 11px; line-height: 1.45; color: var(--text); padding: 2px 0; display: flex; align-items: center; gap: 6px; }
 .rt-tc-sys { font-size: 9px; font-weight: 800; padding: 1.5px 6px; border-radius: 999px; color: #fff; flex: 0 0 auto; letter-spacing: .01em; }
-.rt-tc-sys.ols{background:var(--rt-ols)} .rt-tc-sys.evms{background:var(--rt-evms)}
-.rt-tc-sys.cbms{background:var(--rt-cbms)} .rt-tc-sys.elms{background:var(--rt-elms)}
+.rt-tc-sys.ols {background:var(--rt-ols)} .rt-tc-sys.evms {background:var(--rt-evms)}
+.rt-tc-sys.cbms {background:var(--rt-cbms)} .rt-tc-sys.elms {background:var(--rt-elms)}
 .rt-tc-f { font-size: 10.5px; font-weight: 700; color: #2F7D4E; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #C7E8D2; }
 /* Group-by toolbar + filter modes */
 .rt-toolbar { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 16px; }
@@ -1570,6 +1507,12 @@ function tcStatusClause(val) {
   const escaped = jqlEscape(val)
   return `(cf[12128] = "${escaped}" OR cf[11735] = "${escaped}")`
 }
+// Ticket Detail Status: cf[12127] on OLS, cf[12130] on MICA2.
+function tdStatusClause(val) {
+  if (val === 'Empty') return '(cf[12127] is EMPTY AND cf[12130] is EMPTY)'
+  const escaped = jqlEscape(val)
+  return `(cf[12127] = "${escaped}" OR cf[12130] = "${escaped}")`
+}
 function jiraJqlUrl(jql) {
   return `https://skilllane.atlassian.net/issues/?jql=${encodeURIComponent(jql + ' ORDER BY created DESC')}`
 }
@@ -1620,8 +1563,6 @@ const EPICS = [
   { key: 'MICA2-635', name: 'Create Exam (AI)',                system: 'EvMS' },
   { key: 'MICA2-636', name: 'Exam Room',                       system: 'EvMS' },
 ]
-const ALL_EPIC_KEYS = EPICS.map(e => e.key)
-function jqlAllEpics() { return `parent in (${ALL_EPIC_KEYS.join(',',MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629,MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653,MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-636)})` }
 
 // ── Epic group-by options ──
 const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints())'
@@ -1642,9 +1583,9 @@ const GROUP_OPTIONS = [
   },
   {
     key: 'tdStatus', label: 'Ticket Details Status',
-    fields: 'customfield_12127',
-    extract: iss => [iss.fields?.customfield_12127?.value || 'Empty'],
-    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('cf[12127]', val)}`,
+    fields: 'customfield_12127,customfield_12130',
+    extract: iss => [tdStatusValue(iss) || 'Empty'],
+    jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${tdStatusClause(val)}`,
   },
   {
     key: 'issueType', label: 'Issue Type',
@@ -1670,7 +1611,7 @@ const GROUP_OPTIONS = [
     jql: (epicKey, val) => `parent = ${epicKey} AND ${EPIC_FILTER} AND ${fieldClause('assignee', val)}`,
   },
 ]
-const ALL_EPIC_FIELDS = 'summary,status,issuetype,assignee,customfield_12127,customfield_12128,customfield_11735,customfield_12120,customfield_11013'
+const ALL_EPIC_FIELDS = 'summary,status,issuetype,assignee,customfield_12127,customfield_12130,customfield_12128,customfield_11735,customfield_12120,customfield_11013'
 const epicIssuesStore = {}
 
 function getActiveGroupOpt() {
@@ -1761,14 +1702,19 @@ function darkenForBadge(hex) {
   return `#${d(r)}${d(g)}${d(b)}`
 }
 
-async function fetchIssues(jql, fields = 'customfield_12128', opts = {}) {
+async function fetchIssues(jql, fields, opts = {}) {
   const all = []
   let nextPageToken = null
   const freshParam = opts.fresh ? '&_fresh=1' : '' // manual refresh bypasses the edge cache
+  // The proxy verifies this Firebase ID token before touching Jira, so an
+  // unauthenticated caller can't reach the shared credential. getIdToken()
+  // returns a cached token or silently refreshes an expired one.
+  const idToken = auth.currentUser ? await auth.currentUser.getIdToken() : ''
+  const headers = { 'Accept': 'application/json', 'Authorization': `Bearer ${idToken}` }
   while (true) {
     let url = `${JIRA_BASE}/search/jql?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100${freshParam}`
     if (nextPageToken) url += `&nextPageToken=${encodeURIComponent(nextPageToken)}`
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+    const res = await fetch(url, { headers })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     if (!data.issues || data.issues.length === 0) break
@@ -1805,15 +1751,6 @@ function makePrefetcher(fn) {
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
-
-function groupByStatus(issues) {
-  const counts = {}
-  issues.forEach(issue => {
-    const s = (issue.fields.customfield_12128 && issue.fields.customfield_12128.value) || 'Empty'
-    counts[s] = (counts[s] || 0) + 1
-  })
-  return Object.entries(counts).sort((a, b) => b[1] - a[1])
-}
 
 // ── SVG Donut ──
 function polar(cx, cy, r, deg) {
@@ -1882,51 +1819,6 @@ function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
   return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">${paths}${labels}</svg>`
 }
 
-// ── SVG Pie (solid, no gap) ──
-function piePath(cx, cy, r, s, e) {
-  const p1 = polar(cx, cy, r, s), p2 = polar(cx, cy, r, e)
-  const lg = (e - s) > 180 ? 1 : 0
-  const f = n => n.toFixed(3)
-  return `M${cx} ${cy} L${f(p1.x)} ${f(p1.y)} A${r} ${r} 0 ${lg} 1 ${f(p2.x)} ${f(p2.y)}Z`
-}
-
-function buildPie(groups, total, sz = 170) {
-  const CX = sz/2, CY = sz/2, RO = Math.round(sz * 0.47)
-  const MIN_SPAN = 30
-  if (total === 0) {
-    return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><circle cx="${CX}" cy="${CY}" r="${RO}" fill="#E5E5EA"/></svg>`
-  }
-  if (groups.length === 1) {
-    const color = statusColor(groups[0][0])
-    return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg"><circle cx="${CX}" cy="${CY}" r="${RO}" fill="${color}"/>
-      <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="central" font-family="Inter,-apple-system,sans-serif" font-size="${Math.round(sz*0.08)}" font-weight="600" fill="rgba(255,255,255,0.95)">100%</text></svg>`
-  }
-  const sumGroups = groups.reduce((s, [,c]) => s + c, 0)
-  const arcTotal = Math.max(sumGroups, 1)
-  const rawSpans = groups.map(([,c]) => c / arcTotal * 360)
-  const boosts = rawSpans.map(s => s > 0 && s < MIN_SPAN ? MIN_SPAN - s : 0)
-  const totalBoost = boosts.reduce((a, b) => a + b, 0)
-  const totalReducible = rawSpans.reduce((a, s, i) => a + (boosts[i] === 0 && s > 0 ? s : 0), 0)
-  const adjSpans = totalBoost > 0 && totalReducible > totalBoost
-    ? rawSpans.map((s, i) => s === 0 ? 0 : boosts[i] > 0 ? MIN_SPAN : s - (s / totalReducible) * totalBoost)
-    : rawSpans
-
-  let paths = '', labels = '', cur = 0
-  const lbl_sz = Math.round(sz * 0.095)
-  const lbl_sz_sm = Math.round(sz * 0.072)
-  groups.forEach(([name, count], i) => {
-    const pct = count / arcTotal
-    const adj = adjSpans[i]
-    if (adj <= 0) return
-    const s = cur, e = s + adj, mid = (s + e) / 2
-    paths += `<path d="${piePath(CX, CY, RO, s, e)}" fill="${statusColor(name)}"/>`
-    const lp = polar(CX, CY, RO * 0.62, mid)
-    labels += `<text x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-family="Inter,-apple-system,sans-serif" font-size="${adj >= MIN_SPAN * 1.5 ? lbl_sz : lbl_sz_sm}" font-weight="700" fill="rgba(255,255,255,0.95)">${Math.round(pct*100)}%</text>`
-    cur += adj
-  })
-  return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">${paths}${labels}</svg>`
-}
-
 // ── Render epic cards ──
 function renderCard(epic, groups, total, groupOpt) {
   const card = document.getElementById('card-' + epic.key)
@@ -1974,114 +1866,17 @@ function renderError(epic, err) {
     <div class="error-wrap"><div class="error-box"><div class="error-text">Failed to load data<br><span style="opacity:.7">${err.message}</span></div></div></div>`
 }
 
-// ── Render pie view (large donut) ──
-function renderPieView(containerId, groups, total, title, jiraLink, jiraLinkText) {
-  const el = document.getElementById(containerId)
-  if (!el) return
-  const svg = buildDonut(groups, total, 200)
-  const legendTotal = Math.max(groups.reduce((s, [,c]) => s + c, 0), 1)
-  const legendHTML = groups.map(([name, count]) => {
-    const pct = legendTotal > 0 ? Math.round(count / legendTotal * 100) : 0
-    const color = statusColor(name)
-    return `<div class="legend-item">
-      <div style="flex:1;min-width:0">
-        <div class="legend-row-top">
-          <span class="legend-dot" style="background:${color}"></span>
-          <span class="legend-name" title="${esc(name)}">${esc(name)}</span>
-          <span class="legend-count">${count} (${pct}%)</span>
-        </div>
-        <div class="legend-bar-track"><div class="legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-      </div>
-    </div>`
-  }).join('')
-  el.innerHTML = `
-    <div class="view-header">
-      <div class="view-title">${title}</div>
-      <div class="view-meta"><a class="summary-link" href="${jiraLink}" target="_blank" rel="noopener">${jiraLinkText} ↗</a></div>
-    </div>
-    <div class="pie-view-card">
-      <div class="donut-wrap-lg">
-        ${svg}
-        <div class="donut-center">
-          <span class="donut-total">${total}</span>
-          <span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span>
-        </div>
-      </div>
-      <div class="legend-lg">${legendHTML}</div>
-    </div>`
-}
-
-// ── Dual Pie Section helpers ──
-function buildPieSectionLegend(groups, total, jqlFn, displayFn) {
-  const _df = displayFn || (x => x)
-  const legendTotal = Math.max(groups.reduce((s, [,c]) => s + c, 0), 1)
-  return groups.map(([name, count]) => {
-    const pct = legendTotal > 0 ? Math.round(count / legendTotal * 100) : 0
-    const color = statusColor(name)
-    const dn = _df(name)
-    const nameEl = jqlFn
-      ? `<a class="legend-name legend-link" href="${jqlFn(name)}" target="_blank" rel="noopener noreferrer" title="${esc(dn)}">${esc(dn)}</a>`
-      : `<span class="legend-name" title="${esc(dn)}">${esc(dn)}</span>`
-    return `<div class="legend-item">
-      <div style="flex:1;min-width:0">
-        <div class="legend-row-top">
-          <span class="legend-dot" style="background:${color}"></span>
-          ${nameEl}
-          <span class="legend-count">${count}</span>
-        </div>
-        <div class="legend-bar-track"><div class="legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-      </div>
-    </div>`
-  }).join('')
-}
-
-function renderDualPieSection(label, groups, total, accentColor) {
-  const head = `<div class="pie-section-head">
-      <div class="pie-section-type">
-        <span class="pie-section-dot" style="background:${accentColor}"></span>${label}
-      </div>
-      <div class="pie-section-meta">${total} ticket${total !== 1 ? 's' : ''} total</div>
-    </div>`
-  if (total === 0) {
-    return `<div class="pie-section-card">${head}
-      <div class="empty-state">
-        <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
-        <div class="empty-title">No data available</div>
-        <div class="empty-sub">No ${label.toLowerCase()} found in Jira</div>
-      </div>
-    </div>`
-  }
-  const svg = buildDonut(groups, total, 170)
-  return `<div class="pie-section-card">${head}
-    <div class="pie-section-body">
-      <div class="donut-wrap-md">${svg}<div class="donut-center"><span class="donut-total">${total}</span><span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
-      <div class="legend-lg">${buildPieSectionLegend(groups, total)}</div>
-    </div>
-  </div>`
-}
-
-function renderDualPieView(containerId, storySec, bugSec, title, jiraLink) {
-  const el = document.getElementById(containerId)
-  if (!el) return
-  el.innerHTML = `
-    <div class="view-header">
-      <div class="view-title">${title}</div>
-      <div class="view-meta"><a class="summary-link" href="${jiraLink}" target="_blank" rel="noopener">View in Jira ↗</a></div>
-    </div>
-    <div class="dual-pie-grid">
-      ${renderDualPieSection(storySec.label, storySec.groups, storySec.total, '#88B4DC')}
-      ${renderDualPieSection(bugSec.label, bugSec.groups, bugSec.total, '#DC8896')}
-    </div>`
-}
-
-// ── Summary bar section ──
-
-// ── Ticket Table ──
+// ── Issue field readers ──
 function sn(name) { return (name || '').replace(/\s*\([^)]*\)/g, '').trim() }
 function fn(name) { return sn(name).split(/\s+/)[0] || name }
 function getQaOwnerUsers(iss) { return iss.fields?.customfield_12120 || iss.fields?.customfield_11013 || [] }
 // cf[12128] on OLS, cf[11735] on MICA2 — see tcStatusClause.
 function tcStatusValue(iss) { return iss.fields?.customfield_12128?.value || iss.fields?.customfield_11735?.value || '' }
+// cf[12127] on OLS, cf[12130] on MICA2 — see tdStatusClause.
+function tdStatusValue(iss) { return iss.fields?.customfield_12127?.value || iss.fields?.customfield_12130?.value || '' }
+// Remark is a plain text field, and the ids are swapped relative to the two above:
+// cf[12121] on OLS, cf[11049] on MICA2.
+function remarkValue(iss) { return iss.fields?.customfield_12121 || iss.fields?.customfield_11049 || '' }
 
 // Sprint field (customfield_10008) is an array — a ticket can belong to several
 // sprints at once (e.g. a closed one it started in plus a future one it moved to).
@@ -2092,289 +1887,6 @@ function activeFutureSprint(iss) {
   const arr = iss.fields?.customfield_10008 || []
   const st = s => (s?.state || '').toLowerCase() // Jira returns lowercase; guard against casing drift
   return arr.find(s => st(s) === 'active') || arr.find(s => st(s) === 'future') || null
-}
-
-function initTicketTable(containerId, issues) {
-  const container = document.getElementById(containerId)
-  if (!container) return
-
-  const rows = issues.map(iss => {
-    const owners = getQaOwnerUsers(iss).map(u => sn(u.displayName) || 'Empty').filter(Boolean)
-    const pk = iss.fields?.parent?.key || ''
-    const pn = iss.fields?.parent?.fields?.summary || ''
-    const sprintName = activeFutureSprint(iss)?.name || ''
-    return {
-      key: iss.key,
-      summary: iss.fields?.summary || '',
-      tdStatus: iss.fields?.customfield_12127?.value || '',
-      status: iss.fields?.status?.name || '',
-      tcStatus: tcStatusValue(iss),
-      assignee: sn(iss.fields?.assignee?.displayName || ''),
-      qaOwners: owners, qaOwner: owners.join(', '),
-      parentKey: pk, parentName: pn,
-      parentDisplay: pk ? (pn ? `${pk} ${pn}` : pk) : '',
-      sprint: sprintName
-    }
-  })
-
-  const uniqFlat = fn => [...new Set(rows.flatMap(fn).filter(Boolean))].sort()
-  const FM = [
-    { key: 'tdStatus',  label: 'Ticket Details Status', vals: uniqFlat(r => [r.tdStatus]) },
-    { key: 'status',    label: 'Status',                 vals: uniqFlat(r => [r.status]) },
-    { key: 'tcStatus',  label: 'TC Status',              vals: uniqFlat(r => [r.tcStatus]) },
-    { key: 'assignee',  label: 'Assignee',               vals: uniqFlat(r => [r.assignee]) },
-    { key: 'qaOwner',   label: 'QA Owner',               vals: uniqFlat(r => r.qaOwners) },
-    { key: 'parentKey', label: 'Epic',                   vals: uniqFlat(r => [r.parentKey]) },
-    { key: 'sprint',    label: 'Sprint',                 vals: uniqFlat(r => [r.sprint]) }
-  ]
-  const COLS = [
-    { key:'key',      label:'Key' },
-    { key:'summary',  label:'Summary' },
-    { key:'tdStatus', label:'Ticket Details Status' },
-    { key:'status',   label:'Status' },
-    { key:'tcStatus', label:'TC Status' },
-    { key:'assignee', label:'Assignee' },
-    { key:'qaOwner',  label:'QA Owner' },
-    { key:'parentKey',label:'Epic' },
-    { key:'sprint',   label:'Sprint' }
-  ]
-  let st = {
-    search:'', sortCol:'key', sortDir:'asc', page:1, pageSize:10,
-    filters: Object.fromEntries(FM.map(f => [f.key, []])),
-    openMenus: new Set()
-  }
-
-  function getFiltered() {
-    let data = rows
-    if (st.search) {
-      const q = st.search.toLowerCase()
-      data = data.filter(r =>
-        r.key.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q) ||
-        r.assignee.toLowerCase().includes(q) || r.qaOwner.toLowerCase().includes(q) ||
-        r.parentDisplay.toLowerCase().includes(q)
-      )
-    }
-    for (const { key } of FM) {
-      const vals = st.filters[key]; if (!vals.length) continue
-      data = key === 'qaOwner'
-        ? data.filter(r => r.qaOwners.some(o => vals.includes(o)))
-        : data.filter(r => vals.includes(r[key]))
-    }
-    return [...data].sort((a, b) => {
-      const va = (a[st.sortCol]||'').toString().toLowerCase()
-      const vb = (b[st.sortCol]||'').toString().toLowerCase()
-      return st.sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-    })
-  }
-
-  function bdg(val) {
-    if (!val) return '<span class="tt-nil">—</span>'
-    const c = statusColor(val)
-    const tc = darkenForBadge(c)
-    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${val}</span>`
-  }
-
-  // Persistent event delegation — survives innerHTML re-renders
-  if (!container._ttInit) {
-    container._ttInit = true
-    container.addEventListener('click', e => {
-      const btn = e.target.closest('.tt-dd-btn')
-      if (btn) {
-        e.stopPropagation()
-        const wrap = btn.closest('.tt-dd-wrap')
-        const fkey = wrap?.dataset.fkey
-        const menu = btn.nextElementSibling
-        const isOpen = menu.style.display !== 'none'
-        container.querySelectorAll('.tt-dd-menu').forEach(m => {
-          if (m !== menu && m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
-        })
-        st.openMenus.clear()
-        if (!isOpen) { menu.style.display='block'; btn.setAttribute('aria-expanded','true'); st.openMenus.add(fkey) }
-        else { menu.style.display='none'; btn.setAttribute('aria-expanded','false') }
-        return
-      }
-      const item = e.target.closest('.tt-dd-item[data-fkey]')
-      if (item) {
-        e.stopPropagation()
-        const key = item.dataset.fkey, val = item.dataset.val
-        if (val === '') {
-          st.filters[key] = []
-          st.openMenus.delete(key)
-        } else {
-          const idx = st.filters[key].indexOf(val)
-          if (idx >= 0) st.filters[key].splice(idx, 1)
-          else st.filters[key].push(val)
-          st.openMenus.add(key)
-        }
-        st.page = 1
-        render()
-      }
-    })
-    document.addEventListener('click', () => {
-      container.querySelectorAll('.tt-dd-menu').forEach(m => {
-        if (m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
-      })
-      const pm = container.querySelector('.tt-pgsz-menu')
-      if (pm && pm.style.display !== 'none') pm.style.display = 'none'
-      st.openMenus.clear()
-    })
-  }
-
-  function render() {
-    const prevId = document.activeElement?.id
-    const filtered = getFiltered()
-    const total = filtered.length
-    const totalPages = Math.max(1, Math.ceil(total / st.pageSize))
-    if (st.page > totalPages) st.page = totalPages
-    const start = (st.page - 1) * st.pageSize
-    const slice = filtered.slice(start, start + st.pageSize)
-    const hasF = st.search || Object.values(st.filters).some(v => v.length > 0)
-
-    const thHTML = COLS.map(c => {
-      const act = st.sortCol === c.key
-      return `<th class="tt-th${act?' tt-sort-active':''}" data-col="${c.key}">${c.label}<span class="tt-sort-icon">${act?(st.sortDir==='asc'?'↑':'↓'):'↕'}</span></th>`
-    }).join('')
-
-    const tbodyHTML = slice.length === 0
-      ? `<tr><td class="tt-td tt-empty-cell" colspan="${COLS.length}">
-           <div class="tt-empty-title">No tickets found</div>
-           <div class="tt-empty-sub">Try adjusting your search or filters</div>
-         </td></tr>`
-      : slice.map(r => {
-          const par = r.parentKey
-            ? `<a class="tt-parent-key" href="https://skilllane.atlassian.net/browse/${r.parentKey}" target="_blank" rel="noopener">${r.parentKey}</a>${r.parentName?`<span class="tt-parent-name">${r.parentName}</span>`:''}`
-            : '<span class="tt-nil">—</span>'
-          return `<tr class="tt-tr">
-            <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
-            <td class="tt-td tt-summary-cell"><div class="tt-summary-text">${r.summary||'—'}</div></td>
-            <td class="tt-td">${bdg(r.tdStatus)}</td>
-            <td class="tt-td">${bdg(r.status)}</td>
-            <td class="tt-td">${bdg(r.tcStatus)}</td>
-            <td class="tt-td" style="white-space:nowrap">${r.assignee||'<span class="tt-nil">—</span>'}</td>
-            <td class="tt-td"><div class="tt-summary-text">${r.qaOwner||'<span class="tt-nil">—</span>'}</div></td>
-            <td class="tt-td">${par}</td>
-            <td class="tt-td" style="white-space:nowrap">${r.sprint||'<span class="tt-nil">—</span>'}</td>
-          </tr>`
-        }).join('')
-
-    const UPPER_KEYS = new Set(['tdStatus','status','tcStatus'])
-    const filtersHTML = FM.map(f => {
-      const selVals = st.filters[f.key]
-      const hasActive = selVals.length > 0
-      const dispV = v => f.key==='parentKey' ? (rows.find(r=>r.parentKey===v)?.parentDisplay||v) : UPPER_KEYS.has(f.key) ? v.toUpperCase() : v
-      const curLabel = !hasActive ? `All ${f.label}` : selVals.length === 1 ? dispV(selVals[0]) : `${selVals.length} selected`
-      const items = [
-        `<div class="tt-dd-item${!hasActive?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="">All ${f.label}</div>`,
-        ...f.vals.map(v => {
-          const isSel = selVals.includes(v)
-          return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="${v.replace(/"/g,'&quot;')}">${isSel?'✓ ':''}${dispV(v)}</div>`
-        })
-      ].join('')
-      return `<div class="tt-dd-wrap" data-fkey="${f.key}">
-        <button class="tt-dd-btn${hasActive?' tt-dd-on':''}" type="button" aria-expanded="false">
-          <span class="tt-dd-label">${curLabel}</span>
-          <svg class="tt-dd-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="tt-dd-menu" style="display:none">${items}</div>
-      </div>`
-    }).join('')
-
-    const from = total===0 ? 0 : start+1, to = Math.min(start+st.pageSize,total)
-    const pageInfo = total===0 ? 'No tickets found' : `${from}–${to} of ${total} tickets`
-
-    const pnums = []
-    if (totalPages<=7) { for(let i=1;i<=totalPages;i++) pnums.push(i) }
-    else if (st.page<=4) [1,2,3,4,5,'…',totalPages].forEach(n=>pnums.push(n))
-    else if (st.page>=totalPages-3) [1,'…',totalPages-4,totalPages-3,totalPages-2,totalPages-1,totalPages].forEach(n=>pnums.push(n))
-    else [1,'…',st.page-1,st.page,st.page+1,'…',totalPages].forEach(n=>pnums.push(n))
-
-    const pnHTML = pnums.map(n =>
-      typeof n==='string'
-        ? `<span style="padding:0 3px;color:var(--dim);line-height:30px;font-size:11px">${n}</span>`
-        : `<button class="tt-page-num${n===st.page?' tt-pg-active':''}" data-page="${n}">${n}</button>`
-    ).join('')
-
-    container.innerHTML = `
-      <div class="section-row" style="margin-top:13px">
-        <span class="section-title">Ticket List</span>
-        <span class="section-sub">${rows.length} tickets</span>
-        <button class="tt-clear-btn" id="tt-clr" style="margin-left:auto;visibility:${hasF?'visible':'hidden'}">✕ Clear</button>
-      </div>
-      <div class="tt-toolbar">
-        <div class="tt-toolbar-row">
-          <input class="tt-search" id="tt-srch" placeholder="Search tickets" value="${st.search.replace(/"/g,'&quot;')}">
-        </div>
-        <div class="tt-toolbar-row">${filtersHTML}</div>
-      </div>
-      <div class="tt-table-wrap">
-        <table class="tt-table">
-          <colgroup>
-            <col class="tt-col-key"><col class="tt-col-summary"><col class="tt-col-tdstatus">
-            <col class="tt-col-status"><col class="tt-col-tcstatus"><col class="tt-col-assignee">
-            <col class="tt-col-qaowner"><col class="tt-col-epic"><col class="tt-col-sprint">
-          </colgroup>
-          <thead><tr>${thHTML}</tr></thead><tbody>${tbodyHTML}</tbody></table>
-      </div>
-      <div class="tt-pagination">
-        <span class="tt-page-info">${pageInfo}</span>
-        <div class="tt-page-controls">
-          <button class="tt-page-btn" id="tt-prv" ${st.page<=1?'disabled':''}>← Prev</button>
-          <div style="display:flex;align-items:center;gap:2px">${pnHTML}</div>
-          <button class="tt-page-btn" id="tt-nxt" ${st.page>=totalPages?'disabled':''}>Next →</button>
-        </div>
-        <div class="tt-pgsz-wrap">
-          <button class="tt-pgsz-btn" type="button" id="tt-pgsz-btn">
-            <span>${st.pageSize} / page</span>
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div class="tt-pgsz-menu" id="tt-pgsz-menu">
-            ${[10,25,50,100].map(n=>`<div class="tt-pgsz-item${st.pageSize===n?' tt-pgsz-sel':''}" data-pgsz="${n}">${n} / page</div>`).join('')}
-          </div>
-        </div>
-      </div>`
-
-    for (const fkey of st.openMenus) {
-      const wrap = container.querySelector(`.tt-dd-wrap[data-fkey="${fkey}"]`)
-      if (wrap) {
-        const menu = wrap.querySelector('.tt-dd-menu')
-        const btn = wrap.querySelector('.tt-dd-btn')
-        if (menu) { menu.style.display = 'block'; btn?.setAttribute('aria-expanded', 'true') }
-      }
-    }
-
-    const g = id => container.querySelector('#'+id)
-    g('tt-srch')?.addEventListener('input', e=>{st.search=e.target.value;st.page=1;render()})
-    g('tt-clr')?.addEventListener('click', ()=>{st.search='';st.filters=Object.fromEntries(FM.map(f=>[f.key,[]]));st.openMenus.clear();st.page=1;render()})
-    container.querySelectorAll('.tt-th[data-col]').forEach(th=>th.addEventListener('click',()=>{
-      const col=th.dataset.col
-      if(st.sortCol===col) st.sortDir=st.sortDir==='asc'?'desc':'asc'; else{st.sortCol=col;st.sortDir='asc'}
-      render()
-    }))
-    g('tt-prv')?.addEventListener('click',()=>{if(st.page>1){st.page--;render()}})
-    g('tt-nxt')?.addEventListener('click',()=>{if(st.page<totalPages){st.page++;render()}})
-    container.querySelectorAll('.tt-page-num[data-page]').forEach(btn=>btn.addEventListener('click',()=>{st.page=parseInt(btn.dataset.page);render()}))
-    const pgszBtn = g('tt-pgsz-btn'), pgszMenu = g('tt-pgsz-menu')
-    pgszBtn?.addEventListener('click', e => {
-      e.stopPropagation()
-      const open = pgszMenu.style.display !== 'none'
-      pgszMenu.style.display = open ? 'none' : 'block'
-    })
-    pgszMenu?.querySelectorAll('.tt-pgsz-item').forEach(item => item.addEventListener('click', e => {
-      e.stopPropagation()
-      st.pageSize = parseInt(item.dataset.pgsz); st.page = 1
-      pgszMenu.style.display = 'none'
-      render()
-    }))
-
-    if (prevId==='tt-srch') { const inp=g('tt-srch'); inp?.focus(); inp?.setSelectionRange(inp.value.length,inp.value.length) }
-  }
-
-  render()
-  container._ttReset = () => {
-    st.search = ''; st.sortCol = 'key'; st.sortDir = 'asc'; st.page = 1; st.pageSize = 10
-    st.filters = Object.fromEntries(FM.map(f => [f.key, []])); st.openMenus.clear()
-    render()
-  }
 }
 
 // ── Progress Tracker ──
@@ -2762,7 +2274,7 @@ function initBlockedTable(containerId, issues, refetch) {
       qaOwners: owners, qaOwner: owners.join(', '),
       parentKey: pk, parentName: pn,
       parentDisplay: pk ? (pn ? `${pk} ${pn}` : pk) : '',
-      remark: iss.fields?.customfield_11049 || ''
+      remark: remarkValue(iss)
     }
   })
   let dataRows = buildRows(issues)
@@ -2818,7 +2330,7 @@ function initBlockedTable(containerId, issues, refetch) {
     if (!val) return '<span class="tt-nil">—</span>'
     const c = statusColor(val)
     const tc = darkenForBadge(c)
-    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${val}</span>`
+    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${esc(val)}</span>`
   }
 
   if (!container._btInit) {
@@ -2893,8 +2405,8 @@ function initBlockedTable(containerId, issues, refetch) {
             <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
             <td class="tt-td tt-summary-cell"><div class="tt-summary-text">${esc(r.summary)||'—'}</div></td>
             <td class="tt-td">${bdg(r.status)}</td>
-            <td class="tt-td" style="white-space:nowrap">${r.assignee||'<span class="tt-nil">—</span>'}</td>
-            <td class="tt-td"><div class="tt-summary-text">${r.qaOwner||'<span class="tt-nil">—</span>'}</div></td>
+            <td class="tt-td" style="white-space:nowrap">${r.assignee?esc(r.assignee):'<span class="tt-nil">—</span>'}</td>
+            <td class="tt-td"><div class="tt-summary-text">${r.qaOwner?esc(r.qaOwner):'<span class="tt-nil">—</span>'}</div></td>
             <td class="tt-td">${par}</td>
             <td class="tt-td">${r.remark ? esc(r.remark) : '<span class="tt-nil">—</span>'}</td>
           </tr>`
@@ -2909,12 +2421,12 @@ function initBlockedTable(containerId, issues, refetch) {
         `<div class="tt-dd-item${!hasActive?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="">All ${f.label}</div>`,
         ...f.vals.map(v => {
           const isSel = selVals.includes(v)
-          return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="${v.replace(/"/g,'&quot;')}">${isSel?'✓ ':''}${dispV(v)}</div>`
+          return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="${v.replace(/"/g,'&quot;')}">${isSel?'✓ ':''}${esc(dispV(v))}</div>`
         })
       ].join('')
       return `<div class="tt-dd-wrap" data-fkey="${f.key}">
         <button class="tt-dd-btn${hasActive?' tt-dd-on':''}" type="button" aria-expanded="false">
-          <span class="tt-dd-label">${curLabel}</span>
+          <span class="tt-dd-label">${esc(curLabel)}</span>
           <svg class="tt-dd-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="tt-dd-menu" style="display:none">${items}</div>
@@ -3089,7 +2601,7 @@ function initMissingTable(containerId, issues, refetch) {
       sprint: sprintName,
       system: iss._system || '',
       missing: missing.join(', '),
-      remark: iss.fields?.customfield_11049 || ''
+      remark: remarkValue(iss)
     }
   })
   let dataRows = buildRows(issues)
@@ -3156,7 +2668,7 @@ function initMissingTable(containerId, issues, refetch) {
     if (!val) return '<span class="tt-nil">—</span>'
     const c = statusColor(val)
     const tc = darkenForBadge(c)
-    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${val}</span>`
+    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${esc(val)}</span>`
   }
 
   if (!container._mtInit) {
@@ -3241,9 +2753,9 @@ function initMissingTable(containerId, issues, refetch) {
             <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
             <td class="tt-td tt-summary-cell"><div class="tt-summary-text">${esc(r.summary)||'—'}</div></td>
             <td class="tt-td mt-status-cell">${mbdg(r.status)}</td>
-            <td class="tt-td" style="white-space:nowrap">${r.assignee||'<span class="tt-nil">—</span>'}</td>
-            <td class="tt-td"><div class="tt-summary-text">${r.qaOwner||'<span class="tt-nil">—</span>'}</div></td>
-            <td class="tt-td" style="white-space:nowrap">${r.sprint||'<span class="tt-nil">—</span>'}</td>
+            <td class="tt-td" style="white-space:nowrap">${r.assignee?esc(r.assignee):'<span class="tt-nil">—</span>'}</td>
+            <td class="tt-td"><div class="tt-summary-text">${r.qaOwner?esc(r.qaOwner):'<span class="tt-nil">—</span>'}</div></td>
+            <td class="tt-td" style="white-space:nowrap">${r.sprint?esc(r.sprint):'<span class="tt-nil">—</span>'}</td>
             <td class="tt-td">${par}</td>
             <td class="tt-td">${missingTags}</td>
           </tr>`
@@ -3258,12 +2770,12 @@ function initMissingTable(containerId, issues, refetch) {
         `<div class="tt-dd-item${!hasActive?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="">All ${f.label}</div>`,
         ...f.vals.map(v => {
           const isSel = selVals.includes(v)
-          return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="${v.replace(/"/g,'&quot;')}">${isSel?'✓ ':''}${dispV(v)}</div>`
+          return `<div class="tt-dd-item${isSel?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="${v.replace(/"/g,'&quot;')}">${isSel?'✓ ':''}${esc(dispV(v))}</div>`
         })
       ].join('')
       return `<div class="tt-dd-wrap" data-fkey="${f.key}">
         <button class="tt-dd-btn${hasActive?' tt-dd-on':''}" type="button" aria-expanded="false">
-          <span class="tt-dd-label">${curLabel}</span>
+          <span class="tt-dd-label">${esc(curLabel)}</span>
           <svg class="tt-dd-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="tt-dd-menu" style="display:none">${items}</div>
@@ -3360,7 +2872,7 @@ function initMissingTable(containerId, issues, refetch) {
             <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="tt-pgsz-menu" id="mt-pgsz-menu">
-            ${[10,25,50,100].map(n=>`<div class="tt-pgsz-item${mst.pageSize===n?' mt-pgsz-sel':''}" data-pgsz="${n}">${n} / page</div>`).join('')}
+            ${[10,25,50,100].map(n=>`<div class="tt-pgsz-item${mst.pageSize===n?' tt-pgsz-sel':''}" data-pgsz="${n}">${n} / page</div>`).join('')}
           </div>
         </div>
       </div>`
@@ -3426,8 +2938,8 @@ function initMissingTable(containerId, issues, refetch) {
 
 // Field sets shared by the initial Progress Tracker load and the per-table
 // refresh buttons — kept in one place so the queries never drift apart.
-const PT_BLOCKED_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049,priority'
-const PT_MISSING_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_11049,customfield_10008'
+const PT_BLOCKED_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_12121,customfield_11049,priority'
+const PT_MISSING_FIELDS = 'status,assignee,customfield_12120,customfield_11013,summary,labels,parent,issuetype,customfield_12121,customfield_11049,customfield_10008'
 
 function isBlockedIssue(iss) {
   const statusBlocked = (iss.fields?.status?.name || '').toLowerCase().includes('blocked')
@@ -3816,7 +3328,6 @@ function switchView(viewId) {
   document.querySelectorAll('.view-panel').forEach(el => {
     el.classList.toggle('hidden', el.id !== 'view-' + viewId)
   })
-  document.getElementById('pp-tbl')?._ttReset?.()
   document.getElementById('pt-blocked-container')?._btReset?.()
   document.getElementById('pt-missing-container')?._mtReset?.()
   // every tab's selections go back to default when switching tabs
@@ -4060,10 +3571,7 @@ function showApp() {
       e.preventDefault(); e.stopPropagation()
       const wrap = pgszBtn.closest('.tt-pgsz-wrap')
       const menuFinder = () => wrap ? wrap.querySelector('.tt-pgsz-menu') : null
-      // 'tt-pgsz-sel' is the canonical selected-state class; 'mt-pgsz-sel' covers
-      // a pre-existing typo in one copy of this markup (Master Ticket table) —
-      // checking both keeps the sheet's checkmark correct without touching that code.
-      openSheet('Rows per page', 'single', menuFinder, '.tt-pgsz-item', ['tt-pgsz-sel', 'mt-pgsz-sel'])
+      openSheet('Rows per page', 'single', menuFinder, '.tt-pgsz-item', ['tt-pgsz-sel'])
       return
     }
 
