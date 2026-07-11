@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mica Phase 2</title>
-  <script>/* set theme before paint — no flash of light mode. No saved choice → follow OS */(function(){try{var t=localStorage.getItem('mica-theme');if(t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
+  <script>/* set theme before paint — no flash. Default is always light; dark only when the user chose it */(function(){try{if(localStorage.getItem('mica-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzBGNzY2RSIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjguNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMjUpIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTYgNy41IEE4LjUgOC41IDAgMSAxIDguMSAyMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMi41IDE2IEwxNSAxOC41IEwyMC41IDEzIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjwvc3ZnPgo=">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3782,15 +3782,6 @@ function showApp() {
   }
   sync()
   if (btn) btn.addEventListener('click', () => apply(!isDark()))
-  // No explicit choice saved → live-follow OS theme changes
-  try {
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-      if (localStorage.getItem(KEY)) return
-      if (e.matches) root.setAttribute('data-theme', 'dark')
-      else root.removeAttribute('data-theme')
-      sync()
-    })
-  } catch (e) {}
 })()
 </script>
 </body>
