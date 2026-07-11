@@ -5,12 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mica Phase 2</title>
+  <script>/* set theme before paint — no flash of light mode. No saved choice → follow OS */(function(){try{var t=localStorage.getItem('mica-theme');if(t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzBGNzY2RSIvPjxjaXJjbGUgY3g9IjE2IiBjeT0iMTYiIHI9IjguNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMjUpIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMTYgNy41IEE4LjUgOC41IDAgMSAxIDguMSAyMSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMi41IDE2IEwxNSAxOC41IEwyMC41IDEzIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgZmlsbD0ibm9uZSIvPjwvc3ZnPgo=">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
 :root {
+  color-scheme: light;
   --bg: #F2F2F7;
   --card: #FFFFFF;
   --elevated: #E5E5EA;
@@ -20,10 +22,99 @@
   --muted: #535358;
   --dim: #8E8E93;
   --accent: #0F766E;
+  --accent-rgb: 15,118,110;      /* teal tint base — re-pointed in [data-theme=dark] */
+  --on-accent: #ffffff;          /* text/icon that sits ON an accent fill */
+  --danger: #991B1B;
+  --danger-rgb: 153,27,27;
+  /* surface overlays (hover / faint lines) — flip to white-alpha in dark */
+  --hover: rgba(0,0,0,0.025);
+  --hover-weak: rgba(0,0,0,0.018);
+  --hover-row: rgba(0,0,0,0.03);
+  --line-faint: rgba(0,0,0,0.04);
+  --fill-faint: rgba(0,0,0,0.015);
+  --border-hover: rgba(0,0,0,0.18);
   --radius: 16px;
   --radius-sm: 12px;
   --sidebar-w: 264px;
 }
+
+/* ══════════════════ DARK THEME ══════════════════
+   Retrofit: :root tokens are re-pointed here; the few hardcoded light-only colours
+   (JS-injected badge/card tints, calendar day fills, shimmer) get explicit overrides
+   below. Light mode is untouched — every value in :root is byte-identical to before. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0F0F13;
+  --card: #1A1A1F;
+  --elevated: #26262D;
+  --border: rgba(255,255,255,0.09);
+  --border-strong: rgba(255,255,255,0.16);
+  --text: #ECECEF;
+  --muted: #A6A6AE;
+  --dim: #7C7C86;
+  --accent: #2DD4BF;             /* teal-400: reads on near-black, unlike teal-700 */
+  --accent-rgb: 45,212,191;
+  --on-accent: #06231F;          /* near-black teal for text on the light accent fill */
+  --danger: #F98B84;
+  --danger-rgb: 249,139,132;
+  --hover: rgba(255,255,255,0.055);
+  --hover-weak: rgba(255,255,255,0.04);
+  --hover-row: rgba(255,255,255,0.06);
+  --line-faint: rgba(255,255,255,0.07);
+  --fill-faint: rgba(255,255,255,0.03);
+  --border-hover: rgba(255,255,255,0.28);
+}
+/* Regression Timeline system palette — lighten the strong hue (headings must read
+   on dark) and rebuild tint/border as translucent so they sit over dark cells. */
+:root[data-theme="dark"] #view-regression-timeline {
+  --rt-ols:#7FA8E6;  --rt-ols-t:rgba(43,75,128,0.30);  --rt-ols-l:rgba(127,168,230,0.34);
+  --rt-evms:#4FD6C4; --rt-evms-t:rgba(18,133,122,0.28); --rt-evms-l:rgba(79,214,196,0.34);
+  --rt-cbms:#E0A44F; --rt-cbms-t:rgba(176,106,18,0.30); --rt-cbms-l:rgba(224,164,79,0.34);
+  --rt-elms:#A88DF0; --rt-elms-t:rgba(106,75,206,0.32); --rt-elms-l:rgba(168,141,240,0.36);
+}
+/* Badges: light keeps its inline colour (darkenForBadge). Dark rebuilds the chip
+   from the passed --bc so bg/border/text all track the theme with contrast. */
+:root[data-theme="dark"] .tt-badge {
+  background: color-mix(in srgb, var(--bc) 28%, transparent) !important;
+  border-color: color-mix(in srgb, var(--bc) 50%, transparent) !important;
+  color: color-mix(in srgb, var(--bc) 60%, white) !important;
+}
+/* Regression legend cards get --rc (strong colour) inline from JS; derive a dark
+   tint/border and a lightened heading from it. */
+:root[data-theme="dark"] .rsc-card {
+  background: color-mix(in srgb, var(--rc) 16%, var(--card)) !important;
+  border-color: color-mix(in srgb, var(--rc) 42%, transparent) !important;
+}
+:root[data-theme="dark"] .rsc-sys { color: color-mix(in srgb, var(--rc) 55%, white); }
+/* TC-delivery block (hardcoded greens) */
+:root[data-theme="dark"] .rt-tc { background: rgba(26,143,76,0.16); border-color: rgba(90,200,140,0.30); border-left-color: #3DDB85; }
+:root[data-theme="dark"] .rt-tc-h { color: #6FE0A2; border-bottom-color: rgba(120,220,160,0.24); }
+:root[data-theme="dark"] .rt-tc-f { color: #7FDCA5; border-top-color: rgba(120,220,160,0.24); }
+/* Calendar day states (hardcoded light greys) — sit just above the card tone */
+:root[data-theme="dark"] .rt-day.weekend { background: rgba(255,255,255,0.022); }
+:root[data-theme="dark"] .rt-day.holiday { background: rgba(255,255,255,0.045); }
+/* Skeleton shimmer */
+:root[data-theme="dark"] .card-skeleton { background: linear-gradient(90deg,#1E1E24 25%,#26262D 50%,#1E1E24 75%); background-size: 200% 100%; }
+/* Google sign-in button stays brand-white on the dark auth card */
+:root[data-theme="dark"] .btn-google { background: #FFFFFF; color: #1F1F1F; border-color: rgba(0,0,0,0.14); }
+:root[data-theme="dark"] .btn-google:hover { background: #F1F1F3; }
+/* Mobile horizontal-scroll fade on the ticket table — flip to white so it shows on dark cells */
+:root[data-theme="dark"] .tt-table-wrap::after { background: linear-gradient(to right, rgba(0,0,0,0), rgba(255,255,255,0.10)); }
+
+/* ── Theme toggle button (top nav) ── */
+.tn-theme {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; padding: 0; flex-shrink: 0;
+  background: none; border: 1px solid var(--border-strong); border-radius: 8px;
+  color: var(--muted); cursor: pointer; font-family: inherit;
+  transition: color .12s, background .12s, border-color .12s;
+}
+.tn-theme:hover { color: var(--accent); border-color: var(--accent); background: var(--hover); }
+.tn-theme svg { width: 15px; height: 15px; display: block; }
+.tn-theme .icon-sun { display: none; }
+:root[data-theme="dark"] .tn-theme .icon-moon { display: none; }
+:root[data-theme="dark"] .tn-theme .icon-sun { display: block; }
+@media (max-width: 520px) { .tn-theme { width: 28px; height: 28px; } }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -57,7 +148,7 @@ body {
   width: 60px; height: 60px; border-radius: 16px;
   background: var(--accent); margin: 0 auto 20px;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(15,118,110,0.28);
+  box-shadow: 0 4px 16px rgba(var(--accent-rgb),0.28);
 }
 .auth-icon svg { width: 36px; height: 36px; }
 .auth-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -.02em; }
@@ -73,8 +164,8 @@ body {
 .btn-google:hover { background: #F5F5F7; box-shadow: 0 2px 8px rgba(0,0,0,0.09); border-color: rgba(0,0,0,0.18); }
 .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
 .auth-error {
-  font-size: 12px; color: #991B1B; margin-top: 14px; display: none;
-  background: rgba(153,27,27,0.06); border: 1px solid rgba(153,27,27,0.15);
+  font-size: 12px; color: var(--danger); margin-top: 14px; display: none;
+  background: rgba(var(--danger-rgb),0.06); border: 1px solid rgba(var(--danger-rgb),0.15);
   border-radius: 10px; padding: 8px 12px;
 }
 .auth-note { font-size: 11px; color: var(--muted); margin-top: 20px; opacity: 0.55; }
@@ -95,8 +186,8 @@ body {
   letter-spacing: .015em; white-space: nowrap;
   padding: 4px 11px 4px 9px;
   margin-right: 14px;
-  background: rgba(15,118,110,0.08);
-  border: 1px solid rgba(15,118,110,0.18);
+  background: rgba(var(--accent-rgb),0.08);
+  border: 1px solid rgba(var(--accent-rgb),0.18);
   border-radius: 8px;
   align-self: center;
 }
@@ -117,7 +208,7 @@ body {
   transition: color .12s, border-color .12s, background .12s;
   position: relative;
 }
-.sb-nav-item:hover { color: var(--text); background: rgba(0,0,0,0.025); }
+.sb-nav-item:hover { color: var(--text); background: var(--hover); }
 .sb-nav-item.active {
   color: var(--accent); font-weight: 600;
   border-bottom: 2px solid var(--accent);
@@ -136,7 +227,7 @@ body {
   font-size: 11.5px; color: var(--muted); cursor: pointer;
   font-family: inherit; border-radius: 8px; transition: color .12s, background .12s;
 }
-.sb-logout:hover { color: #991B1B; background: rgba(153,27,27,0.06); }
+.sb-logout:hover { color: var(--danger); background: rgba(var(--danger-rgb),0.06); }
 
 /* ── MAIN WRAP ── */
 #main-wrap {
@@ -172,7 +263,7 @@ body {
 .epic-empty-heading { font-size: 12px; font-weight: 600; color: var(--dim); margin-bottom: 10px; }
 .epic-empty-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .epic-empty-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 12px; color: var(--text); text-decoration: none; transition: border-color .15s, background .15s; }
-.epic-empty-chip:hover { border-color: rgba(15,118,110,0.3); background: rgba(15,118,110,0.04); }
+.epic-empty-chip:hover { border-color: rgba(var(--accent-rgb),0.3); background: rgba(var(--accent-rgb),0.04); }
 .epic-empty-chip .chip-key { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 10px; color: var(--accent); font-weight: 500; }
 .epic-empty-chip .chip-name { color: var(--muted); font-size: 11px; }
 .epic-grid-inner {
@@ -207,11 +298,11 @@ body {
 .epic-key {
   font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
   font-size: 10px; font-weight: 500; color: var(--dim);
-  background: var(--elevated); border: 1px solid rgba(0,0,0,0.06);
+  background: var(--elevated); border: 1px solid var(--border);
   border-radius: 6px; padding: 2px 7px;
   text-decoration: none; cursor: pointer; transition: background .12s, color .12s, border-color .12s;
 }
-.epic-key:hover { background: rgba(15,118,110,0.08); color: var(--accent); border-color: rgba(15,118,110,0.22); }
+.epic-key:hover { background: rgba(var(--accent-rgb),0.08); color: var(--accent); border-color: rgba(var(--accent-rgb),0.22); }
 .epic-name {
   width: 100%;
   font-size: 13px; font-weight: 600; color: var(--text);
@@ -305,7 +396,7 @@ body {
 .view-loading::before {
   content: '';
   width: 36px; height: 36px;
-  border: 3px solid rgba(15,118,110,0.15);
+  border: 3px solid rgba(var(--accent-rgb),0.15);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: loading-spin .8s linear infinite;
@@ -330,7 +421,7 @@ body {
   background: var(--card); color: var(--text); outline: none;
   transition: border-color .12s, box-shadow .12s;
 }
-.tt-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.tt-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.1); }
 
 
 /* Custom dropdown */
@@ -346,9 +437,9 @@ body {
   text-align: left; display: flex; align-items: center; gap: 6px;
   transition: border-color .12s, box-shadow .12s;
 }
-.tt-dd-btn:hover { border-color: rgba(0,0,0,0.18); color: var(--text); }
-.tt-dd-btn:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
-.tt-dd-btn.tt-dd-on { border-color: var(--accent); background: rgba(15,118,110,0.06); color: var(--accent); font-weight: 600; }
+.tt-dd-btn:hover { border-color: var(--border-hover); color: var(--text); }
+.tt-dd-btn:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.1); }
+.tt-dd-btn.tt-dd-on { border-color: var(--accent); background: rgba(var(--accent-rgb),0.06); color: var(--accent); font-weight: 600; }
 .tt-dd-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tt-dd-arrow { flex-shrink: 0; transition: transform .15s; color: var(--dim); }
 .tt-dd-btn.tt-dd-on .tt-dd-arrow { color: var(--accent); }
@@ -366,7 +457,7 @@ body {
   cursor: pointer; color: var(--text); white-space: nowrap; transition: background .1s;
 }
 .tt-dd-item:hover { background: var(--elevated); }
-.tt-dd-item.tt-dd-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.tt-dd-item.tt-dd-sel { background: rgba(var(--accent-rgb),0.1); color: var(--accent); font-weight: 600; }
 .tt-clear-btn {
   display: inline-flex; align-items: center; justify-content: center; line-height: 1;
   padding: 7px 11px; border: 1px solid var(--border-strong);
@@ -401,7 +492,7 @@ body {
 .tt-th.tt-sort-active .tt-sort-icon { opacity: 1; }
 .tt-td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
 .tt-tr:last-child .tt-td { border-bottom: none; }
-.tt-tr:hover .tt-td { background: rgba(0,0,0,0.018); }
+.tt-tr:hover .tt-td { background: var(--hover-weak); }
 .tt-key { font-family:'JetBrains Mono','SF Mono',Menlo,monospace; font-size: 11px; color: var(--accent); font-weight: 400; white-space: nowrap; text-decoration: none; }
 .tt-key:hover { text-decoration: underline; }
 .tt-summary-cell { max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
@@ -423,7 +514,7 @@ body {
 .tt-page-btn:disabled { opacity: .32; cursor: default; }
 .tt-page-num { min-width: 30px; height: 30px; border: 1px solid transparent; border-radius: 7px; font-size: 12px; font-family: inherit; background: none; color: var(--muted); cursor: pointer; padding: 0 5px; transition: background .12s, color .12s, border-color .12s; }
 .tt-page-num:hover:not(.tt-pg-active) { background: var(--elevated); color: var(--text); }
-.tt-page-num.tt-pg-active { background: var(--accent); color: white; border-color: var(--accent); }
+.tt-page-num.tt-pg-active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .tt-pgsz-wrap { position: relative; }
 .tt-pgsz-btn {
   padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px;
@@ -431,8 +522,8 @@ body {
   cursor: pointer; display: flex; align-items: center; gap: 6px;
   transition: border-color .12s, box-shadow .12s;
 }
-.tt-pgsz-btn:hover { border-color: rgba(0,0,0,0.18); color: var(--text); }
-.tt-pgsz-btn:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.1); }
+.tt-pgsz-btn:hover { border-color: var(--border-hover); color: var(--text); }
+.tt-pgsz-btn:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.1); }
 .tt-pgsz-menu {
   position: absolute; bottom: calc(100% + 5px); right: 0; min-width: 100%; z-index: 300;
   background: var(--card); border: 1px solid var(--border-strong); border-radius: 10px;
@@ -443,7 +534,7 @@ body {
   white-space: nowrap; color: var(--text);
 }
 .tt-pgsz-item:hover { background: var(--elevated); }
-.tt-pgsz-item.tt-pgsz-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.tt-pgsz-item.tt-pgsz-sel { background: rgba(var(--accent-rgb),0.1); color: var(--accent); font-weight: 600; }
 .tt-pageinfo-group { display: flex; align-items: center; gap: 8px; }
 .tt-refresh-btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -457,11 +548,11 @@ body {
 .tt-refresh-btn svg { width: 15px; height: 15px; display: block; }
 .tt-refresh-btn.tt-refreshing svg { animation: tt-spin .7s linear infinite; }
 @keyframes tt-spin { to { transform: rotate(360deg); } }
-.view-error { font-size: 12px; color: #991B1B; padding: 32px 0; }
+.view-error { font-size: 12px; color: var(--danger); padding: 32px 0; }
 .sprint-notice {
   display: flex; align-items: center; gap: 9px;
   font-size: 11.5px; color: var(--muted); line-height: 1.5;
-  background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15);
+  background: rgba(var(--accent-rgb),0.05); border: 1px solid rgba(var(--accent-rgb),0.15);
   border-radius: 10px; padding: 8px 14px; margin-bottom: 14px;
 }
 .sprint-notice svg { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
@@ -492,8 +583,8 @@ body {
 .empty-title { font-size: 12px; font-weight: 600; color: var(--muted); }
 .empty-sub { font-size: 11px; color: var(--dim); text-align: center; line-height: 1.5; white-space: nowrap; }
 .error-wrap { width: 100%; }
-.error-box { background: rgba(153,27,27,0.05); border: 1px solid rgba(153,27,27,0.14); border-radius: 10px; padding: 12px 14px; }
-.error-text { font-size: 11px; color: #991B1B; line-height: 1.5; }
+.error-box { background: rgba(var(--danger-rgb),0.05); border: 1px solid rgba(var(--danger-rgb),0.14); border-radius: 10px; padding: 12px 14px; }
+.error-text { font-size: 11px; color: var(--danger); line-height: 1.5; }
 .hidden { display: none !important; }
 
 /* ── SUMMARY SECTION ── */
@@ -513,9 +604,9 @@ body {
   transition: border-color .12s, box-shadow .12s;
   white-space: nowrap;
 }
-.gb-trigger:hover { border-color: rgba(15,118,110,0.4); }
-.gb-trigger:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); }
-.gb-trigger[aria-expanded="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); }
+.gb-trigger:hover { border-color: rgba(var(--accent-rgb),0.4); }
+.gb-trigger:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.12); }
+.gb-trigger[aria-expanded="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.12); }
 .gb-chevron { color: var(--dim); flex-shrink: 0; transition: transform .15s; }
 .gb-trigger[aria-expanded="true"] .gb-chevron { transform: rotate(180deg); }
 .gb-menu {
@@ -635,8 +726,8 @@ body {
 .pt-donut-total { font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif; font-size: 1.6rem; font-weight: 600; color: var(--text); line-height: 1; }
 .pt-donut-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: .04em; text-transform: uppercase; }
 .pt-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0; }
-.pt-legend-item { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(0,0,0,0.04); text-decoration: none; color: inherit; cursor: pointer; border-radius: 6px; transition: background .15s; }
-a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
+.pt-legend-item { display: flex; align-items: flex-start; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line-faint); text-decoration: none; color: inherit; cursor: pointer; border-radius: 6px; transition: background .15s; }
+a.pt-legend-item:hover { background: var(--hover-row); }
 .pt-legend-item:last-child { border-bottom: none; }
 .pt-legend-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; margin-top: 3px; }
 .pt-legend-info { flex: 1; min-width: 0; }
@@ -680,7 +771,7 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
 .pt-th-total { color: var(--dim); min-width: 40px; }
 .pt-td {
   padding: 5px 6px; text-align: center;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid var(--line-faint);
   vertical-align: middle;
 }
 .pt-td-status { text-align: left; font-size: 11.5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; display: flex; align-items: center; gap: 7px; }
@@ -690,7 +781,7 @@ a.pt-legend-item:hover { background: rgba(0,0,0,0.03); }
 .pt-tfoot-label { text-align: left; font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; }
 .pt-cell-val { font-family: 'JetBrains Mono','SF Mono',Menlo,monospace; font-weight: 600; color: var(--text); }
 .pt-cell-zero { color: var(--dim); font-size: 13px; opacity: 0.5; }
-tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; background: rgba(0,0,0,0.015); }
+tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; background: var(--fill-faint); }
 .pt-blocked-wrap {
   margin-top: 28px;
   background: var(--card); border: 1px solid var(--border);
@@ -706,6 +797,9 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .pt-done-num { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1; }
 .pt-done-status { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .07em; margin-top: 4px; }
 .pt-done-pct { font-size: 10px; color: var(--dim); margin-top: 2px; letter-spacing: .05em; }
+.pt-done-types { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
+.pt-done-type { font-size: 10px; color: var(--dim); letter-spacing: .05em; }
+.pt-done-type b { color: var(--muted); font-weight: 600; margin-right: 2px; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1199px) { .epic-grid-inner { grid-template-columns: repeat(2, 1fr); } }
@@ -736,7 +830,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .sb-nav-item { padding: 0 10px; font-size: 11.5px; flex-shrink: 0; }
   .tn-right { gap: 8px; padding-left: 10px; }
   /* Sprint notice: stack columns vertically */
-  .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(15,118,110,0.15) !important; }
+  .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(var(--accent-rgb),0.15) !important; }
   /* Progress tracker: single column */
   .pt-body { grid-template-columns: 1fr; gap: 16px; }
   .pt-left-col { padding-right: 0; }
@@ -768,7 +862,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   /* Sprint notice */
   .sprint-notice { font-size: 10.5px; padding: 0; border-radius: 8px; }
   .sprint-notice > div { flex-direction: column !important; }
-  .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(15,118,110,0.15) !important; }
+  .sprint-notice > div > div[style*="border-left"] { border-left: none !important; border-top: 1px solid rgba(var(--accent-rgb),0.15) !important; }
   .sprint-notice ul { font-size: 10px; }
   /* Sprint notice: collapsible on mobile (Phase 3) */
   .sprint-notice.sn-collapsed { max-height: 120px; overflow: hidden; position: relative; }
@@ -987,7 +1081,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   background: none; border: none; width: 100%; text-align: left;
 }
 .bs-item:active { background: var(--elevated); }
-.bs-item.bs-item-sel { background: rgba(15,118,110,0.1); color: var(--accent); font-weight: 600; }
+.bs-item.bs-item-sel { background: rgba(var(--accent-rgb),0.1); color: var(--accent); font-weight: 600; }
 .bs-item-check { color: var(--accent); font-weight: 700; margin-left: 8px; flex-shrink: 0; }
 
 /* ══ Regression Testing Timeline tab ══ */
@@ -1002,9 +1096,9 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-intro p { font-size: 12.5px; color: var(--muted); margin-top: 4px; max-width: 70ch; }
 /* Progress Tracker link (Google Sheet) */
 .rt-track { display: inline-flex; align-items: center; gap: 10px; margin-top: 13px; text-decoration: none;
-  background: var(--card); border: 1px solid rgba(15,118,110,0.25); border-radius: 10px; padding: 9px 13px;
+  background: var(--card); border: 1px solid rgba(var(--accent-rgb),0.25); border-radius: 10px; padding: 9px 13px;
   transition: border-color .12s, box-shadow .12s; max-width: 100%; }
-.rt-track:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(15,118,110,0.10); }
+.rt-track:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.10); }
 .rt-track-ic { color: var(--accent); flex-shrink: 0; }
 .rt-track-tx { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .rt-track-tt { font-size: 12.5px; font-weight: 800; color: var(--accent); letter-spacing: -.01em; }
@@ -1012,12 +1106,12 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 /* top header: intro (left) + QA Owner (right) */
 .rt-head { display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; margin-bottom: 18px; }
 .rt-head .rt-intro { flex: 1 1 400px; margin-bottom: 0; }
-.rt-qa { flex: 1 1 500px; background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.15);
+.rt-qa { flex: 1 1 500px; background: rgba(var(--accent-rgb),0.05); border: 1px solid rgba(var(--accent-rgb),0.15);
   border-radius: 12px; padding: 12px 14px; }
 .rt-qa-title { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 10px; }
 .rt-qa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.rt-qa-card { background: var(--card); border: 1px solid rgba(15,118,110,0.12); border-radius: 10px; padding: 9px 10px; min-width: 0; }
+.rt-qa-card { background: var(--card); border: 1px solid rgba(var(--accent-rgb),0.12); border-radius: 10px; padding: 9px 10px; min-width: 0; }
 .rt-qa-sys { font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 5px; }
 .rt-qa-card.elms .rt-qa-sys { color: var(--rt-elms); }
 .rt-qa-card.cbms .rt-qa-sys { color: var(--rt-cbms); }
@@ -1082,11 +1176,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-day .rt-n { font-size: 15px; font-weight: 600; color: var(--dim); line-height: 1;
   display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; vertical-align: middle; }
 .rt-day.has .rt-n { color: var(--text); font-weight: 800; }
-.rt-day.today .rt-n { background: var(--accent); color: #fff; border-radius: 50%; box-shadow: 0 3px 9px rgba(15,118,110,.4); }
-.rt-day.today { box-shadow: inset 0 0 0 2px var(--accent); background: rgba(15,118,110,0.045); }
+.rt-day.today .rt-n { background: var(--accent); color: var(--on-accent); border-radius: 50%; box-shadow: 0 3px 9px rgba(var(--accent-rgb),.4); }
+.rt-day.today { box-shadow: inset 0 0 0 2px var(--accent); background: rgba(var(--accent-rgb),0.045); }
 .rt-today-tag { position: absolute; top: 9px; right: 9px; z-index: 1; font-size: 8.5px; font-weight: 800;
-  letter-spacing: .06em; text-transform: uppercase; color: #fff; background: var(--accent);
-  padding: 2px 7px; border-radius: 999px; line-height: 1.2; box-shadow: 0 2px 6px rgba(15,118,110,.35); }
+  letter-spacing: .06em; text-transform: uppercase; color: var(--on-accent); background: var(--accent);
+  padding: 2px 7px; border-radius: 999px; line-height: 1.2; box-shadow: 0 2px 6px rgba(var(--accent-rgb),.35); }
 /* today + holiday same day: reserve the top-right Today-pill zone so a holiday
    badge stays clear of the pill (wide cols) or wraps to the next line instead of
    sliding under it (narrow / mobile cols). ~57px ≈ pill width + right offset. */
@@ -1191,6 +1285,10 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       </a>
     </div>
     <div class="tn-right">
+      <button class="tn-theme" id="btn-theme" type="button" aria-label="สลับโหมดมืด / สว่าง" title="สลับโหมดมืด / สว่าง" aria-pressed="false">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
       <span class="live-dot"></span>
       <span id="last-updated">Loading…</span>
       <button class="sb-logout" id="btn-logout">
@@ -1217,7 +1315,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> ELMS, CBMS, EvMS</li>
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> OLS</li>
               </ul>
-              <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(15,118,110,0.12)">
+              <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(var(--accent-rgb),0.12)">
                 <div style="font-weight:500;color:var(--text);margin-bottom:2px">หลักการนับ ticket:</div>
                 <ul>
                   <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
@@ -1233,7 +1331,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
             </div>
           </div>
           <!-- Right: Jira update checklist -->
-          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
+          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(var(--accent-rgb),0.15);min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="min-width:0">
               <div style="font-weight:600;margin-bottom:3px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
@@ -1341,7 +1439,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/MICA2/boards/180" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">MICA2 Board</a> ELMS, CBMS, EvMS</li>
                 <li><a href="https://skilllane.atlassian.net/jira/software/projects/OLS/boards/818" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">OLS Board</a> OLS</li>
               </ul>
-              <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(15,118,110,0.12)">
+              <div style="margin-top:5px;padding-top:5px;border-top:1px solid rgba(var(--accent-rgb),0.12)">
                 <div style="font-weight:500;color:var(--text);margin-bottom:2px">หลักการนับ ticket:</div>
                 <ul>
                   <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
@@ -1357,7 +1455,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
             </div>
           </div>
           <!-- Right: Jira update checklist -->
-          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(15,118,110,0.15);min-width:0">
+          <div style="flex:1 1 340px;padding:7px 12px;display:flex;gap:9px;align-items:flex-start;border-left:1px solid rgba(var(--accent-rgb),0.15);min-width:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div style="min-width:0">
               <div style="font-weight:600;margin-bottom:3px">เพื่อให้ข้อมูลถูกต้อง กรุณาอัปเดตใน Jira:</div>
@@ -1777,7 +1875,7 @@ function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
 
   if (total === 0) {
     return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="${CX}" cy="${CY}" r="${(RO+RI)/2}" fill="none" stroke="#E5E5EA" stroke-width="${RO-RI}"/>
+      <circle cx="${CX}" cy="${CY}" r="${(RO+RI)/2}" fill="none" stroke="var(--elevated)" stroke-width="${RO-RI}"/>
     </svg>`
   }
   if (groups.length === 1) {
@@ -2205,12 +2303,27 @@ function renderPtCard(sys, groups, total, issues) {
   const doneCount = doneGroups.reduce((s, [,c]) => s + c, 0)
   const donePct = legendTotal > 0 ? Math.round(doneCount / legendTotal * 100) : 0
   const doneLabel = doneGroups.map(([name]) => name).join(' / ') || 'Done'
+  // Done tickets split by issue type — same done statuses as above; omit absent types
+  const doneStatusNames = new Set(doneGroups.map(([name]) => name))
+  const doneTypeCounts = {}
+  issues.forEach(iss => {
+    if (doneStatusNames.has(iss.fields?.status?.name)) {
+      const t = iss.fields?.issuetype?.name || 'Other'
+      doneTypeCounts[t] = (doneTypeCounts[t] || 0) + 1
+    }
+  })
+  const doneTypeRows = Object.entries(doneTypeCounts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([name, count]) => `<div class="pt-done-type"><b>${esc(name)}</b> ${count} of ${legendTotal} tickets</div>`)
+    .join('')
+  const doneTypesHTML = doneTypeRows ? `<div class="pt-done-types">${doneTypeRows}</div>` : ''
   const doneHTML = `<div class="pt-waiting pt-waiting-narrow">
     <div class="pt-waiting-head">Done <span class="pt-waiting-count">${doneCount}</span></div>
     <div class="pt-done-pill">
       <div class="pt-done-num">${donePct}%</div>
       <div class="pt-done-status">${esc(doneLabel.toUpperCase())}</div>
       <div class="pt-done-pct">${doneCount} of ${legendTotal} tickets</div>
+      ${doneTypesHTML}
     </div>
   </div>`
 
@@ -2334,7 +2447,7 @@ function initBlockedTable(containerId, issues, refetch) {
     if (!val) return '<span class="tt-nil">—</span>'
     const c = statusColor(val)
     const tc = darkenForBadge(c)
-    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${esc(val)}</span>`
+    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55;--bc:${c}">${esc(val)}</span>`
   }
 
   if (!container._btInit) {
@@ -2672,7 +2785,7 @@ function initMissingTable(containerId, issues, refetch) {
     if (!val) return '<span class="tt-nil">—</span>'
     const c = statusColor(val)
     const tc = darkenForBadge(c)
-    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55">${esc(val)}</span>`
+    return `<span class="tt-badge" style="background:${c}33;color:${tc};border-color:${c}55;--bc:${c}">${esc(val)}</span>`
   }
 
   if (!container._mtInit) {
@@ -2751,7 +2864,7 @@ function initMissingTable(containerId, issues, refetch) {
             ? `<a class="tt-parent-key" href="https://skilllane.atlassian.net/browse/${r.parentKey}" target="_blank" rel="noopener">${r.parentKey}</a>${r.parentName?`<span class="tt-parent-name">${esc(r.parentName)}</span>`:''}`
             : '<span class="tt-nil">—</span>'
           const missingTags = r.missing ? `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:5px">${r.missing.split(', ').map(m =>
-            `<span class="tt-badge" style="background:#E8453C33;color:#C0392B;border-color:#E8453C55;font-size:10px;white-space:nowrap">${m}</span>`
+            `<span class="tt-badge" style="background:#E8453C33;color:#C0392B;border-color:#E8453C55;font-size:10px;white-space:nowrap;--bc:#E8453C">${m}</span>`
           ).join('')}</div>` : ''
           return `<tr class="tt-tr">
             <td class="tt-td"><a class="tt-key" href="https://skilllane.atlassian.net/browse/${r.key}" target="_blank" rel="noopener">${r.key}</a></td>
@@ -3648,6 +3761,34 @@ function showApp() {
     mq.addEventListener('change', applyState)
     applyState()
   })
+})()
+
+/* ── Dark-mode toggle ──
+   Initial theme is applied by the inline <head> script (before paint, no flash).
+   This only wires the button, persists the choice, and keeps aria-pressed in sync. */
+;(function () {
+  const KEY = 'mica-theme'
+  const root = document.documentElement
+  const btn = document.getElementById('btn-theme')
+  const isDark = () => root.getAttribute('data-theme') === 'dark'
+  const sync = () => { if (btn) btn.setAttribute('aria-pressed', isDark() ? 'true' : 'false') }
+  function apply(dark) {
+    if (dark) root.setAttribute('data-theme', 'dark')
+    else root.removeAttribute('data-theme')
+    try { localStorage.setItem(KEY, dark ? 'dark' : 'light') } catch (e) {}
+    sync()
+  }
+  sync()
+  if (btn) btn.addEventListener('click', () => apply(!isDark()))
+  // No explicit choice saved → live-follow OS theme changes
+  try {
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (localStorage.getItem(KEY)) return
+      if (e.matches) root.setAttribute('data-theme', 'dark')
+      else root.removeAttribute('data-theme')
+      sync()
+    })
+  } catch (e) {}
 })()
 </script>
 </body>
