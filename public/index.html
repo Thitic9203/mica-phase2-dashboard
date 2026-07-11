@@ -3249,12 +3249,13 @@ function buildRegressionTimeline() {
     for(let i=0;i<first;i++) cells += '<div class="rt-day pad"></div>'
     for(let d=1;d<=dim;d++){
       const dow = new Date(y,m,d).getDay()
-      const we = (dow===0||dow===6) ? 'weekend' : ''
+      const isWeekend = (dow===0||dow===6)
+      const we = isWeekend ? 'weekend' : ''
       const key = iso(y,m,d)
       const evs = MS.filter(e=>e.date===key && showEv(e, mode))
       const dlv = pickDlv(DELIV[key] || [], mode)
       const holi = HOLI_NAMES[key]
-      const isToday = key === TODAY
+      const isToday = key === TODAY && !isWeekend
       // holiday alone doesn't count as "has" — a holiday-only day stays the short
       // (:not(.has)) height so weeks with only a public holiday collapse.
       const has = (evs.length || dlv.length) ? 'has' : ''
