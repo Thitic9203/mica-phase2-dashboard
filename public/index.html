@@ -1323,8 +1323,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                   <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
                   <li><strong>Sprint:</strong>
                     <ul style="margin-top:2px">
-                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่เคยอยู่ใน Sprint — active, future หรือ sprint ที่ปิดไปแล้ว (นับงานที่เสร็จใน sprint ที่ปิดด้วย ตัวเลขจึงถูกต้องแม้อยู่ช่วงสลับ sprint)</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่ไม่เคยถูกกำหนด Sprint (อยู่ใน Backlog, sprint ว่าง)</li>
+                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน Sprint active หรือ future และงานที่ทำเสร็จแล้ว (Done) ใน Sprint ที่ปิดไปแล้ว จึงนับงานที่เสร็จครบเสมอ ตัวเลขถูกต้องแม้อยู่ช่วงสลับ sprint</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ใน Backlog คือยังไม่ Done และไม่ได้อยู่ใน Sprint active/future (ไม่ว่าจะยังไม่เคยกำหนด Sprint หรือ Sprint เดิมปิดไปแล้ว)</li>
                     </ul>
                   </li>
                   <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น ป้องกัน double count เมื่อมีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขในลิงก์ Jira อาจสูงกว่า เพราะแสดงทุก ticket ที่ผู้นั้นเป็น QA owner ไม่ว่า primary หรือไม่)</span></li>
@@ -1447,8 +1447,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                   <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
                   <li><strong>Sprint:</strong>
                     <ul style="margin-top:2px">
-                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่เคยอยู่ใน Sprint — active, future หรือ sprint ที่ปิดไปแล้ว (นับงานที่เสร็จใน sprint ที่ปิดด้วย ตัวเลขจึงถูกต้องแม้อยู่ช่วงสลับ sprint)</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่ไม่เคยถูกกำหนด Sprint (อยู่ใน Backlog, sprint ว่าง)</li>
+                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน Sprint active หรือ future และงานที่ทำเสร็จแล้ว (Done) ใน Sprint ที่ปิดไปแล้ว จึงนับงานที่เสร็จครบเสมอ ตัวเลขถูกต้องแม้อยู่ช่วงสลับ sprint</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ใน Backlog คือยังไม่ Done และไม่ได้อยู่ใน Sprint active/future (ไม่ว่าจะยังไม่เคยกำหนด Sprint หรือ Sprint เดิมปิดไปแล้ว)</li>
                     </ul>
                   </li>
                   <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น ป้องกัน double count เมื่อมีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขในลิงก์ Jira อาจสูงกว่า เพราะแสดงทุก ticket ที่ผู้นั้นเป็น QA owner ไม่ว่า primary หรือไม่)</span></li>
@@ -1669,7 +1669,7 @@ const EPICS = [
 ]
 
 // ── Epic group-by options ──
-const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND sprint is not EMPTY'
+const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints() OR (sprint in closedSprints() AND statusCategory = Done))'
 const GROUP_OPTIONS = [
   {
     key: 'tcStatus', label: 'TC Status',
@@ -2021,19 +2021,19 @@ const PT_MISSING_SYSTEMS = [
   {
     id: 'OLS', name: 'OLS', color: '#2b4b80',
     // OLS tickets don't require a QA Owner, so no QA-owner clause here.
-    jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR parent is EMPTY OR assignee is EMPTY) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `project = OLS AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR parent is EMPTY OR assignee is EMPTY) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'ELMS', name: 'ELMS', color: '#8A78BF',
-    jql: () => `parent in (MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `parent in (MICA2-125,MICA2-626,MICA2-627,MICA2-628,MICA2-629) AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'CBMS', name: 'CBMS', color: '#C0986A',
-    jql: () => `parent in (MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `parent in (MICA2-648,MICA2-649,MICA2-650,MICA2-651,MICA2-652,MICA2-653) AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
   {
     id: 'EvMS', name: 'EvMS', color: '#4487C5',
-    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636) AND issuetype in (Story, Bug, Task) AND (sprint is EMPTY OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
+    jql: () => `parent in (MICA2-630,MICA2-631,MICA2-632,MICA2-633,MICA2-634,MICA2-635,MICA2-636) AND issuetype in (Story, Bug, Task) AND ((sprint is EMPTY OR (sprint NOT IN openSprints() AND sprint NOT IN futureSprints())) OR assignee is EMPTY OR (cf[12120] is EMPTY AND cf[11013] is EMPTY)) AND status not in (Done, Closed, Cancelled)`,
   },
 ]
 
@@ -2061,7 +2061,8 @@ function isBugIssue(iss) {
   return (iss.fields?.issuetype?.name || '').toLowerCase() === 'bug'
 }
 
-// `sys.jql()` already restricts to sprinted tickets — sprint is not EMPTY (see EPIC_FILTER),
+// `sys.jql()` already scopes to counted work — active/future sprints plus Done work from
+// closed sprints (see EPIC_FILTER),
 // so narrowing it to Bug is all this chart needs — no extra Jira query.
 function buildPtBugPriority(sys, issues) {
   const bugs = issues.filter(isBugIssue)
@@ -2075,7 +2076,7 @@ function buildPtBugPriority(sys, issues) {
       <div class="empty-state" style="padding:18px 0">
         <div class="empty-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg></div>
         <div class="empty-title">No bugs</div>
-        <div class="empty-sub">No bugs in the open or future sprints</div>
+        <div class="empty-sub">No bugs in active/future sprints or completed work</div>
       </div>
     </div>`
   }
@@ -2345,7 +2346,7 @@ function renderPtCard(sys, groups, total, issues) {
     'QA OWNER'
   )
 
-  // ── Bugs by Priority (open + future sprints, same base JQL as the donut above) ──
+  // ── Bugs by Priority (active/future sprints + Done work in closed sprints, same base JQL as the donut above) ──
   const bugPriorityHTML = buildPtBugPriority(sys, issues)
 
   const body = total > 0
