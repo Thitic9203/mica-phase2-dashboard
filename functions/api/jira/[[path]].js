@@ -128,5 +128,10 @@ function withStatus(res, status) {
   const h = new Headers(res.headers)
   h.set('X-Cache', status)
   h.delete('Access-Control-Allow-Origin')
+  // The `max-age=300` on the stored entry is for the *edge* Cache API only (freshness
+  // is managed here via X-Fetched-At). Never let the browser cache /api/jira, or a Jira
+  // edit stays invisible on reload for up to 5 min. no-store → every reload revalidates
+  // at the edge, so edits surface within the edge SWR window (≤120s) instead.
+  h.set('Cache-Control', 'no-store')
   return new Response(res.body, { status: res.status, headers: h })
 }
