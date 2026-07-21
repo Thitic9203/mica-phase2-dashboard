@@ -26,6 +26,8 @@
   --on-accent: #ffffff;          /* text/icon that sits ON an accent fill */
   --danger: #991B1B;
   --danger-rgb: 153,27,27;
+  --warn: #B45309;               /* amber-700 — urgency step below danger (on-theme, matches READY-TO-TEST amber) */
+  --warn-rgb: 180,83,9;
   /* surface overlays (hover / faint lines) — flip to white-alpha in dark */
   --hover: rgba(0,0,0,0.025);
   --hover-weak: rgba(0,0,0,0.018);
@@ -57,6 +59,8 @@
   --on-accent: #06231F;          /* near-black teal for text on the light accent fill */
   --danger: #F98B84;
   --danger-rgb: 249,139,132;
+  --warn: #F0B357;               /* lightened amber so it reads on near-black */
+  --warn-rgb: 240,179,87;
   --hover: rgba(255,255,255,0.055);
   --hover-weak: rgba(255,255,255,0.04);
   --hover-row: rgba(255,255,255,0.06);
@@ -90,6 +94,10 @@
 :root[data-theme="dark"] .rt-tc { background: rgba(26,143,76,0.16); border-color: rgba(90,200,140,0.30); border-left-color: #3DDB85; }
 :root[data-theme="dark"] .rt-tc-h { color: #6FE0A2; border-bottom-color: rgba(120,220,160,0.24); }
 :root[data-theme="dark"] .rt-tc-f { color: #7FDCA5; border-top-color: rgba(120,220,160,0.24); }
+/* SKL-QA Regression block (cooler emerald) */
+:root[data-theme="dark"] .rt-rg { background: rgba(4,120,87,0.20); border-color: rgba(60,200,160,0.30); border-left-color: #34D8B0; }
+:root[data-theme="dark"] .rt-rg-h { color: #5FE0C0; border-bottom-color: rgba(90,220,180,0.24); }
+:root[data-theme="dark"] .rt-rg-f { color: #6FDCC0; border-top-color: rgba(90,220,180,0.24); }
 /* Calendar day states (hardcoded light greys) — sit just above the card tone */
 :root[data-theme="dark"] .rt-day.weekend { background: rgba(255,255,255,0.022); }
 :root[data-theme="dark"] .rt-day.holiday { background: rgba(255,255,255,0.045); }
@@ -311,6 +319,17 @@ body {
   letter-spacing: -.01em; line-height: 1.45;
   margin-bottom: 8px;
 }
+/* Regression lot label (top-right of an OLS epic card). Colour = urgency step:
+   Lot 1 (soonest window) = danger red, Lot 2 = amber — both from theme tokens so
+   they track light/dark. */
+.epic-lot {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px;
+  font-size: 9.5px; font-weight: 800; letter-spacing: .02em; white-space: nowrap;
+  padding: 3px 9px 3px 8px; border-radius: 999px; line-height: 1.2; border: 1px solid;
+}
+.epic-lot::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+.epic-lot.lot1 { color: var(--danger); background: rgba(var(--danger-rgb),0.10); border-color: rgba(var(--danger-rgb),0.28); }
+.epic-lot.lot2 { color: var(--warn);   background: rgba(var(--warn-rgb),0.12);   border-color: rgba(var(--warn-rgb),0.32); }
 
 /* ── DONUT ── */
 .card-body { width: 100%; display: flex; flex-direction: row; align-items: center; gap: 18px; }
@@ -1217,6 +1236,20 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-tc-sys.ols {background:var(--rt-ols)} .rt-tc-sys.evms {background:var(--rt-evms)}
 .rt-tc-sys.cbms {background:var(--rt-cbms)} .rt-tc-sys.elms {background:var(--rt-elms)}
 .rt-tc-f { font-size: 10.5px; font-weight: 700; color: #2F7D4E; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #C7E8D2; }
+/* SKL-QA Regression block — same shape as TC delivery, a cooler/deeper emerald tone */
+.rt-rg { margin-top: 9px; border: 1px solid #B4E0CD; border-left: 3px solid #047857;
+  background: #E6F5EE; border-radius: 10px; padding: 8px 11px 9px; }
+.rt-ev + .rt-rg, .rt-rg + .rt-ev, .rt-rg + .rt-rg, .rt-tc + .rt-rg, .rt-rg + .rt-tc { margin-top: 8px; }
+.rt-rg-h { font-size: 11.5px; font-weight: 800; color: #065F46; letter-spacing: -.01em; line-height: 1;
+  padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px dashed #BFE4D3; display: flex; align-items: center; gap: 6px; }
+.rt-rg-h::before { content: "QA"; font-size: 8.5px; font-weight: 800; color: #fff; background: #047857;
+  padding: 2px 5px; border-radius: 5px; line-height: 1; }
+.rt-rg ul { list-style: none; margin: 0; padding: 0; }
+.rt-rg li { font-size: 11px; line-height: 1.45; color: var(--text); padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+.rt-rg-sys { font-size: 9px; font-weight: 800; padding: 1.5px 6px; border-radius: 999px; color: #fff; flex: 0 0 auto; letter-spacing: .01em; }
+.rt-rg-sys.ols {background:var(--rt-ols)} .rt-rg-sys.evms {background:var(--rt-evms)}
+.rt-rg-sys.cbms {background:var(--rt-cbms)} .rt-rg-sys.elms {background:var(--rt-elms)}
+.rt-rg-f { font-size: 10.5px; font-weight: 700; color: #0A7050; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #BFE4D3; }
 /* Group-by toolbar + filter modes */
 .rt-toolbar { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 16px; }
 /* fixed-width label so the group-by trigger never resizes/jitters when the
@@ -1385,6 +1418,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <h3>Regression Testing Readiness Timeline</h3>
           <p>วันที่แต่ละระบบพร้อมให้เริ่ม Regression Testing ครอบคลุมทั้ง 4 ระบบ (ELMS, CBMS, EvMS, OLS) — แต่ละกล่องสีคือโมดูลที่พร้อมทดสอบในวันนั้น</p>
           <p style="margin-top:6px"><span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#1a8f4c;padding:2px 5px;border-radius:5px;vertical-align:middle">TC</span> SKL · TC Delivery = วันที่ นำส่ง Test Case ให้ HI เข้ามา regression <strong>ก่อนวัน regression 2 วันทำการ</strong> (ไม่นับเสาร์–อาทิตย์ และวันหยุดนักขัตฤกษ์ไทย) <strong>ภายใน 6 PM</strong></p>
+          <p style="margin-top:6px"><span style="display:inline-block;font-size:8.5px;font-weight:800;color:#fff;background:#047857;padding:2px 5px;border-radius:5px;vertical-align:middle">QA</span> SKL-QA · Regression = วันที่ทีม SKL-QA ลงมือ regression แต่ละระบบ — <strong>ELMS</strong> 15, 16, 17 ก.ค., <strong>CBMS</strong> 20, 21, 22, 23 ก.ค., <strong>EvMS</strong> 24, 27, 30, 31 ก.ค., <strong>OLS</strong> รอบ 1 · 24, 27, 30, 31 ก.ค. และ รอบ 2 · 3, 4, 5, 6 ส.ค.</p>
           <a class="rt-track" href="https://docs.google.com/spreadsheets/d/1-zfLYVYbZWeKyJYneGN1xB2VKQO9NFXGtXMZUu5l-YI/edit?usp=sharing" target="_blank" rel="noopener">
             <svg class="rt-track-ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
             <span class="rt-track-tx">
@@ -1419,6 +1453,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
               <li class="gb-item" role="option" data-value="evms">Activities of EvMS</li>
               <li class="gb-item" role="option" data-value="ols">Activities of OLS</li>
               <li class="gb-item" role="option" data-value="tc">SKL · TC Delivery</li>
+              <li class="gb-item" role="option" data-value="qareg">SKL-QA · Regression</li>
               <li class="gb-item" role="option" data-value="ready">Ready to test for HI-QA</li>
             </ul>
           </div>
@@ -1629,22 +1664,25 @@ const SYSTEMS = [
 ]
 const EPICS = [
   // OLS — Open Learning System (display order set manually per QA request)
-  { key: 'OLS-3',  name: 'Media Management',                   system: 'OLS' },
-  { key: 'OLS-4',  name: 'Course Management',                  system: 'OLS' },
-  { key: 'OLS-5',  name: 'Learning Path Management',           system: 'OLS' },
-  { key: 'OLS-6',  name: 'Media List and View',                system: 'OLS' },
-  { key: 'OLS-7',  name: 'Profile Page',                       system: 'OLS' },
-  { key: 'OLS-17', name: 'Content Management',                 system: 'OLS' },
-  { key: 'OLS-9',  name: 'User Moderation',                    system: 'OLS' },
-  { key: 'OLS-8',  name: 'Social Interaction',                 system: 'OLS' },
-  { key: 'OLS-12', name: 'Recommendation System',              system: 'OLS' },
-  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS' },
-  { key: 'OLS-1',  name: 'Authentication',                     system: 'OLS' },
-  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS' },
-  { key: 'OLS-10', name: 'Live Streaming',                     system: 'OLS' },
-  { key: 'OLS-13', name: 'Achievement/Badge System',           system: 'OLS' },
-  { key: 'OLS-14', name: 'Backoffice CMS',                     system: 'OLS' },
-  { key: 'OLS-15', name: 'Report/Stat/Dashboard',              system: 'OLS' },
+  // `lot` = SKL-QA regression window: Lot 1 = 24,27,30,31 Jul (ready to test 3 Aug),
+  //         Lot 2 = 3,4,5,6 Aug (ready to test 7 Aug). Mirrors the two OLS groups in
+  //         the Regression Testing Timeline calendar.
+  { key: 'OLS-3',  name: 'Media Management',                   system: 'OLS', lot: 1 },
+  { key: 'OLS-4',  name: 'Course Management',                  system: 'OLS', lot: 1 },
+  { key: 'OLS-5',  name: 'Learning Path Management',           system: 'OLS', lot: 1 },
+  { key: 'OLS-6',  name: 'Media List and View',                system: 'OLS', lot: 1 },
+  { key: 'OLS-7',  name: 'Profile Page',                       system: 'OLS', lot: 1 },
+  { key: 'OLS-17', name: 'Content Management',                 system: 'OLS', lot: 1 },
+  { key: 'OLS-9',  name: 'User Moderation',                    system: 'OLS', lot: 1 },
+  { key: 'OLS-8',  name: 'Social Interaction',                 system: 'OLS', lot: 1 },
+  { key: 'OLS-12', name: 'Recommendation System',              system: 'OLS', lot: 1 },
+  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS', lot: 2 },
+  { key: 'OLS-1',  name: 'Authentication',                     system: 'OLS', lot: 2 },
+  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS', lot: 2 },
+  { key: 'OLS-10', name: 'Live Streaming',                     system: 'OLS', lot: 2 },
+  { key: 'OLS-13', name: 'Achievement/Badge System',           system: 'OLS', lot: 2 },
+  { key: 'OLS-14', name: 'Backoffice CMS',                     system: 'OLS', lot: 2 },
+  { key: 'OLS-15', name: 'Report/Stat/Dashboard',              system: 'OLS', lot: 2 },
   // ELMS — Extended Learning Management System
   { key: 'MICA2-125', name: 'AI Integration',                  system: 'ELMS' },
   { key: 'MICA2-626', name: 'Google Docs',                     system: 'ELMS' },
@@ -1951,10 +1989,12 @@ function renderCard(epic, groups, total, groupOpt) {
         <div class="donut-wrap">${svg}<div class="donut-center"><span class="donut-total">${total}</span><span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
         <div class="legend">${legendHTML}</div>
        </div>`
+  const lotHTML = epic.lot ? `<span class="epic-lot lot${epic.lot}">Regression test Lot ${epic.lot}</span>` : ''
   card.innerHTML = `
     <div class="card-meta" style="align-items:center;flex-wrap:wrap;margin-bottom:10px;gap:8px">
       <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener">${epic.key}</a>
       <span class="epic-name" style="margin-bottom:0;flex:1;min-width:0">${epic.name}</span>
+      ${lotHTML}
     </div>
     ${body}`
 }
@@ -3205,6 +3245,7 @@ const RT_SKL_STATUS_META = [
   { key: 'READY TO TEST', color: '#E0A64E' },
   { key: 'REVIEWING',     color: '#B98BD4' },
   { key: 'PASSED',        color: '#4FB07A' },
+  { key: 'PASSED WITH MINOR ISSUES', color: '#8FD3AE' },
   { key: 'DONE',          color: '#3F9C63' },
   { key: 'FAILED',        color: '#D8483F' },
 ]
@@ -3362,9 +3403,21 @@ function buildRegressionTimeline() {
     const dd = backBiz(e.date, 2)
     ;(DELIV[dd] = DELIV[dd] || []).push({ sys: e.sys, color: e.color, reg: e.date })
   })
-  // mode: 'all' | 'elms' | 'cbms' | 'evms' | 'ols' | 'tc' | 'ready'
-  const showEv = (e, mode) => mode==='tc' ? false : (mode==='all' || mode==='ready') ? true : e.color===mode
-  const pickDlv = (list, mode) => mode==='ready' ? [] : (mode==='all' || mode==='tc') ? list : list.filter(x => x.color===mode)
+  // SKL-QA Regression testing windows per system. Each day a system runs regression
+  // gets its own card; `label` is the full window shown in the card footer.
+  const QAREG_SYS = [
+    { sys:'ELMS', color:'elms', dates:['2026-07-15','2026-07-16','2026-07-17'],              label:'15, 16, 17 ก.ค.' },
+    { sys:'CBMS', color:'cbms', dates:['2026-07-20','2026-07-21','2026-07-22','2026-07-23'], label:'20, 21, 22, 23 ก.ค.' },
+    { sys:'EvMS', color:'evms', dates:['2026-07-24','2026-07-27','2026-07-30','2026-07-31'], label:'24, 27, 30, 31 ก.ค.' },
+    { sys:'OLS',  color:'ols',  dates:['2026-07-24','2026-07-27','2026-07-30','2026-07-31'], label:'รอบที่ 1 · 24, 27, 30, 31 ก.ค.', round:1 },
+    { sys:'OLS',  color:'ols',  dates:['2026-08-03','2026-08-04','2026-08-05','2026-08-06'], label:'รอบที่ 2 · 3, 4, 5, 6 ส.ค.',      round:2 },
+  ]
+  const QAREG = {}
+  QAREG_SYS.forEach(s => s.dates.forEach(d => { (QAREG[d] = QAREG[d] || []).push(s) }))
+  // mode: 'all' | 'elms' | 'cbms' | 'evms' | 'ols' | 'tc' | 'ready' | 'qareg'
+  const showEv = (e, mode) => (mode==='tc' || mode==='qareg') ? false : (mode==='all' || mode==='ready') ? true : e.color===mode
+  const pickDlv = (list, mode) => (mode==='ready' || mode==='qareg') ? [] : (mode==='all' || mode==='tc') ? list : list.filter(x => x.color===mode)
+  const showRg = (mode, color) => mode==='all' || mode==='qareg' || mode===color
   function buildMonth(y,m,label,mode){
     const first = new Date(y,m,1).getDay(), dim = new Date(y,m+1,0).getDate()
     let cells = ''
@@ -3376,11 +3429,12 @@ function buildRegressionTimeline() {
       const key = iso(y,m,d)
       const evs = MS.filter(e=>e.date===key && showEv(e, mode))
       const dlv = pickDlv(DELIV[key] || [], mode)
+      const rgs = (QAREG[key] || []).filter(s => showRg(mode, s.color))
       const holi = HOLI_NAMES[key]
       const isToday = key === TODAY && !isWeekend
       // holiday alone doesn't count as "has" — a holiday-only day stays the short
       // (:not(.has)) height so weeks with only a public holiday collapse.
-      const has = (evs.length || dlv.length) ? 'has' : ''
+      const has = (evs.length || dlv.length || rgs.length) ? 'has' : ''
       const today = isToday ? 'today' : ''
       const todayTag = isToday ? '<span class="rt-today-tag">Today</span>' : ''
       const holiHTML = holi ? `<div class="rt-holi">${esc(holi)}</div>` : ''
@@ -3394,7 +3448,19 @@ function buildRegressionTimeline() {
         const items = dlv.map(x => `<li><span class="rt-tc-sys ${x.color}">${x.sys}</span> regression ${fmtShort(x.reg)}</li>`).join('')
         deliv = `<div class="rt-tc"><div class="rt-tc-h">SKL · TC Delivery</div><ul>${items}</ul><div class="rt-tc-f">ภายใน 6 PM</div></div>`
       }
-      cells += `<div class="rt-day ${we} ${has} ${today} ${holi?'holiday':''}"><span class="rt-n">${d}</span>${todayTag}${holiHTML}${blocks}${deliv}</div>`
+      const regHTML = rgs.map(s =>
+        `<div class="rt-rg"><div class="rt-rg-h">SKL-QA · Regression</div>`+
+        `<ul><li><span class="rt-rg-sys ${s.color}">${s.sys}</span> Regression${s.round ? ' #'+s.round : ''}</li></ul>`+
+        `<div class="rt-rg-f">${s.label}</div></div>`).join('')
+      // Stack the day's blocks by priority so the CUSTOMER's part (HI-QA "Ready to
+      // test") always sits at the very top of the cell, above SKL's own parts —
+      // prio 0 = customer (Ready to test for HI-QA), 1 = SKL · TC Delivery, 2 = SKL-QA · Regression.
+      const dayBody = [
+        { prio: 0, html: blocks },
+        { prio: 1, html: deliv },
+        { prio: 2, html: regHTML },
+      ].filter(b => b.html).sort((a, b) => a.prio - b.prio).map(b => b.html).join('')
+      cells += `<div class="rt-day ${we} ${has} ${today} ${holi?'holiday':''}"><span class="rt-n">${d}</span>${todayTag}${holiHTML}${dayBody}</div>`
     }
     const [mn,yr] = label.split(' ')
     return `<div class="rt-month"><div class="rt-mtop"><div class="rt-mhead">`+
