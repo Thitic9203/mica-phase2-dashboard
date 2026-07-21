@@ -1125,13 +1125,13 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-track-tt { font-size: 12.5px; font-weight: 800; color: var(--accent); letter-spacing: -.01em; }
 .rt-track-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
 /* top header: intro (left) + QA Owner (right) */
-.rt-head { display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; margin-bottom: 18px; }
+.rt-head { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 18px; }
 .rt-head .rt-intro { flex: 1 1 400px; margin-bottom: 0; }
-.rt-qa { flex: 1 1 500px; background: rgba(var(--accent-rgb),0.05); border: 1px solid rgba(var(--accent-rgb),0.15);
+.rt-qa { flex: 0 1 440px; background: rgba(var(--accent-rgb),0.05); border: 1px solid rgba(var(--accent-rgb),0.15);
   border-radius: 12px; padding: 12px 14px; }
 .rt-qa-title { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 10px; }
-.rt-qa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.rt-qa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .rt-qa-card { background: var(--card); border: 1px solid rgba(var(--accent-rgb),0.12); border-radius: 10px; padding: 9px 10px; min-width: 0; }
 .rt-qa-sys { font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 5px; }
 .rt-qa-card.elms .rt-qa-sys { color: var(--rt-elms); }
