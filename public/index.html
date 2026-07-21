@@ -1663,10 +1663,11 @@ const SYSTEMS = [
   { id: 'EvMS', name: 'Evaluation Management System (EvMS)' },
 ]
 const EPICS = [
-  // OLS — Open Learning System (display order set manually per QA request)
-  // `lot` = SKL-QA regression window: Lot 1 = 24,27,30,31 Jul (ready to test 3 Aug),
-  //         Lot 2 = 3,4,5,6 Aug (ready to test 7 Aug). Mirrors the two OLS groups in
-  //         the Regression Testing Timeline calendar.
+  // OLS — Open Learning System. Display order = Regression Lot 1 first, then Lot 2;
+  // within each lot ordered by the QA test-case-prep → testing timeline (Progress
+  // Tracker sheet). `lot` = SKL-QA regression window: Lot 1 = 24,27,30,31 Jul
+  // (ready to test 3 Aug), Lot 2 = 3,4,5,6 Aug (ready to test 7 Aug).
+  // --- Lot 1 (TC prep → test): W2→W4, W2→W6, W2→W6, W3→W7 ×4, W7 ×2 ---
   { key: 'OLS-3',  name: 'Media Management',                   system: 'OLS', lot: 1 },
   { key: 'OLS-4',  name: 'Course Management',                  system: 'OLS', lot: 1 },
   { key: 'OLS-5',  name: 'Learning Path Management',           system: 'OLS', lot: 1 },
@@ -1676,11 +1677,12 @@ const EPICS = [
   { key: 'OLS-9',  name: 'User Moderation',                    system: 'OLS', lot: 1 },
   { key: 'OLS-8',  name: 'Social Interaction',                 system: 'OLS', lot: 1 },
   { key: 'OLS-12', name: 'Recommendation System',              system: 'OLS', lot: 1 },
-  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS', lot: 2 },
+  // --- Lot 2 (TC prep → test): W5→W7, W8 ×3, W9 ×3 ---
   { key: 'OLS-1',  name: 'Authentication',                     system: 'OLS', lot: 2 },
-  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS', lot: 2 },
+  { key: 'OLS-11', name: 'Integration NDLP (Media)',           system: 'OLS', lot: 2 },
   { key: 'OLS-10', name: 'Live Streaming',                     system: 'OLS', lot: 2 },
   { key: 'OLS-13', name: 'Achievement/Badge System',           system: 'OLS', lot: 2 },
+  { key: 'OLS-2',  name: 'User Management',                    system: 'OLS', lot: 2 },
   { key: 'OLS-14', name: 'Backoffice CMS',                     system: 'OLS', lot: 2 },
   { key: 'OLS-15', name: 'Report/Stat/Dashboard',              system: 'OLS', lot: 2 },
   // ELMS — Extended Learning Management System
