@@ -1237,19 +1237,20 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rt-tc-sys.cbms {background:var(--rt-cbms)} .rt-tc-sys.elms {background:var(--rt-elms)}
 .rt-tc-f { font-size: 10.5px; font-weight: 700; color: #2F7D4E; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #C7E8D2; }
 /* SKL-QA Regression block — same shape as TC delivery, a cooler/deeper emerald tone */
-.rt-rg { margin-top: 9px; border: 1px solid #93D6BF; border-left: 3px solid #0B8A6B;
-  background: #CBEEDE; border-radius: 10px; padding: 8px 11px 9px; }
+/* Teal (the board's accent green) — a clearly different green from TC Delivery's leaf green */
+.rt-rg { margin-top: 9px; border: 1px solid #93D3C9; border-left: 3px solid #0F766E;
+  background: #BDE7DF; border-radius: 10px; padding: 8px 11px 9px; }
 .rt-ev + .rt-rg, .rt-rg + .rt-ev, .rt-rg + .rt-rg, .rt-tc + .rt-rg, .rt-rg + .rt-tc { margin-top: 8px; }
-.rt-rg-h { font-size: 11.5px; font-weight: 800; color: #05604A; letter-spacing: -.01em; line-height: 1;
-  padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px dashed #9CDAC5; display: flex; align-items: center; gap: 6px; }
-.rt-rg-h::before { content: "QA"; font-size: 8.5px; font-weight: 800; color: #fff; background: #0B8A6B;
+.rt-rg-h { font-size: 11.5px; font-weight: 800; color: #0A544C; letter-spacing: -.01em; line-height: 1;
+  padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px dashed #93D3C9; display: flex; align-items: center; gap: 6px; }
+.rt-rg-h::before { content: "QA"; font-size: 8.5px; font-weight: 800; color: #fff; background: #0F766E;
   padding: 2px 5px; border-radius: 5px; line-height: 1; }
 .rt-rg ul { list-style: none; margin: 0; padding: 0; }
 .rt-rg li { font-size: 11px; line-height: 1.45; color: var(--text); padding: 2px 0; display: flex; align-items: center; gap: 6px; }
 .rt-rg-sys { font-size: 9px; font-weight: 800; padding: 1.5px 6px; border-radius: 999px; color: #fff; flex: 0 0 auto; letter-spacing: .01em; }
 .rt-rg-sys.ols {background:var(--rt-ols)} .rt-rg-sys.evms {background:var(--rt-evms)}
 .rt-rg-sys.cbms {background:var(--rt-cbms)} .rt-rg-sys.elms {background:var(--rt-elms)}
-.rt-rg-f { font-size: 10.5px; font-weight: 700; color: #076B52; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #9CDAC5; }
+.rt-rg-f { font-size: 10.5px; font-weight: 700; color: #0F766E; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #93D3C9; }
 /* Group-by toolbar + filter modes */
 .rt-toolbar { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 16px; }
 /* fixed-width label so the group-by trigger never resizes/jitters when the
@@ -1432,8 +1433,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <div class="rt-qa-grid">
             <div class="rt-qa-card elms"><div class="rt-qa-sys">ELMS</div><ul><li>Pasit (Kim)</li><li>Papawarin (Maple)</li><li>Chayakorn (Korn)</li></ul></div>
             <div class="rt-qa-card cbms"><div class="rt-qa-sys">CBMS</div><ul><li>Pasit (Kim)</li><li>Duangsamon (Noon)</li><li>Chayakorn (Korn)</li></ul></div>
-            <div class="rt-qa-card evms"><div class="rt-qa-sys">EvMS</div><ul><li>Oran (Oran)</li><li>Nipit (Mark)</li><li>Makkawan (Moss)</li><li>Chalawadee (Nene)</li></ul></div>
-            <div class="rt-qa-card ols"><div class="rt-qa-sys">OLS</div><ul><li>Samorn (Mapraw)</li><li>Sujaree (Manoi)</li><li>Wasana (Preaw)</li></ul></div>
+            <div class="rt-qa-card evms"><div class="rt-qa-sys">EvMS</div><ul><li>Oran (Oran)</li><li>Makkawan (Moss)</li></ul></div>
+            <div class="rt-qa-card ols"><div class="rt-qa-sys">OLS</div><ul><li>Samorn (Mapraw)</li><li>Sujaree (Manoi)</li><li>Nipit (Mark)</li></ul></div>
           </div>
         </div>
       </div>
