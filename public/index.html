@@ -2538,8 +2538,9 @@ function initBlockedTable(containerId, issues, refetch) {
       container.querySelectorAll('.tt-dd-menu').forEach(m => {
         if (m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
       })
-      const pm = container.querySelector('.tt-pgsz-menu')
-      if (pm && pm.style.display !== 'none') pm.style.display = 'none'
+      container.querySelectorAll('.tt-pgsz-menu').forEach(pm => {
+        if (pm.style.display !== 'none') pm.style.display = 'none'
+      })
       bst.openMenus.clear()
     })
   }
@@ -2883,8 +2884,9 @@ function initMissingTable(containerId, issues, refetch) {
       container.querySelectorAll('.tt-dd-menu').forEach(m => {
         if (m.style.display !== 'none') { m.style.display='none'; m.previousElementSibling?.setAttribute('aria-expanded','false') }
       })
-      const pm = container.querySelector('.tt-pgsz-menu')
-      if (pm && pm.style.display !== 'none') pm.style.display = 'none'
+      container.querySelectorAll('.tt-pgsz-menu').forEach(pm => {
+        if (pm.style.display !== 'none') pm.style.display = 'none'
+      })
       mst.openMenus.clear()
     })
   }
