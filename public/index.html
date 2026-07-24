@@ -3653,8 +3653,10 @@ function renderEmptyEpicLists() {
       const card = document.getElementById('card-' + e.key)
       return card && card.dataset.empty === '1'
     })
-    const old = group.querySelector('.epic-empty-section')
-    if (old) old.remove()
+    // Scope to this section only: the no-epic section shares .epic-empty-section for
+    // styling, so an unscoped querySelector would delete that one instead and leave a
+    // stale copy of this section behind on every re-render.
+    group.querySelectorAll('.epic-empty-section:not(.epic-noepic-section)').forEach(n => n.remove())
     if (!emptyEpics.length) return
     const chips = emptyEpics.map(e =>
       `<a class="epic-empty-chip" href="${jiraJqlUrl(`parent = ${e.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener"><span class="chip-key">${e.key}</span><span class="chip-name">${esc(e.name)}</span></a>`
@@ -3681,8 +3683,7 @@ async function renderNoEpicLists() {
     const jql = build()
     let issues
     try { issues = await fetchIssues(jql, 'summary,issuetype') } catch { return }
-    const old = group.querySelector('.epic-noepic-section')
-    if (old) old.remove()
+    group.querySelectorAll('.epic-noepic-section').forEach(n => n.remove())
     if (!issues.length) return
     const chips = issues.map(iss =>
       `<a class="epic-empty-chip" href="${jiraJqlUrl(`key = ${iss.key}`)}" target="_blank" rel="noopener"><span class="chip-key">${esc(iss.key)}</span><span class="chip-name">${esc(iss.fields?.summary || '')}</span></a>`
