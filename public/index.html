@@ -3238,18 +3238,43 @@ function stampData(view) {
 //   https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pubhtml
 // Snapshot synced: 8 Jul 2026. `counts` = number of modules per SKL-QA status.
 // To update: change the counts below (add status keys as the sheet's statuses change).
+// One distinct hue per status — no two statuses may share a colour, or a bar with
+// e.g. NOT STARTED + TESTING reads as a single solid block. Hues follow the board
+// accents: neutral grey = not begun, blue = in flight, amber/purple = waiting,
+// maroon/red = bad, green = good.
 const RT_SKL_STATUS_META = [
-  { key: 'NOT STARTED',   color: '#9AA0A6' },
-  { key: 'TO DO',         color: '#B7BCC4' },
-  { key: 'IN PROGRESS',   color: '#4F97D6' },
-  { key: 'BLOCKED',       color: '#E0655F' },
-  { key: 'READY TO TEST', color: '#E0A64E' },
-  { key: 'REVIEWING',     color: '#B98BD4' },
-  { key: 'PASSED',        color: '#4FB07A' },
-  { key: 'PASSED WITH MINOR ISSUES', color: '#8FD3AE' },
-  { key: 'DONE',          color: '#3F9C63' },
-  { key: 'FAILED',        color: '#D8483F' },
+  { key: 'NOT STARTED',   color: '#9AA0A6' }, // grey
+  { key: 'TO DO',         color: '#C3C9D2' }, // light cool grey
+  { key: 'IN PROGRESS',   color: '#6FB0E8' }, // light blue
+  { key: 'TESTING',       color: '#2F6FBF' }, // blue
+  { key: 'RETESTING',     color: '#4457B5' }, // indigo
+  { key: 'READY TO TEST', color: '#E0A64E' }, // amber
+  { key: 'REVIEWING',     color: '#B98BD4' }, // purple
+  { key: 'BLOCKED',       color: '#8E3B52' }, // maroon — bad, but not the FAILED red
+  { key: 'FAILED',        color: '#D64036' }, // red
+  { key: 'PASSED',        color: '#4FB07A' }, // green
+  { key: 'PASSED WITH MINOR ISSUES', color: '#8FD3AE' }, // light green
+  { key: 'DONE',          color: '#2F8F57' }, // deep green
+  { key: 'CANCELLED',     color: '#A79E96' }, // warm grey
+  { key: 'N/A',           color: '#BDB6AE' }, // warm light grey
 ]
+// Sheet wording that means one of the statuses above (keys are already uppercased).
+const RT_SKL_STATUS_ALIAS = {
+  'IN-PROGRESS': 'IN PROGRESS', 'INPROGRESS': 'IN PROGRESS', 'DOING': 'IN PROGRESS',
+  'IN TESTING': 'TESTING', 'TEST': 'TESTING', 'TESTING IN PROGRESS': 'TESTING',
+  'RE-TESTING': 'RETESTING', 'RE TEST': 'RETESTING', 'RETEST': 'RETESTING',
+  'READY FOR TEST': 'READY TO TEST', 'READY': 'READY TO TEST',
+  'IN REVIEW': 'REVIEWING', 'REVIEW': 'REVIEWING',
+  'ON HOLD': 'BLOCKED', 'HOLD': 'BLOCKED',
+  'FAIL': 'FAILED', 'PASS': 'PASSED',
+  'PASSED WITH MINOR ISSUE': 'PASSED WITH MINOR ISSUES',
+  'PASSED WITH MINOR': 'PASSED WITH MINOR ISSUES',
+  'CANCELED': 'CANCELLED', 'SKIPPED': 'CANCELLED', 'NO NEED TO TEST': 'CANCELLED',
+  'NA': 'N/A', '-': 'N/A',
+}
+// Spare hues for statuses the sheet adds later — never grey, so a new status can
+// never be mistaken for NOT STARTED.
+const RT_SKL_STATUS_SPARE = ['#0F8B8D', '#C2703C', '#7A6FD1', '#B03A76', '#5C8A2E', '#1F6F8B']
 // `counts` below is the fallback snapshot (8 Jul 2026); live-refreshed from the sheet
 // on load via loadRegressionStatusLive(). `gid` = each system's "Summary" tab.
 const RT_SKL_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pub'
@@ -3266,8 +3291,22 @@ function buildRegressionStatus() {
   const host = document.getElementById('rt-legend')
   if (!host) return
   const order = RT_SKL_STATUS_META.map(m => m.key)
-  const rank = k => { const i = order.indexOf(k); return i < 0 ? 999 : i }
-  const colorOf = k => (RT_SKL_STATUS_META.find(m => m.key === k) || {}).color || '#9AA0A6'
+  // Sheet values vary in spacing/wording — fold them onto a canonical key first.
+  const norm = k => {
+    const s = String(k).toUpperCase().replace(/\s+/g, ' ').replace(/[.:]+$/, '').trim()
+    return RT_SKL_STATUS_ALIAS[s] || s
+  }
+  const rank = k => { const i = order.indexOf(norm(k)); return i < 0 ? 999 : i }
+  const colorOf = k => {
+    const s = norm(k)
+    const hit = RT_SKL_STATUS_META.find(m => m.key === s)
+    if (hit) return hit.color
+    // Unknown status: pick a stable spare hue from the string so it stays the same
+    // across renders and stays distinct from NOT STARTED grey.
+    let h = 0
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
+    return RT_SKL_STATUS_SPARE[h % RT_SKL_STATUS_SPARE.length]
+  }
   host.innerHTML = RT_SKL.map(sys => {
     const entries = Object.entries(sys.counts)
       .filter(([, n]) => n > 0)
