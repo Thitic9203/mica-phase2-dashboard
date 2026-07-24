@@ -3255,8 +3255,8 @@ const RT_SKL_STATUS_META = [
   { key: 'PASSED',        color: '#4FB07A' }, // green
   { key: 'PASSED WITH MINOR ISSUES', color: '#8FD3AE' }, // light green
   { key: 'DONE',          color: '#2F8F57' }, // deep green
-  { key: 'CANCELLED',     color: '#A79E96' }, // warm grey
-  { key: 'N/A',           color: '#BDB6AE' }, // warm light grey
+  { key: 'CANCELLED',     color: '#8A7B6E' }, // warm taupe — darker than NOT STARTED grey
+  { key: 'N/A',           color: '#C6BCB0' }, // warm light grey
 ]
 // Sheet wording that means one of the statuses above (keys are already uppercased).
 const RT_SKL_STATUS_ALIAS = {
@@ -3276,15 +3276,20 @@ const RT_SKL_STATUS_ALIAS = {
 // never be mistaken for NOT STARTED.
 const RT_SKL_STATUS_SPARE = ['#0F8B8D', '#C2703C', '#7A6FD1', '#B03A76', '#5C8A2E', '#1F6F8B']
 // `counts` below is the fallback snapshot (8 Jul 2026); live-refreshed from the sheet
-// on load via loadRegressionStatusLive(). `gid` = each system's "Summary" tab.
+// on load via loadRegressionStatusLive().
+//   tcGid = the system's "<SYS>: TC List" tab — one row per TEST CASE. This is the
+//           primary source: the bar's % is the share of TEST CASES per status.
+//   gid   = the system's "Summary" tab — one row per MODULE. Used only when the TC
+//           List has no rows yet (EvMS today), so the card still shows something.
 const RT_SKL_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pub'
 // color = system accent; tint/line = same fill/border the calendar uses for that
 // system's "Ready to test for HI-QA" cell (--rt-<sys>-t / --rt-<sys>-l).
+// `unit` = what `counts` is counting right now ('test case' once TC data loads).
 const RT_SKL = [
-  { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  counts: { 'NOT STARTED': 6 } },
-  { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', counts: { 'NOT STARTED': 11 } },
-  { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  counts: { 'NOT STARTED': 6 } },
-  { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', ready: '3 & 7 Aug 2026',   gid: '1115838130', counts: { 'NOT STARTED': 16 } },
+  { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  tcGid: '887562437',  unit: 'module', counts: { 'NOT STARTED': 6 } },
+  { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', tcGid: '152253607',  unit: 'module', counts: { 'NOT STARTED': 11 } },
+  { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  tcGid: '1384123613', unit: 'module', counts: { 'NOT STARTED': 6 } },
+  { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', ready: '3 & 7 Aug 2026',   gid: '1115838130', tcGid: '2084955184', unit: 'module', counts: { 'NOT STARTED': 16 } },
 ]
 
 function buildRegressionStatus() {
@@ -3330,7 +3335,7 @@ function buildRegressionStatus() {
       <div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>
       <div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(sys.ready)}</span></div>
       <div class="rsc-title">SKL Regression Testing Status</div>
-      <div class="rsc-total">${total} module${total !== 1 ? 's' : ''} total</div>
+      <div class="rsc-total">${total} ${esc(sys.unit || 'module')}${total !== 1 ? 's' : ''} total</div>
       <div class="rsc-bar">${segs}</div>
       <ul class="rsc-legend">${legend}</ul>
     </div>`
@@ -3377,11 +3382,46 @@ async function rtFetchSklCounts(gid) {
   return counts
 }
 
+// Live SKL-QA status counts from a system's "<SYS>: TC List" tab — one row per TEST
+// CASE, so the card's % is the share of test cases, not of modules.
+async function rtFetchSklTcCounts(gid) {
+  const url = `${RT_SKL_CSV_BASE}?gid=${gid}&single=true&output=csv`
+  const res = await fetch(url, { cache: 'no-store' })
+  if (!res.ok) throw new Error('HTTP ' + res.status)
+  const rows = rtParseCSV(await res.text())
+  if (!rows.length) throw new Error('empty sheet')
+  // Header layout: No. | Module | Test case name | ... | SKL-QA Test Status | ... | HI-QA Test Status
+  // First /^SKL-QA/ column is the SKL one; the HI-QA columns come after it.
+  const col = rows[0].findIndex(h => /^\s*SKL-QA/i.test(h))
+  if (col < 0) throw new Error('no SKL-QA column')
+  const counts = {}
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i]
+    if (!r) continue
+    // A real test case has a module OR a test case name. The tab is padded with
+    // hundreds of rows that carry only a running number (EvMS) — those are not
+    // test cases and must not be counted as NOT STARTED.
+    if (!(r[1] || '').trim() && !(r[2] || '').trim()) continue
+    const v = ((r[col] || '').trim() || 'NOT STARTED').toUpperCase()
+    counts[v] = (counts[v] || 0) + 1
+  }
+  if (!Object.keys(counts).length) throw new Error('no test case rows')
+  return counts
+}
+
 // Refresh every card from the sheet; each system falls back to its snapshot on failure.
 async function loadRegressionStatusLive() {
   let live = 0
   await Promise.all(RT_SKL.map(async sys => {
-    try { sys.counts = await rtFetchSklCounts(sys.gid); live++ }
+    // Test cases first — that's what the % is meant to measure. A system whose TC
+    // List is still empty falls back to module counts so its card isn't blank.
+    try {
+      sys.counts = await rtFetchSklTcCounts(sys.tcGid); sys.unit = 'test case'; live++
+      return
+    } catch (e) {
+      console.warn('SKL-QA TC List fetch failed for', sys.id, '-', e.message, '(falling back to module counts)')
+    }
+    try { sys.counts = await rtFetchSklCounts(sys.gid); sys.unit = 'module'; live++ }
     catch (e) { console.warn('SKL-QA live fetch failed for', sys.id, '-', e.message, '(using snapshot)') }
   }))
   buildRegressionStatus()
