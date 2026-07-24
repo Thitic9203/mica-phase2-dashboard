@@ -3334,7 +3334,7 @@ function buildRegressionStatus() {
     }).join('')
     const legend = entries.map(([k, n]) =>
       `<li><span class="dot" style="background:${colorOf(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
-    ).join('') || '<li class="rsc-empty">ยังไม่มี Test Case ในชีต</li>'
+    ).join('') || '<li class="rsc-empty">Awaiting test cases</li>'
     // 0 test cases: an empty flex bar would collapse to a bare grey strip that reads
     // as a status. Give it a hatched "awaiting data" fill instead.
     const bar = total ? segs : '<span class="rsc-seg rsc-seg-empty"></span>'
