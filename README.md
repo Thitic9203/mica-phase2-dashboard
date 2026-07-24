@@ -64,4 +64,4 @@ functions/__/auth/[[path]].js  Firebase auth proxy (pluton-dashboard)
 npx wrangler pages dev public   # needs JIRA_AUTH in env to proxy Jira
 ```
 
-See [PLAN.md](PLAN.md) for the full build plan and decisions.
+See [PLAN.md](PLAN.md) for the full build plan and decisions, and [POSTMORTEM.md](POSTMORTEM.md) for bugs that reached production and the rules taken from them.
