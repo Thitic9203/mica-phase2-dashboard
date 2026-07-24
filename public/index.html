@@ -1164,6 +1164,9 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rsc-legend li { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text); }
 .rsc-legend .dot { width: 11px; height: 11px; border-radius: 3px; flex: 0 0 auto; }
 .rsc-legend .n { color: var(--muted); font-weight: 600; }
+.rsc-legend .rsc-empty { color: var(--muted); font-weight: 600; }
+/* 0 test cases — hatched, so an empty bar never reads as a real status colour. */
+.rsc-seg-empty { width: 100%; background: repeating-linear-gradient(135deg, var(--elevated), var(--elevated) 6px, var(--border) 6px, var(--border) 12px); }
 @media (max-width: 900px) { .rt-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .rt-legend { grid-template-columns: minmax(0, 1fr); } }
 /* month */
@@ -3280,7 +3283,8 @@ const RT_SKL_STATUS_SPARE = ['#0F8B8D', '#C2703C', '#7A6FD1', '#B03A76', '#5C8A2
 //   tcGid = the system's "<SYS>: TC List" tab — one row per TEST CASE. This is the
 //           primary source: the bar's % is the share of TEST CASES per status.
 //   gid   = the system's "Summary" tab — one row per MODULE. Used only when the TC
-//           List has no rows yet (EvMS today), so the card still shows something.
+//           List cannot be fetched or parsed, so the card still shows something.
+//           An empty TC List is NOT that case — it means 0 test cases (EvMS today).
 const RT_SKL_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRzblcODwl8aKQA3GilfuXSIdiZtksaRVBHOCRQjt_psF0eovR2_CDUP9JaOKAJjHVHOtOaVlQP/pub'
 // color = system accent; tint/line = same fill/border the calendar uses for that
 // system's "Ready to test for HI-QA" cell (--rt-<sys>-t / --rt-<sys>-l).
@@ -3330,13 +3334,16 @@ function buildRegressionStatus() {
     }).join('')
     const legend = entries.map(([k, n]) =>
       `<li><span class="dot" style="background:${colorOf(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
-    ).join('') || '<li class="n">No data</li>'
+    ).join('') || '<li class="rsc-empty">ยังไม่มี Test Case ในชีต</li>'
+    // 0 test cases: an empty flex bar would collapse to a bare grey strip that reads
+    // as a status. Give it a hatched "awaiting data" fill instead.
+    const bar = total ? segs : '<span class="rsc-seg rsc-seg-empty"></span>'
     return `<div class="rsc-card" style="--rc:${sys.color};--rc-bg:${sys.tint};--rc-bd:${sys.line}">
       <div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>
       <div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(sys.ready)}</span></div>
       <div class="rsc-title">SKL Regression Testing Status</div>
       <div class="rsc-total">${total} ${esc(sys.unit || 'module')}${total !== 1 ? 's' : ''} total</div>
-      <div class="rsc-bar">${segs}</div>
+      <div class="rsc-bar">${bar}</div>
       <ul class="rsc-legend">${legend}</ul>
     </div>`
   }).join('')
@@ -3405,7 +3412,10 @@ async function rtFetchSklTcCounts(gid) {
     const v = ((r[col] || '').trim() || 'NOT STARTED').toUpperCase()
     counts[v] = (counts[v] || 0) + 1
   }
-  if (!Object.keys(counts).length) throw new Error('no test case rows')
+  // A tab that parsed fine but holds no test cases yet (EvMS today) is VALID live
+  // data — the system genuinely has 0 test cases. Returning {} instead of throwing
+  // keeps it on the test-case unit like every other system; only a real fetch or
+  // parse failure above falls back to module counts.
   return counts
 }
 
@@ -3413,8 +3423,9 @@ async function rtFetchSklTcCounts(gid) {
 async function loadRegressionStatusLive() {
   let live = 0
   await Promise.all(RT_SKL.map(async sys => {
-    // Test cases first — that's what the % is meant to measure. A system whose TC
-    // List is still empty falls back to module counts so its card isn't blank.
+    // Test cases are the unit for every system — that's what the % measures. An
+    // empty TC List is not a failure (it means 0 test cases so far), so only a
+    // fetch/parse error drops a card to module counts.
     try {
       sys.counts = await rtFetchSklTcCounts(sys.tcGid); sys.unit = 'test case'; live++
       return
