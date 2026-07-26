@@ -2120,6 +2120,23 @@ function armReveal(root, sel) {
   })
 }
 
+// Replay the entrance "วึ้บ" on chart cards that are already on-screen. The shared
+// IntersectionObserver only reacts when a card's visibility CHANGES, so a card that
+// never left the viewport (e.g. re-rendered in place after a group-by change) would
+// otherwise sit still. Play the visible ones now — staggered so many donuts never
+// rasterise together — and re-arm the rest so they still play when scrolled into view.
+function replayInView(cards) {
+  if (REDUCE_MOTION || typeof gsap === 'undefined') return
+  const vh = window.innerHeight || document.documentElement.clientHeight
+  let i = 0
+  cards.forEach(el => {
+    if (!el || el.style.display === 'none') return
+    const r = el.getBoundingClientRect()
+    if (r.bottom > 0 && r.top < vh) { revealCharts(el, i * 0.05); i++ } // in view → play now
+    else el.__revArmed = true                                          // off-screen → play on scroll-in
+  })
+}
+
 // ── Render epic cards ──
 function renderCard(epic, groups, total, groupOpt) {
   const card = document.getElementById('card-' + epic.key)
@@ -2596,6 +2613,7 @@ function initBlockedTable(containerId, issues, refetch) {
       qaOwners: owners, qaOwner: owners.join(', '),
       parentKey: pk, parentName: pn,
       parentDisplay: pk ? (pn ? `${pk} ${pn}` : pk) : '',
+      system: iss._system || '',
       remark: remarkValue(iss)
     }
   })
@@ -2605,7 +2623,7 @@ function initBlockedTable(containerId, issues, refetch) {
   const BFM = [
     { key: 'assignee',  label: 'Assignee',  map: r => [r.assignee] },
     { key: 'qaOwner',   label: 'QA Owner',  map: r => r.qaOwners },
-    { key: 'parentKey', label: 'Epic',      map: r => [r.parentKey] }
+    { key: 'system',    label: 'System',    map: r => [r.system] }
   ]
   const recomputeFilterVals = () => BFM.forEach(f => { f.vals = uniqFlat(f.map) })
   recomputeFilterVals()
@@ -2632,6 +2650,7 @@ function initBlockedTable(containerId, issues, refetch) {
       data = data.filter(r =>
         r.key.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q) ||
         r.assignee.toLowerCase().includes(q) || r.qaOwner.toLowerCase().includes(q) ||
+        r.system.toLowerCase().includes(q) ||
         r.parentDisplay.toLowerCase().includes(q) || r.remark.toLowerCase().includes(q)
       )
     }
@@ -2738,7 +2757,7 @@ function initBlockedTable(containerId, issues, refetch) {
     const filtersHTML = BFM.map(f => {
       const selVals = bst.filters[f.key]
       const hasActive = selVals.length > 0
-      const dispV = v => f.key==='parentKey' ? (dataRows.find(r=>r.parentKey===v)?.parentDisplay||v) : BUPPER.has(f.key) ? v.toUpperCase() : v
+      const dispV = v => BUPPER.has(f.key) ? v.toUpperCase() : v
       const curLabel = !hasActive ? `All ${f.label}` : selVals.length === 1 ? dispV(selVals[0]) : `${selVals.length} selected`
       const items = [
         `<div class="tt-dd-item${!hasActive?' tt-dd-sel':''}" data-fkey="${f.key}" data-val="">All ${f.label}</div>`,
@@ -3895,7 +3914,8 @@ function showApp() {
         item.classList.add('gb-item--selected')
         label.textContent = item.textContent
         hidden.value = val
-        hidden.dispatchEvent(new Event('change'))
+        hidden.dispatchEvent(new Event('change'))  // → reRenderAllEpics: re-renders every card in place
+        replayInView([...document.querySelectorAll('#epic-grid .epic-card')])  // "วึ้บ" so the change is visible
         close()
       })
     })
