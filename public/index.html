@@ -1975,23 +1975,28 @@ function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
 // prefers reduced motion, both helpers are no-ops and the dashboard is untouched.
 const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
-function countUp(el) {
+function countUp(el, delay = 0) {
   if (!el || REDUCE_MOTION || typeof gsap === 'undefined') return null
   const target = parseInt(el.textContent, 10)
   if (!Number.isFinite(target) || target <= 0) return null // 0 / non-numeric: leave as-is
   const o = { v: 0 }
-  return gsap.to(o, {
-    v: target, duration: 0.7, ease: 'power2.out', snap: { v: 1 },
+  const tl = gsap.timeline({ delay })
+  tl.to(o, {
+    v: target, duration: 0.85, ease: 'power2.out', snap: { v: 1 },
     onUpdate() { el.textContent = String(Math.round(o.v)) },
     onComplete() { el.textContent = String(target) }, // guarantee exact final value
   })
+  // "ดึ้ง" — springy pop the instant the number lands on its value.
+  tl.fromTo(el, { scale: 1 }, { scale: 1.18, duration: 0.16, ease: 'back.out(4)', transformOrigin: '50% 50%' }, '>-0.04')
+  tl.to(el, { scale: 1, duration: 0.32, ease: 'power3.out', clearProps: 'transform' })
+  return tl // progress(1) settles the count to exact + scale back to 1 + clearProps
 }
 
 // Donut wedge grows angularly from 0 to its true span (Apple Activity-ring feel).
 // The final path d is regenerated from the SAME geometry the static render used,
 // and onComplete restores the EXACT original d string, so the settled DOM is
 // byte-identical to no-animation.
-function sweepArc(path, i) {
+function sweepArc(path, delay) {
   if (typeof gsap === 'undefined') return null
   const a = (path.getAttribute('data-arc') || '').split(',').map(Number)
   if (a.length !== 6 || a.some(n => !Number.isFinite(n))) return null
@@ -2000,7 +2005,7 @@ function sweepArc(path, i) {
   const st = { p: 0 }
   path.setAttribute('d', arcPath(cx, cy, ro, ri, s, s)) // collapse now → no flash of the full wedge
   return gsap.to(st, {
-    p: 1, duration: 0.7, delay: 0.045 * i, ease: 'power3.out',
+    p: 1, duration: 0.85, delay: delay || 0, ease: 'power2.out',
     onUpdate() { path.setAttribute('d', arcPath(cx, cy, ro, ri, s, s + (e - s) * st.p)) },
     onComplete() { path.setAttribute('d', origD) }, // restore exact original geometry
   })
@@ -2008,66 +2013,90 @@ function sweepArc(path, i) {
 
 // Single-group full ring draws on via stroke-dashoffset; clearProps returns it to
 // the solid ring the static render draws.
-function drawRing(circle) {
+function drawRing(circle, delay) {
   if (typeof gsap === 'undefined') return null
   const r = parseFloat(circle.getAttribute('r'))
   if (!Number.isFinite(r)) return null
   const C = 2 * Math.PI * r
   return gsap.fromTo(circle,
     { strokeDasharray: C, strokeDashoffset: C },
-    { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out', clearProps: 'strokeDasharray,strokeDashoffset' })
+    { strokeDashoffset: 0, duration: 0.85, delay: delay || 0, ease: 'power2.out', clearProps: 'strokeDasharray,strokeDashoffset' })
 }
 
-function revealCharts(scope) {
+function revealCharts(scope, baseOffset = 0) {
   if (!scope || REDUCE_MOTION || typeof gsap === 'undefined') return
   const q = s => scope.querySelectorAll(s)
+  const b = baseOffset || 0     // extra lead-in (used to stagger cards on tab re-open)
   const tw = []                 // every tween created, for the failsafe below
   const add = t => { if (t) tw.push(t); return t }
-  // Donut SVGs: quick pop, then the wedges SWEEP to their value.
-  scope.querySelectorAll('.donut-wrap svg, .pt-donut-wrap svg').forEach(svg => {
-    add(gsap.from(svg, { duration: 0.4, scale: 0.9, transformOrigin: '50% 50%',
-      ease: 'back.out(2)', clearProps: 'transform' }))
-    // Multi-group: each coloured wedge grows angularly to its true span.
-    svg.querySelectorAll('path[data-arc]').forEach((path, i) => add(sweepArc(path, i)))
+  // Body wrapped in try/finally so the failsafe is ALWAYS scheduled — even if a tween
+  // creation throws after sweepArc collapsed a path — so a collapsed/hidden chart
+  // element can never be left stuck. (Body indentation kept flat, minimal diff.)
+  try {
+  // Donuts: stagger each SVG (dStep) so many cards never rasterise together — that
+  // concurrency was the stutter. No transform on the <svg> itself (scaling an SVG
+  // re-rasterises every path each frame); a cheap opacity fade carries the entrance.
+  const donuts = scope.querySelectorAll('.donut-wrap svg, .pt-donut-wrap svg')
+  const dStep = 0.09
+  donuts.forEach((svg, di) => {
+    const d0 = b + di * dStep
+    add(gsap.from(svg, { duration: 0.3, autoAlpha: 0, delay: d0, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+    // Multi-group wedges grow together to their value — smooth, no per-frame flood.
+    svg.querySelectorAll('path[data-arc]').forEach(path => add(sweepArc(path, d0)))
     // Single-group: the full ring draws on.
-    svg.querySelectorAll('circle[data-ring]').forEach(c => add(drawRing(c)))
+    svg.querySelectorAll('circle[data-ring]').forEach(c => add(drawRing(c, d0)))
     // Empty-state grey ring (no data-arc/ring): gentle fade so it doesn't pop blank.
     svg.querySelectorAll('circle:not([data-ring])').forEach(c => add(gsap.from(c, {
-      duration: 0.4, autoAlpha: 0, ease: 'power1.out', clearProps: 'opacity,visibility' })))
-    // Wedge % labels fade in once the arcs have mostly grown.
-    add(gsap.from(svg.querySelectorAll('text'), { duration: 0.35, autoAlpha: 0,
-      stagger: 0.04, delay: 0.42, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+      duration: 0.4, autoAlpha: 0, delay: d0, ease: 'power1.out', clearProps: 'opacity,visibility' })))
+    // Wedge % labels fade in once the arcs have grown.
+    add(gsap.from(svg.querySelectorAll('text'), { duration: 0.3, autoAlpha: 0,
+      stagger: 0.03, delay: d0 + 0.5, ease: 'power1.out', clearProps: 'opacity,visibility' }))
   })
-  // Donut centre overlay + count-up of the total (number climbs while arcs sweep).
-  add(gsap.from(q('.donut-center, .pt-donut-center'), { duration: 0.45, autoAlpha: 0,
-    delay: 0.1, ease: 'power1.out', clearProps: 'opacity,visibility' }))
-  q('.donut-total, .pt-donut-total').forEach(el => add(countUp(el)))
+  // Donut centre overlay + count-up with a "ดึ้ง" pop when the number lands.
+  add(gsap.from(q('.donut-center, .pt-donut-center'), { duration: 0.4, autoAlpha: 0,
+    delay: b + 0.1, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+  q('.donut-total, .pt-donut-total').forEach(el => add(countUp(el, b + 0.05)))
   // Legend rows rise + fade.
-  add(gsap.from(q('.legend-item, .pt-legend-item'), { duration: 0.45, autoAlpha: 0, y: 8,
-    stagger: 0.035, delay: 0.1, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }))
-  // Legend mini-bars fill from the left via scaleX (layout width is never touched).
-  add(gsap.from(q('.pt-legend-bar-fill'), { duration: 0.6, scaleX: 0, transformOrigin: 'left center',
-    stagger: 0.035, delay: 0.12, ease: 'power3.out', clearProps: 'transform' }))
-  // Segmented status bars fill from the left.
+  add(gsap.from(q('.legend-item, .pt-legend-item'), { duration: 0.5, autoAlpha: 0, y: 8,
+    stagger: 0.035, delay: b + 0.12, ease: 'power2.out', clearProps: 'transform,opacity,visibility' }))
+  // Legend mini-bars fill from the left, then "ดึ้ง" (overshoot clipped by the track).
+  add(gsap.from(q('.pt-legend-bar-fill'), { duration: 0.7, scaleX: 0, transformOrigin: 'left center',
+    stagger: 0.035, delay: b + 0.15, ease: 'back.out(1.8)', clearProps: 'transform' }))
+  // Segmented status bars fill smoothly (adjacent segments — no overshoot, avoids overlap).
   scope.querySelectorAll('.sbc-bar, .rsc-bar').forEach(bar => {
-    add(gsap.from(bar.children, { duration: 0.6, scaleX: 0, transformOrigin: 'left center',
-      stagger: 0.04, ease: 'power3.out', clearProps: 'transform' }))
+    add(gsap.from(bar.children, { duration: 0.7, scaleX: 0, transformOrigin: 'left center',
+      stagger: 0.05, delay: b, ease: 'power2.out', clearProps: 'transform' }))
   })
   // Cards fade-rise.
-  add(gsap.from(q('.pt-card, .rsc-card'), { duration: 0.5, autoAlpha: 0, y: 12,
-    stagger: 0.05, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }))
+  add(gsap.from(q('.pt-card, .rsc-card'), { duration: 0.55, autoAlpha: 0, y: 14,
+    stagger: 0.05, delay: b, ease: 'power2.out', clearProps: 'transform,opacity,visibility' }))
 
-  // ── Failsafe (Layer 5): guarantee the final visible state ──
-  // GSAP is driven by requestAnimationFrame, which a browser THROTTLES in a
-  // background/hidden tab — a chart mid-reveal would otherwise freeze at opacity:0.
-  // This native setTimeout (NOT gsap's rAF ticker) fires regardless, and
-  // progress(1) synchronously jumps any unfinished tween to its END state, which
-  // is the element's natural rendered state AND triggers its clearProps. Net
-  // result: after ~1.5s the charts are always fully visible with correct data,
-  // even if the animation engine never ran a single frame.
-  window.setTimeout(() => {
-    tw.forEach(t => { try { if (t && t.progress() < 1) t.progress(1) } catch (e) {} })
-  }, 1700)
+  } finally {
+    // ── Failsafe (Layer 5): guarantee the final visible state ──
+    // GSAP runs on requestAnimationFrame, which a browser THROTTLES in a hidden tab —
+    // a chart mid-reveal would otherwise freeze half-shown. This native setTimeout
+    // fires regardless, and progress(1) jumps any unfinished tween to its END state
+    // (natural rendered state + clearProps). Scheduled in `finally` so it runs even if
+    // the body threw after collapsing an arc. Delay covers the last staggered donut +
+    // any card lead-in, so a backgrounded tab still lands fully-rendered.
+    window.setTimeout(() => {
+      tw.forEach(t => { try { if (t && t.progress() < 1) t.progress(1) } catch (e) {} })
+    }, 2600)
+  }
+}
+
+// Replay the entrance on the Epic tab when it's re-opened (it renders once and is
+// only shown/hidden, unlike PT/Regression which refetch). Staggered per card so the
+// donuts cascade instead of all rasterising at once. No refetch — purely visual.
+function replayEpicAnimations() {
+  if (REDUCE_MOTION || typeof gsap === 'undefined') return
+  let i = 0
+  document.querySelectorAll('#view-epic-tc .epic-card').forEach(card => {
+    if (card.classList.contains('card-skeleton') || card.dataset.empty === '1') return
+    if (!card.querySelector('.donut-wrap svg, .pt-donut-wrap svg')) return
+    revealCharts(card, Math.min(i, 14) * 0.06)
+    i++
+  })
 }
 
 // ── Render epic cards ──
@@ -3729,6 +3758,9 @@ function switchView(viewId) {
   renderUpdatedLabel()
   if (viewId === 'progress-tracker') loadProgressTracker()
   if (viewId === 'regression-timeline') loadRegressionStatusLive()
+  // Epic tab renders once (only shown/hidden), so refetch won't re-trigger the
+  // entrance — replay it directly on the already-rendered cards instead.
+  if (viewId === 'epic-tc') replayEpicAnimations()
 }
 
 // ── App ──
