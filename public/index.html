@@ -2085,17 +2085,38 @@ function revealCharts(scope, baseOffset = 0) {
   }
 }
 
-// Replay the entrance on the Epic tab when it's re-opened (it renders once and is
-// only shown/hidden, unlike PT/Regression which refetch). Staggered per card so the
-// donuts cascade instead of all rasterising at once. No refetch — purely visual.
-function replayEpicAnimations() {
-  if (REDUCE_MOTION || typeof gsap === 'undefined') return
-  let i = 0
-  document.querySelectorAll('#view-epic-tc .epic-card').forEach(card => {
-    if (card.classList.contains('card-skeleton') || card.dataset.empty === '1') return
-    if (!card.querySelector('.donut-wrap svg, .pt-donut-wrap svg')) return
-    revealCharts(card, Math.min(i, 14) * 0.06)
-    i++
+// ── Scroll-reveal ──
+// Play the entrance when a card scrolls INTO view, and replay it every time the card
+// re-enters (scrolling down to it OR back up to it). One shared IntersectionObserver —
+// no plugin, no scroll listener. Because only on-screen cards ever animate at once it
+// also keeps the motion smooth (no 8-donuts-at-once rasterise storm).
+let __revealIO = null
+function chartRevealObserver() {
+  if (__revealIO) return __revealIO
+  if (typeof IntersectionObserver === 'undefined') return null
+  __revealIO = new IntersectionObserver(entries => {
+    entries.forEach(ent => {
+      const el = ent.target
+      if (ent.isIntersecting) {
+        if (el.__revArmed) { el.__revArmed = false; revealCharts(el) } // one play per entry
+      } else {
+        el.__revArmed = true                                           // left view → re-arm
+      }
+    })
+  }, { rootMargin: '0px 0px -22% 0px' }) // fire once the card has risen into the top ~78%
+  return __revealIO
+}
+// Observe each chart card so it reveals on scroll-in and replays on re-entry. `sel`
+// picks the card elements inside `root`; omit it to observe `root` itself. Falls back
+// to an immediate one-shot reveal where IntersectionObserver isn't available.
+function armReveal(root, sel) {
+  if (!root || REDUCE_MOTION || typeof gsap === 'undefined') return
+  const io = chartRevealObserver()
+  const els = sel ? [...root.querySelectorAll(sel)] : [root]
+  els.forEach(el => {
+    if (!io) { revealCharts(el); return }
+    el.__revArmed = true
+    io.observe(el)
   })
 }
 
@@ -2135,7 +2156,7 @@ function renderCard(epic, groups, total, groupOpt) {
       ${lotHTML}
     </div>
     ${body}`
-  revealCharts(card)
+  armReveal(card)
 }
 
 function renderError(epic, err) {
@@ -3326,7 +3347,7 @@ async function loadProgressTracker() {
     })
 
     el.innerHTML = `<div class="pt-grid">${cards}</div><div class="pt-blocked-wrap" id="pt-blocked-container"></div><div class="pt-blocked-wrap" id="pt-missing-container"></div>`
-    revealCharts(el)
+    armReveal(el, '.pt-card')
     // Manual refresh forces fresh data (bypasses the 30s edge cache); the initial
     // load above still uses the cache.
     initBlockedTable('pt-blocked-container', blockedIssues, () => ptFetchBlockedIssues({ fresh: true }))
@@ -3486,7 +3507,7 @@ function buildRegressionStatus() {
     </div>`
   }).join('')
   scheduleFitBarLabels()
-  revealCharts(host)
+  armReveal(host, '.rsc-card')
 }
 
 // Minimal RFC-4180 CSV parser (handles quoted fields, embedded commas/newlines).
@@ -3758,9 +3779,9 @@ function switchView(viewId) {
   renderUpdatedLabel()
   if (viewId === 'progress-tracker') loadProgressTracker()
   if (viewId === 'regression-timeline') loadRegressionStatusLive()
-  // Epic tab renders once (only shown/hidden), so refetch won't re-trigger the
-  // entrance — replay it directly on the already-rendered cards instead.
-  if (viewId === 'epic-tc') replayEpicAnimations()
+  // Epic tab isn't refetched on open, but its cards stay observed by the scroll-reveal
+  // observer — showing the panel makes them intersect again, replaying the entrance
+  // automatically. PT/Regression re-arm through their on-open refetch + re-render.
 }
 
 // ── App ──
