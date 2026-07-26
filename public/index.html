@@ -1516,6 +1516,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   </div>
 </div>
 
+<!-- GSAP core (vendored, same-origin) — powers Apple-style chart entrance animations. Free standard license. -->
+<script src="gsap.min.js" defer></script>
 <script type="module">
 const APP_VERSION = '2025.07.01a'
 ;(function cacheBust() {
@@ -1965,6 +1967,72 @@ function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
   return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">${paths}${labels}</svg>`
 }
 
+// ── Apple-style chart entrance animations (GSAP) ──
+// Purely additive. Every tween is a gsap.from() that settles the element back to
+// its natural rendered state, then clearProps wipes the inline styles the tween
+// added — so once animation finishes the DOM is byte-identical to the no-animation
+// render (same data, same layout, same colors). If GSAP fails to load or the user
+// prefers reduced motion, both helpers are no-ops and the dashboard is untouched.
+const REDUCE_MOTION = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
+function countUp(el) {
+  if (!el || REDUCE_MOTION || typeof gsap === 'undefined') return null
+  const target = parseInt(el.textContent, 10)
+  if (!Number.isFinite(target) || target <= 0) return null // 0 / non-numeric: leave as-is
+  const o = { v: 0 }
+  return gsap.to(o, {
+    v: target, duration: 0.7, ease: 'power2.out', snap: { v: 1 },
+    onUpdate() { el.textContent = String(Math.round(o.v)) },
+    onComplete() { el.textContent = String(target) }, // guarantee exact final value
+  })
+}
+
+function revealCharts(scope) {
+  if (!scope || REDUCE_MOTION || typeof gsap === 'undefined') return
+  const q = s => scope.querySelectorAll(s)
+  const tw = []                 // every tween created, for the failsafe below
+  const add = t => { if (t) tw.push(t); return t }
+  // Donut SVGs: springy pop + settle; arcs then labels build in sequence.
+  scope.querySelectorAll('.donut-wrap svg, .pt-donut-wrap svg').forEach(svg => {
+    add(gsap.from(svg, { duration: 0.6, scale: 0.6, rotation: -8, transformOrigin: '50% 50%',
+      ease: 'back.out(1.7)', clearProps: 'transform' }))
+    add(gsap.from(svg.querySelectorAll('path, circle'), { duration: 0.45, autoAlpha: 0,
+      stagger: 0.06, delay: 0.05, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+    add(gsap.from(svg.querySelectorAll('text'), { duration: 0.4, autoAlpha: 0,
+      stagger: 0.05, delay: 0.28, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+  })
+  // Donut centre overlay + count-up of the total.
+  add(gsap.from(q('.donut-center, .pt-donut-center'), { duration: 0.45, autoAlpha: 0,
+    delay: 0.15, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+  q('.donut-total, .pt-donut-total').forEach(el => add(countUp(el)))
+  // Legend rows rise + fade.
+  add(gsap.from(q('.legend-item, .pt-legend-item'), { duration: 0.45, autoAlpha: 0, y: 8,
+    stagger: 0.04, delay: 0.1, ease: 'power2.out', clearProps: 'transform,opacity,visibility' }))
+  // Legend mini-bars fill from the left via scaleX (layout width is never touched).
+  add(gsap.from(q('.pt-legend-bar-fill'), { duration: 0.55, scaleX: 0, transformOrigin: 'left center',
+    stagger: 0.04, delay: 0.15, ease: 'power2.out', clearProps: 'transform' }))
+  // Segmented status bars fill from the left.
+  scope.querySelectorAll('.sbc-bar, .rsc-bar').forEach(bar => {
+    add(gsap.from(bar.children, { duration: 0.55, scaleX: 0, transformOrigin: 'left center',
+      stagger: 0.04, ease: 'power2.out', clearProps: 'transform' }))
+  })
+  // Cards fade-rise.
+  add(gsap.from(q('.pt-card, .rsc-card'), { duration: 0.5, autoAlpha: 0, y: 12,
+    stagger: 0.05, ease: 'power2.out', clearProps: 'transform,opacity,visibility' }))
+
+  // ── Failsafe (Layer 5): guarantee the final visible state ──
+  // GSAP is driven by requestAnimationFrame, which a browser THROTTLES in a
+  // background/hidden tab — a chart mid-reveal would otherwise freeze at opacity:0.
+  // This native setTimeout (NOT gsap's rAF ticker) fires regardless, and
+  // progress(1) synchronously jumps any unfinished tween to its END state, which
+  // is the element's natural rendered state AND triggers its clearProps. Net
+  // result: after ~1.5s the charts are always fully visible with correct data,
+  // even if the animation engine never ran a single frame.
+  window.setTimeout(() => {
+    tw.forEach(t => { try { if (t && t.progress() < 1) t.progress(1) } catch (e) {} })
+  }, 1500)
+}
+
 // ── Render epic cards ──
 function renderCard(epic, groups, total, groupOpt) {
   const card = document.getElementById('card-' + epic.key)
@@ -2001,6 +2069,7 @@ function renderCard(epic, groups, total, groupOpt) {
       ${lotHTML}
     </div>
     ${body}`
+  revealCharts(card)
 }
 
 function renderError(epic, err) {
@@ -3191,6 +3260,7 @@ async function loadProgressTracker() {
     })
 
     el.innerHTML = `<div class="pt-grid">${cards}</div><div class="pt-blocked-wrap" id="pt-blocked-container"></div><div class="pt-blocked-wrap" id="pt-missing-container"></div>`
+    revealCharts(el)
     // Manual refresh forces fresh data (bypasses the 30s edge cache); the initial
     // load above still uses the cache.
     initBlockedTable('pt-blocked-container', blockedIssues, () => ptFetchBlockedIssues({ fresh: true }))
@@ -3350,6 +3420,7 @@ function buildRegressionStatus() {
     </div>`
   }).join('')
   scheduleFitBarLabels()
+  revealCharts(host)
 }
 
 // Minimal RFC-4180 CSV parser (handles quoted fields, embedded commas/newlines).
