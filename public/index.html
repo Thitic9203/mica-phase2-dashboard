@@ -1929,7 +1929,7 @@ function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
     const rm = (RO+RI)/2, sw = RO-RI
     const lbl_sz = Math.round(sz * 0.073)
     return `<svg viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="${CX}" cy="${CY}" r="${rm}" fill="none" stroke="${color}" stroke-width="${sw}"/>
+      <circle cx="${CX}" cy="${CY}" r="${rm}" fill="none" stroke="${color}" stroke-width="${sw}" data-ring="1"/>
       <text x="${CX}" y="${CY - rm}" text-anchor="middle" dominant-baseline="central"
         font-family="Inter,-apple-system,BlinkMacSystemFont,sans-serif"
         font-size="${lbl_sz}" font-weight="600" fill="rgba(255,255,255,0.95)">100%</text>
@@ -1955,7 +1955,7 @@ function buildDonut(groups, total, sz = 210, colorFn = statusColor) {
     if (span <= 0) { cur += adj; return }
     const s = cur + GAP / 2, e = s + span, mid = (s + e) / 2
     const color = colorFn(name)
-    paths += `<path d="${arcPath(CX, CY, RO, RI, s, e)}" fill="${color}"/>`
+    paths += `<path d="${arcPath(CX, CY, RO, RI, s, e)}" fill="${color}" data-arc="${CX},${CY},${RO},${RI},${s},${e}"/>`
     const lr = (RO + RI) / 2
     const lp = polar(CX, CY, lr, mid)
     labels += `<text x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}"
@@ -1987,38 +1987,75 @@ function countUp(el) {
   })
 }
 
+// Donut wedge grows angularly from 0 to its true span (Apple Activity-ring feel).
+// The final path d is regenerated from the SAME geometry the static render used,
+// and onComplete restores the EXACT original d string, so the settled DOM is
+// byte-identical to no-animation.
+function sweepArc(path, i) {
+  if (typeof gsap === 'undefined') return null
+  const a = (path.getAttribute('data-arc') || '').split(',').map(Number)
+  if (a.length !== 6 || a.some(n => !Number.isFinite(n))) return null
+  const [cx, cy, ro, ri, s, e] = a
+  const origD = path.getAttribute('d')
+  const st = { p: 0 }
+  path.setAttribute('d', arcPath(cx, cy, ro, ri, s, s)) // collapse now → no flash of the full wedge
+  return gsap.to(st, {
+    p: 1, duration: 0.7, delay: 0.045 * i, ease: 'power3.out',
+    onUpdate() { path.setAttribute('d', arcPath(cx, cy, ro, ri, s, s + (e - s) * st.p)) },
+    onComplete() { path.setAttribute('d', origD) }, // restore exact original geometry
+  })
+}
+
+// Single-group full ring draws on via stroke-dashoffset; clearProps returns it to
+// the solid ring the static render draws.
+function drawRing(circle) {
+  if (typeof gsap === 'undefined') return null
+  const r = parseFloat(circle.getAttribute('r'))
+  if (!Number.isFinite(r)) return null
+  const C = 2 * Math.PI * r
+  return gsap.fromTo(circle,
+    { strokeDasharray: C, strokeDashoffset: C },
+    { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out', clearProps: 'strokeDasharray,strokeDashoffset' })
+}
+
 function revealCharts(scope) {
   if (!scope || REDUCE_MOTION || typeof gsap === 'undefined') return
   const q = s => scope.querySelectorAll(s)
   const tw = []                 // every tween created, for the failsafe below
   const add = t => { if (t) tw.push(t); return t }
-  // Donut SVGs: springy pop + settle; arcs then labels build in sequence.
+  // Donut SVGs: quick pop, then the wedges SWEEP to their value.
   scope.querySelectorAll('.donut-wrap svg, .pt-donut-wrap svg').forEach(svg => {
-    add(gsap.from(svg, { duration: 0.6, scale: 0.6, rotation: -8, transformOrigin: '50% 50%',
-      ease: 'back.out(1.7)', clearProps: 'transform' }))
-    add(gsap.from(svg.querySelectorAll('path, circle'), { duration: 0.45, autoAlpha: 0,
-      stagger: 0.06, delay: 0.05, ease: 'power1.out', clearProps: 'opacity,visibility' }))
-    add(gsap.from(svg.querySelectorAll('text'), { duration: 0.4, autoAlpha: 0,
-      stagger: 0.05, delay: 0.28, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+    add(gsap.from(svg, { duration: 0.4, scale: 0.9, transformOrigin: '50% 50%',
+      ease: 'back.out(2)', clearProps: 'transform' }))
+    // Multi-group: each coloured wedge grows angularly to its true span.
+    svg.querySelectorAll('path[data-arc]').forEach((path, i) => add(sweepArc(path, i)))
+    // Single-group: the full ring draws on.
+    svg.querySelectorAll('circle[data-ring]').forEach(c => add(drawRing(c)))
+    // Empty-state grey ring (no data-arc/ring): gentle fade so it doesn't pop blank.
+    svg.querySelectorAll('circle:not([data-ring])').forEach(c => add(gsap.from(c, {
+      duration: 0.4, autoAlpha: 0, ease: 'power1.out', clearProps: 'opacity,visibility' })))
+    // Wedge % labels fade in once the arcs have mostly grown.
+    add(gsap.from(svg.querySelectorAll('text'), { duration: 0.35, autoAlpha: 0,
+      stagger: 0.04, delay: 0.42, ease: 'power1.out', clearProps: 'opacity,visibility' }))
   })
-  // Donut centre overlay + count-up of the total.
+  // Donut centre overlay + count-up of the total (number climbs while arcs sweep).
   add(gsap.from(q('.donut-center, .pt-donut-center'), { duration: 0.45, autoAlpha: 0,
-    delay: 0.15, ease: 'power1.out', clearProps: 'opacity,visibility' }))
+    delay: 0.1, ease: 'power1.out', clearProps: 'opacity,visibility' }))
   q('.donut-total, .pt-donut-total').forEach(el => add(countUp(el)))
   // Legend rows rise + fade.
   add(gsap.from(q('.legend-item, .pt-legend-item'), { duration: 0.45, autoAlpha: 0, y: 8,
-    stagger: 0.04, delay: 0.1, ease: 'power2.out', clearProps: 'transform,opacity,visibility' }))
+    stagger: 0.035, delay: 0.1, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }))
   // Legend mini-bars fill from the left via scaleX (layout width is never touched).
-  add(gsap.from(q('.pt-legend-bar-fill'), { duration: 0.55, scaleX: 0, transformOrigin: 'left center',
-    stagger: 0.04, delay: 0.15, ease: 'power2.out', clearProps: 'transform' }))
+  add(gsap.from(q('.pt-legend-bar-fill'), { duration: 0.6, scaleX: 0, transformOrigin: 'left center',
+    stagger: 0.035, delay: 0.12, ease: 'power3.out', clearProps: 'transform' }))
   // Segmented status bars fill from the left.
   scope.querySelectorAll('.sbc-bar, .rsc-bar').forEach(bar => {
-    add(gsap.from(bar.children, { duration: 0.55, scaleX: 0, transformOrigin: 'left center',
-      stagger: 0.04, ease: 'power2.out', clearProps: 'transform' }))
+    add(gsap.from(bar.children, { duration: 0.6, scaleX: 0, transformOrigin: 'left center',
+      stagger: 0.04, ease: 'power3.out', clearProps: 'transform' }))
   })
   // Cards fade-rise.
   add(gsap.from(q('.pt-card, .rsc-card'), { duration: 0.5, autoAlpha: 0, y: 12,
-    stagger: 0.05, ease: 'power2.out', clearProps: 'transform,opacity,visibility' }))
+    stagger: 0.05, ease: 'power3.out', clearProps: 'transform,opacity,visibility' }))
 
   // ── Failsafe (Layer 5): guarantee the final visible state ──
   // GSAP is driven by requestAnimationFrame, which a browser THROTTLES in a
@@ -2030,7 +2067,7 @@ function revealCharts(scope) {
   // even if the animation engine never ran a single frame.
   window.setTimeout(() => {
     tw.forEach(t => { try { if (t && t.progress() < 1) t.progress(1) } catch (e) {} })
-  }, 1500)
+  }, 1700)
 }
 
 // ── Render epic cards ──
