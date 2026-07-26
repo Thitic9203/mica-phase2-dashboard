@@ -2132,8 +2132,8 @@ function replayInView(cards) {
   cards.forEach(el => {
     if (!el || el.style.display === 'none') return
     const r = el.getBoundingClientRect()
-    if (r.bottom > 0 && r.top < vh) { revealCharts(el, i * 0.05); i++ } // in view → play now
-    else el.__revArmed = true                                          // off-screen → play on scroll-in
+    if (r.bottom > 0 && r.top < vh) { revealCharts(el, i * 0.05); el.__revArmed = false; i++ } // in view → play now (disarm so the observer won't re-pop it)
+    else el.__revArmed = true                                                                   // off-screen → play on scroll-in
   })
 }
 
@@ -2161,6 +2161,12 @@ function renderCard(epic, groups, total, groupOpt) {
     card.dataset.empty = '1'
     return
   }
+  // A re-render can flip a card empty→has-data (e.g. switching group-by away from a
+  // grouping like TC Status that filtered out all of this epic's tickets). Clear the
+  // empty state a prior render may have set, else the card stays display:none and also
+  // keeps showing in the "Epics Without Tickets" list.
+  card.style.display = ''
+  card.dataset.empty = ''
   const body = `<div class="card-body">
         <div class="donut-wrap">${svg}<div class="donut-center"><span class="donut-total">${total}</span><span class="donut-lbl">${total === 1 ? 'ticket' : 'tickets'}</span></div></div>
         <div class="legend">${legendHTML}</div>
@@ -2613,7 +2619,7 @@ function initBlockedTable(containerId, issues, refetch) {
       qaOwners: owners, qaOwner: owners.join(', '),
       parentKey: pk, parentName: pn,
       parentDisplay: pk ? (pn ? `${pk} ${pn}` : pk) : '',
-      system: iss._system || '',
+      system: (PT_SYSTEMS.find(s => s.name === iss._system)?.id) || iss._system || '',
       remark: remarkValue(iss)
     }
   })
