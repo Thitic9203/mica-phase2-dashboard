@@ -2162,6 +2162,16 @@ function issueTypeBreakdownLabel(issues) {
   return Object.entries(counts).filter(([, c]) => c > 0).map(([t, c]) => `${t} (${c})`).join(', ')
 }
 
+// Status tally for a set of issues, e.g. "To Do (2), In Progress (1)" — sorted by count desc.
+function statusBreakdownLabel(issues) {
+  const counts = {}
+  ;(issues || []).forEach(iss => {
+    const s = iss.fields?.status?.name || 'Unknown'
+    counts[s] = (counts[s] || 0) + 1
+  })
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([s, c]) => `${s} (${c})`).join(', ')
+}
+
 function renderCard(epic, groups, total, groupOpt) {
   const card = document.getElementById('card-' + epic.key)
   if (!card) return
@@ -2353,6 +2363,8 @@ function buildPtBugPriority(sys, issues) {
     const color = priorityColor(name)
     const clause = name === 'None' ? 'priority is EMPTY' : `priority = "${jqlEscape(name)}"`
     const href = jiraJqlUrl(`${bugJql} AND ${clause}`)
+    const breakdown = statusBreakdownLabel(bugs.filter(b => (b.fields?.priority?.name || 'None') === name))
+    const breakdownHTML = breakdown ? `<div class="pt-legend-type-breakdown">${esc(breakdown)}</div>` : ''
     return `<a class="pt-legend-item" href="${esc(href)}" target="_blank" rel="noopener" title="View ${esc(name)} priority bugs in Jira">
       <span class="pt-legend-dot" style="background:${color}"></span>
       <div class="pt-legend-info">
@@ -2362,6 +2374,7 @@ function buildPtBugPriority(sys, issues) {
           <span class="pt-legend-pct">${pct}%</span>
         </div>
         <div class="pt-legend-bar"><div class="pt-legend-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        ${breakdownHTML}
       </div>
     </a>`
   }).join('')
