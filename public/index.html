@@ -367,6 +367,11 @@ body {
 }
 .legend-link { color: inherit; text-decoration: none; cursor: pointer; }
 .legend-link:hover { text-decoration: underline; }
+.legend-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.legend-type-breakdown {
+  font-size: 9px; color: var(--muted); opacity: .7;
+  text-transform: none; letter-spacing: 0; font-weight: 400; white-space: normal;
+}
 
 
 
@@ -916,8 +921,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .donut-lbl { font-size: 6px; }
   .epic-name { font-size: 12px; margin-bottom: 6px; }
   .legend-name { font-size: 9.5px; }
-  
-  
+  .legend-type-breakdown { font-size: 8px; }
+
   .legend-dot { width: 6px; height: 6px; }
   .legend { gap: 4px; }
   /* Pie / donut (overview) */
@@ -1770,11 +1775,15 @@ function getActiveGroupOpt() {
 
 function groupByField(issues, groupOpt) {
   const counts = {}
+  const groupIssues = {}
   issues.forEach(iss => {
     const vals = groupOpt.extract(iss)
-    vals.forEach(v => { counts[v] = (counts[v] || 0) + 1 })
+    vals.forEach(v => {
+      counts[v] = (counts[v] || 0) + 1
+      ;(groupIssues[v] || (groupIssues[v] = [])).push(iss)
+    })
   })
-  return Object.entries(counts).sort((a, b) => b[1] - a[1])
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, count]) => [name, count, groupIssues[name]])
 }
 
 function reRenderAllEpics() {
@@ -2138,6 +2147,17 @@ function replayInView(cards) {
 }
 
 // ── Render epic cards ──
+// Story/Bug/Task tally for a legend group's issues, e.g. "Story (3), Bug (1)".
+// Omits a type entirely when its count is 0; returns '' when nothing to show.
+function issueTypeBreakdownLabel(issues) {
+  const counts = { Story: 0, Bug: 0, Task: 0 }
+  ;(issues || []).forEach(iss => {
+    const t = iss.fields?.issuetype?.name
+    if (t in counts) counts[t]++
+  })
+  return Object.entries(counts).filter(([, c]) => c > 0).map(([t, c]) => `${t} (${c})`).join(', ')
+}
+
 function renderCard(epic, groups, total, groupOpt) {
   const card = document.getElementById('card-' + epic.key)
   if (!card) return
@@ -2147,13 +2167,19 @@ function renderCard(epic, groups, total, groupOpt) {
   const hasData = total > 0
   const _groupOpt = groupOpt || GROUP_OPTIONS[0]
   const _dispFn = _groupOpt.displayFn || (x => x)
-  const legendHTML = groups.map(([name, count]) => {
+  const legendHTML = groups.map(([name, count, groupIssues]) => {
     const pct = total > 0 ? Math.round(count / total * 100) : 0
     const link = jiraJqlUrl(_groupOpt.jql(epic.key, name))
     const dispName = _dispFn(name)
+    // Issue-type breakdown is redundant when the groups themselves ARE issue types.
+    const breakdown = _groupOpt.key !== 'issueType' ? issueTypeBreakdownLabel(groupIssues) : ''
+    const breakdownHTML = breakdown ? `<div class="legend-type-breakdown">${esc(breakdown)}</div>` : ''
     return `<div class="legend-item">
       <span class="legend-dot" style="background:${statusColor(name)}"></span>
-      <a class="legend-name legend-link" href="${link}" target="_blank" rel="noopener noreferrer" title="${esc(dispName)}">${esc(dispName)} (${count})</a>
+      <div class="legend-info">
+        <a class="legend-name legend-link" href="${link}" target="_blank" rel="noopener noreferrer" title="${esc(dispName)}">${esc(dispName)} (${count})</a>
+        ${breakdownHTML}
+      </div>
     </div>`
   }).join('')
   if (!hasData) {
