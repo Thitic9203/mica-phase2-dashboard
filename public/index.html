@@ -3628,10 +3628,14 @@ async function rtFetchSklTcCounts(gid) {
   if (!res.ok) throw new Error('HTTP ' + res.status)
   const rows = rtParseCSV(await res.text())
   if (!rows.length) throw new Error('empty sheet')
-  // Header layout: No. | Module | Test case name | ... | SKL-QA Test Status | ... | HI-QA Test Status
-  // First /^SKL-QA/ column is the SKL one; the HI-QA columns come after it.
-  const col = rows[0].findIndex(h => /^\s*SKL-QA/i.test(h))
-  if (col < 0) throw new Error('no SKL-QA column')
+  // Header layout: No. | Module | ... | SKL-QA Recheck - compare result | SKL-QA Test Status | ... | HI-QA Test Status
+  // Pin to the "SKL-QA Test Status" header BY NAME: a newer "SKL-QA Recheck -
+  // compare result" column now sits before it, so the first /^SKL-QA/ match is the
+  // wrong (recheck) column. Match the header text, never a fixed A/B/C position.
+  const H = h => String(h).toUpperCase().replace(/\s+/g, ' ').trim()
+  let col = rows[0].findIndex(h => H(h) === 'SKL-QA TEST STATUS')
+  if (col < 0) col = rows[0].findIndex(h => /^SKL-QA\b/.test(H(h)) && H(h).endsWith('TEST STATUS'))
+  if (col < 0) throw new Error('no SKL-QA Test Status column')
   const counts = {}
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i]
