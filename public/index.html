@@ -3628,13 +3628,20 @@ async function rtFetchSklTcCounts(gid) {
   if (!res.ok) throw new Error('HTTP ' + res.status)
   const rows = rtParseCSV(await res.text())
   if (!rows.length) throw new Error('empty sheet')
-  // Header layout: No. | Module | ... | SKL-QA Recheck - compare result | SKL-QA Test Status | ... | HI-QA Test Status
-  // Pin to the "SKL-QA Test Status" header BY NAME: a newer "SKL-QA Recheck -
-  // compare result" column now sits before it, so the first /^SKL-QA/ match is the
-  // wrong (recheck) column. Match the header text, never a fixed A/B/C position.
+  // Locate the SKL-QA *Test Status* column. Two header shapes exist in the wild:
+  //   ELMS/CBMS/EvMS — the column is labeled "SKL-QA Test Status" (matched directly).
+  //   OLS            — a "SKL-QA Recheck - compare result" column was inserted and the
+  //                    status sub-header cell was left BLANK, so NO text match can find
+  //                    it (matching it once grabbed the recheck column: RECHECKED / WAIT
+  //                    FOR QA RECHECK — the wrong values).
+  // Both shapes are handled by anchoring to the always-present "SKL-QA QA Name" column:
+  // the Test Status column always sits immediately before it. Never a fixed A/B/C index.
   const H = h => String(h).toUpperCase().replace(/\s+/g, ' ').trim()
   let col = rows[0].findIndex(h => H(h) === 'SKL-QA TEST STATUS')
-  if (col < 0) col = rows[0].findIndex(h => /^SKL-QA\b/.test(H(h)) && H(h).endsWith('TEST STATUS'))
+  if (col < 0) {
+    const qaName = rows[0].findIndex(h => H(h) === 'SKL-QA QA NAME')
+    if (qaName > 0) col = qaName - 1               // status column is the one before QA Name
+  }
   if (col < 0) throw new Error('no SKL-QA Test Status column')
   const counts = {}
   for (let i = 1; i < rows.length; i++) {
