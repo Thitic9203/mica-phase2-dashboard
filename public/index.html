@@ -3531,12 +3531,12 @@ const RT_SKL = [
   { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  tcGid: '887562437',  unit: 'module', counts: { 'NOT STARTED': 6 } },
   { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', tcGid: '152253607',  unit: 'module', counts: { 'NOT STARTED': 11 } },
   { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  tcGid: '1384123613', unit: 'module', counts: { 'NOT STARTED': 6 } },
-  // OLS is split into two HI-QA lots shown stacked in the SAME card. Renaming the
-  // sheet tab to "OLS: TC List (Lot1)" does NOT change its gid, so Lot 1 keeps its
-  // live source. Lot 2's TC List is not built yet → `pending` shows "Update soon".
+  // OLS is split into two HI-QA lots shown stacked in the SAME card, each backed by
+  // its own "OLS: TC List (LotN)" tab (a tab rename does NOT change its gid). Both
+  // share the "OLS: Summary" tab (gid 1115838130) as the module-count fallback.
   { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', lots: [
     { label: 'Lot 1', ready: '3 Aug 2026', gid: '1115838130', tcGid: '2084955184', unit: 'module', counts: { 'NOT STARTED': 16 } },
-    { label: 'Lot 2', ready: '7 Aug 2026', pending: true },
+    { label: 'Lot 2', ready: '7 Aug 2026', gid: '1115838130', tcGid: '1568233273', unit: 'module', counts: { 'NOT STARTED': 16 } },
   ] },
 ]
 
