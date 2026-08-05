@@ -1730,6 +1730,13 @@ const EPICS = [
 
 // ── Epic group-by options ──
 const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints() OR statusCategory = Done)'
+// Per-epic Epic Breakdown refinement for OLS only — mirrors saved Jira filter 22196
+// ("[OLS] Regression Lot1+2 - 16 epics not Done"): drop tickets labelled `backlog`
+// and tickets parked in OLS Sprint 7 (id 6144, delivered after Regression 2). Done is
+// intentionally kept so each donut still shows its progress slice. Applied ONLY to OLS
+// epic cards — other systems (ELMS/CBMS/EvMS) and system-total scopes are untouched.
+const OLS_REGRESSION_EXCL = '(labels is EMPTY OR labels != backlog) AND (sprint is EMPTY OR sprint NOT IN (6144))'
+const epicScopeExtra = epic => epic && epic.system === 'OLS' ? ` AND ${OLS_REGRESSION_EXCL}` : ''
 const GROUP_OPTIONS = [
   {
     key: 'tcStatus', label: 'TC Status',
@@ -2190,7 +2197,7 @@ function renderCard(epic, groups, total, groupOpt) {
   const _dispFn = _groupOpt.displayFn || (x => x)
   const legendHTML = groups.map(([name, count, groupIssues]) => {
     const pct = total > 0 ? Math.round(count / total * 100) : 0
-    const link = jiraJqlUrl(_groupOpt.jql(epic.key, name))
+    const link = jiraJqlUrl(_groupOpt.jql(epic.key, name) + epicScopeExtra(epic))
     const dispName = _dispFn(name)
     // Issue-type breakdown is redundant when the groups themselves ARE issue types.
     const breakdown = _groupOpt.key !== 'issueType' ? issueTypeBreakdownLabel(groupIssues) : ''
@@ -2221,7 +2228,7 @@ function renderCard(epic, groups, total, groupOpt) {
   const lotHTML = epic.lot ? `<span class="epic-lot lot${epic.lot}">Regression test Lot ${epic.lot}</span>` : ''
   card.innerHTML = `
     <div class="card-meta" style="align-items:center;flex-wrap:wrap;margin-bottom:10px;gap:8px">
-      <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener">${epic.key}</a>
+      <a class="epic-key" href="${jiraJqlUrl(`parent = ${epic.key} AND ${EPIC_FILTER}${epicScopeExtra(epic)}`)}" target="_blank" rel="noopener">${epic.key}</a>
       <span class="epic-name" style="margin-bottom:0;flex:1;min-width:0">${epic.name}</span>
       ${lotHTML}
     </div>
@@ -3961,7 +3968,7 @@ function renderEmptyEpicLists() {
     group.querySelectorAll('.epic-empty-section:not(.epic-noepic-section)').forEach(n => n.remove())
     if (!emptyEpics.length) return
     const chips = emptyEpics.map(e =>
-      `<a class="epic-empty-chip" href="${jiraJqlUrl(`parent = ${e.key} AND ${EPIC_FILTER}`)}" target="_blank" rel="noopener"><span class="chip-key">${e.key}</span><span class="chip-name">${esc(e.name)}</span></a>`
+      `<a class="epic-empty-chip" href="${jiraJqlUrl(`parent = ${e.key} AND ${EPIC_FILTER}${epicScopeExtra(e)}`)}" target="_blank" rel="noopener"><span class="chip-key">${e.key}</span><span class="chip-name">${esc(e.name)}</span></a>`
     ).join('')
     const section = document.createElement('div')
     section.className = 'epic-empty-section'
@@ -3999,7 +4006,7 @@ async function renderNoEpicLists() {
 
 async function loadEpic(epic) {
   try {
-    const issues = await fetchIssues(`parent = ${epic.key} AND ${EPIC_FILTER}`, ALL_EPIC_FIELDS)
+    const issues = await fetchIssues(`parent = ${epic.key} AND ${EPIC_FILTER}${epicScopeExtra(epic)}`, ALL_EPIC_FIELDS)
     epicIssuesStore[epic.key] = issues
     const groupOpt = getActiveGroupOpt()
     const scoped = groupOpt.filterIssues ? groupOpt.filterIssues(issues) : issues
