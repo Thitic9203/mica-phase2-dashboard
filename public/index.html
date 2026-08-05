@@ -1176,6 +1176,13 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rsc-legend .rsc-empty { color: var(--muted); font-weight: 600; }
 /* 0 test cases — hatched, so an empty bar never reads as a real status colour. */
 .rsc-seg-empty { width: 100%; background: repeating-linear-gradient(135deg, var(--elevated), var(--elevated) 6px, var(--border) 6px, var(--border) 12px); }
+/* Per-lot sections stacked inside one system card (OLS: Lot 1 + Lot 2). */
+.rsc-lotblock { display: flex; flex-direction: column; }
+.rsc-lotblock--next { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--rc-bd, var(--border)); }
+.rsc-lot { margin-top: 12px; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--rc); }
+.rsc-lotblock--next .rsc-lot { margin-top: 0; }
+/* Lot whose test cases aren't ready yet. */
+.rsc-soon { margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--muted); font-style: italic; }
 @media (max-width: 900px) { .rt-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .rt-legend { grid-template-columns: minmax(0, 1fr); } }
 /* month */
@@ -3524,7 +3531,13 @@ const RT_SKL = [
   { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  tcGid: '887562437',  unit: 'module', counts: { 'NOT STARTED': 6 } },
   { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', tcGid: '152253607',  unit: 'module', counts: { 'NOT STARTED': 11 } },
   { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  tcGid: '1384123613', unit: 'module', counts: { 'NOT STARTED': 6 } },
-  { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', ready: '3 & 7 Aug 2026',   gid: '1115838130', tcGid: '2084955184', unit: 'module', counts: { 'NOT STARTED': 16 } },
+  // OLS is split into two HI-QA lots shown stacked in the SAME card. Renaming the
+  // sheet tab to "OLS: TC List (Lot1)" does NOT change its gid, so Lot 1 keeps its
+  // live source. Lot 2's TC List is not built yet → `pending` shows "Update soon".
+  { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', lots: [
+    { label: 'Lot 1', ready: '3 Aug 2026', gid: '1115838130', tcGid: '2084955184', unit: 'module', counts: { 'NOT STARTED': 16 } },
+    { label: 'Lot 2', ready: '7 Aug 2026', pending: true },
+  ] },
 ]
 
 function buildRegressionStatus() {
@@ -3547,8 +3560,17 @@ function buildRegressionStatus() {
     for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
     return RT_SKL_STATUS_SPARE[h % RT_SKL_STATUS_SPARE.length]
   }
-  host.innerHTML = RT_SKL.map(sys => {
-    const entries = Object.entries(sys.counts)
+  // Render the status body (optional lot heading + ready line + title + total +
+  // bar + legend) for ONE data object — a whole system, or one lot of a system.
+  // `d`: { ready, counts, unit, label?, pending? }
+  const statusBlock = d => {
+    const lotHead = d.label ? `<div class="rsc-lot">${esc(d.label)}</div>` : ''
+    const readyLine = `<div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(d.ready)}</span></div>`
+    // Lot with no TC List yet: placeholder instead of a bar.
+    if (d.pending) {
+      return `${lotHead}${readyLine}<div class="rsc-title">SKL Regression Testing Status</div><div class="rsc-soon">Update soon — กำลังจัดทำ test cases</div>`
+    }
+    const entries = Object.entries(d.counts || {})
       .filter(([, n]) => n > 0)
       .sort((a, b) => rank(a[0]) - rank(b[0]))
     const total = entries.reduce((a, [, n]) => a + n, 0)
@@ -3569,14 +3591,19 @@ function buildRegressionStatus() {
     // 0 test cases: an empty flex bar would collapse to a bare grey strip that reads
     // as a status. Give it a hatched "awaiting data" fill instead.
     const bar = total ? segs : '<span class="rsc-seg rsc-seg-empty"></span>'
-    return `<div class="rsc-card" style="--rc:${sys.color};--rc-bg:${sys.tint};--rc-bd:${sys.line}">
-      <div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>
-      <div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(sys.ready)}</span></div>
-      <div class="rsc-title">SKL Regression Testing Status</div>
-      <div class="rsc-total">${total} ${esc(sys.unit || 'module')}${total !== 1 ? 's' : ''} total</div>
-      <div class="rsc-bar">${bar}</div>
-      <ul class="rsc-legend">${legend}</ul>
-    </div>`
+    return `${lotHead}${readyLine}`+
+      `<div class="rsc-title">SKL Regression Testing Status</div>`+
+      `<div class="rsc-total">${total} ${esc(d.unit || 'module')}${total !== 1 ? 's' : ''} total</div>`+
+      `<div class="rsc-bar">${bar}</div>`+
+      `<ul class="rsc-legend">${legend}</ul>`
+  }
+  host.innerHTML = RT_SKL.map(sys => {
+    const head = `<div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>`
+    // A system with `lots` stacks each lot inside the SAME card (a divider between).
+    const body = sys.lots
+      ? sys.lots.map((lot, i) => `<div class="rsc-lotblock${i ? ' rsc-lotblock--next' : ''}">${statusBlock(lot)}</div>`).join('')
+      : statusBlock(sys)
+    return `<div class="rsc-card" style="--rc:${sys.color};--rc-bg:${sys.tint};--rc-bd:${sys.line}">${head}${body}</div>`
   }).join('')
   scheduleFitBarLabels()
   armReveal(host, '.rsc-card')
@@ -3665,18 +3692,25 @@ async function rtFetchSklTcCounts(gid) {
 // Refresh every card from the sheet; each system falls back to its snapshot on failure.
 async function loadRegressionStatusLive() {
   let live = 0
+  // Refresh one data object (a whole system OR a single lot). Test cases are the
+  // unit — that's what the % measures. An empty TC List is not a failure (0 test
+  // cases so far), so only a fetch/parse error drops it to module counts.
+  const refresh = async (d, tag) => {
+    try { d.counts = await rtFetchSklTcCounts(d.tcGid); d.unit = 'test case'; return true }
+    catch (e) { console.warn('SKL-QA TC List fetch failed for', tag, '-', e.message, '(falling back to module counts)') }
+    try { d.counts = await rtFetchSklCounts(d.gid); d.unit = 'module'; return true }
+    catch (e) { console.warn('SKL-QA live fetch failed for', tag, '-', e.message, '(using snapshot)') }
+    return false
+  }
   await Promise.all(RT_SKL.map(async sys => {
-    // Test cases are the unit for every system — that's what the % measures. An
-    // empty TC List is not a failure (it means 0 test cases so far), so only a
-    // fetch/parse error drops a card to module counts.
-    try {
-      sys.counts = await rtFetchSklTcCounts(sys.tcGid); sys.unit = 'test case'; live++
+    if (sys.lots) {
+      await Promise.all(sys.lots.map(async lot => {
+        if (lot.pending) return          // no TC List tab yet — keep the placeholder
+        if (await refresh(lot, `${sys.id} ${lot.label}`)) live++
+      }))
       return
-    } catch (e) {
-      console.warn('SKL-QA TC List fetch failed for', sys.id, '-', e.message, '(falling back to module counts)')
     }
-    try { sys.counts = await rtFetchSklCounts(sys.gid); sys.unit = 'module'; live++ }
-    catch (e) { console.warn('SKL-QA live fetch failed for', sys.id, '-', e.message, '(using snapshot)') }
+    if (await refresh(sys, sys.id)) live++
   }))
   buildRegressionStatus()
   // Snapshot-only renders leave the timestamp alone — it must not claim a fetch that failed.
