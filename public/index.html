@@ -2553,7 +2553,8 @@ function renderPtCard(sys, groups, total, issues) {
     const rawW = Math.max(count / total * 100, 18)
     const nw = rawW / totalW * 100
     const pct = Math.round(count / total * 100)
-    const lbl = pct >= 1 ? `<span class="sbc-seg-lbl">${pct}%</span>` : ''
+    const pctTxt = pct >= 1 ? `${pct}%` : (count > 0 ? '<1%' : '')
+    const lbl = pctTxt ? `<span class="sbc-seg-lbl">${pctTxt}</span>` : ''
     barSegs += `<div class="sbc-seg" style="width:${nw}%;background:${color}">${lbl}</div>`
   })
   const typeLegend = typeGroups.map(([name, count]) => {
