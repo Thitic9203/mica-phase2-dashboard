@@ -3748,10 +3748,22 @@ function buildRegressionTimeline() {
   ]
   const QAREG = {}
   QAREG_SYS.forEach(s => s.dates.forEach(d => { (QAREG[d] = QAREG[d] || []).push(s) }))
+  // OLS customer (HI-QA) regression deadlines — the date each lot's HI-QA
+  // regression must be finished by. Navy tone, same block shape as the
+  // "Ready to test for HI-QA" card (color 'ols').
+  const HIQA_REG = [
+    { date:'2026-08-07', lot:1, due:'7 Aug 6.30 PM' },
+    { date:'2026-08-11', lot:2, due:'11 Aug 6.30 PM' },
+  ]
+  const HIQAR = {}
+  HIQA_REG.forEach(s => { (HIQAR[s.date] = HIQAR[s.date] || []).push(s) })
   // mode: 'all' | 'elms' | 'cbms' | 'evms' | 'ols' | 'tc' | 'ready' | 'qareg'
   const showEv = (e, mode) => (mode==='tc' || mode==='qareg') ? false : (mode==='all' || mode==='ready') ? true : e.color===mode
   const pickDlv = (list, mode) => (mode==='ready' || mode==='qareg') ? [] : (mode==='all' || mode==='tc') ? list : list.filter(x => x.color===mode)
   const showRg = (mode, color) => mode==='all' || mode==='qareg' || mode===color
+  // HI-QA regression deadline is an OLS customer item — show under All, OLS,
+  // and the customer "Ready to test for HI-QA" filter.
+  const showHq = mode => mode==='all' || mode==='ols' || mode==='ready'
   function buildMonth(y,m,label,mode){
     const first = new Date(y,m,1).getDay(), dim = new Date(y,m+1,0).getDate()
     let cells = ''
@@ -3764,11 +3776,12 @@ function buildRegressionTimeline() {
       const evs = MS.filter(e=>e.date===key && showEv(e, mode))
       const dlv = pickDlv(DELIV[key] || [], mode)
       const rgs = (QAREG[key] || []).filter(s => showRg(mode, s.color))
+      const hqs = showHq(mode) ? (HIQAR[key] || []) : []
       const holi = HOLI_NAMES[key]
       const isToday = key === TODAY && !isWeekend
       // holiday alone doesn't count as "has" — a holiday-only day stays the short
       // (:not(.has)) height so weeks with only a public holiday collapse.
-      const has = (evs.length || dlv.length || rgs.length) ? 'has' : ''
+      const has = (evs.length || dlv.length || rgs.length || hqs.length) ? 'has' : ''
       const today = isToday ? 'today' : ''
       const todayTag = isToday ? '<span class="rt-today-tag">Today</span>' : ''
       const holiHTML = holi ? `<div class="rt-holi">${esc(holi)}</div>` : ''
@@ -3786,11 +3799,20 @@ function buildRegressionTimeline() {
         `<div class="rt-rg"><div class="rt-rg-h">SKL-QA · Regression</div>`+
         `<ul><li><span class="rt-rg-sys ${s.color}">${s.sys}</span> Regression${s.round ? ' #'+s.round : ''}</li></ul>`+
         `<div class="rt-rg-f">${s.label}</div></div>`).join('')
-      // Stack the day's blocks by priority so the CUSTOMER's part (HI-QA "Ready to
-      // test") always sits at the very top of the cell, above SKL's own parts —
-      // prio 0 = customer (Ready to test for HI-QA), 1 = SKL-QA · TC Delivery, 2 = SKL-QA · Regression.
+      // HI-QA (customer) regression deadline — navy, same block shape as the
+      // "Ready to test for HI-QA" card; message reworded to a lot deadline.
+      const hqHTML = hqs.map(s =>
+        `<div class="rt-ev ols"><div class="rt-ev-tag">HI-QA · Regression</div>`+
+        `<div class="rt-ev-sys">OLS</div>`+
+        `<ul><li>Lot ${s.lot} — วันสิ้นสุดการ Regression ของ HI-QA</li></ul>`+
+        `<div class="rt-ev-note"><b>กำหนด:</b> HI-QA เข้าทดสอบ Regression ให้แล้วเสร็จ ภายใน <b>${esc(s.due)}</b></div></div>`).join('')
+      // Stack the day's blocks by priority so the CUSTOMER's parts (HI-QA "Ready to
+      // test" and HI-QA regression deadline) always sit at the very top of the
+      // cell, above SKL's own parts — prio 0 = customer (Ready to test), 0 = HI-QA
+      // regression deadline (rendered just after), 1 = TC Delivery, 2 = Regression.
       const dayBody = [
         { prio: 0, html: blocks },
+        { prio: 0, html: hqHTML },
         { prio: 1, html: deliv },
         { prio: 2, html: regHTML },
       ].filter(b => b.html).sort((a, b) => a.prio - b.prio).map(b => b.html).join('')
