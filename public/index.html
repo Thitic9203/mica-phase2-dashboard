@@ -1376,8 +1376,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                   <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
                   <li><strong>Sprint:</strong>
                     <ul style="margin-top:2px">
-                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน Sprint active หรือ future และงานที่ทำเสร็จแล้ว (Done) ทุกใบ จึงนับงานที่เสร็จครบเสมอ ตัวเลขถูกต้องแม้อยู่ช่วงสลับ sprint</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ใน Backlog เท่านั้น คือยังไม่ Done และไม่ได้อยู่ใน Sprint active/future (ไม่ว่าจะยังไม่เคยกำหนด Sprint หรือ Sprint เดิมปิดไปแล้ว)</li>
+                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน Sprint active หรือ future และงานที่ทำเสร็จแล้ว (Done) ที่ยังผูกกับ sprint อยู่ (แม้ sprint นั้นจะปิดไปแล้ว) จึงนับงานที่เสร็จในสปรินต์ครบเสมอ</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน <strong>โซน Backlog ของบอร์ด</strong> คือไม่อยู่ใน Sprint ใดเลย (รวมถึงที่ Done แล้วแต่ถูกดันกลับ backlog) และ ticket ที่ติด label <code>backlog</code> — เพราะไม่แสดงบนบอร์ด Jira</li>
                     </ul>
                   </li>
                   <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น ป้องกัน double count เมื่อมีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขในลิงก์ Jira อาจสูงกว่า เพราะแสดงทุก ticket ที่ผู้นั้นเป็น QA owner ไม่ว่า primary หรือไม่)</span></li>
@@ -1500,8 +1500,8 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                   <li>นับเฉพาะ <strong>Story, Bug, Task</strong> ที่ผูกกับ Epic ของระบบนั้นๆ (ไม่รวม Sub-task, Epic ฯลฯ)</li>
                   <li><strong>Sprint:</strong>
                     <ul style="margin-top:2px">
-                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน Sprint active หรือ future และงานที่ทำเสร็จแล้ว (Done) ทุกใบ จึงนับงานที่เสร็จครบเสมอ ตัวเลขถูกต้องแม้อยู่ช่วงสลับ sprint</li>
-                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ใน Backlog เท่านั้น คือยังไม่ Done และไม่ได้อยู่ใน Sprint active/future (ไม่ว่าจะยังไม่เคยกำหนด Sprint หรือ Sprint เดิมปิดไปแล้ว)</li>
+                      <li><strong>นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน Sprint active หรือ future และงานที่ทำเสร็จแล้ว (Done) ที่ยังผูกกับ sprint อยู่ (แม้ sprint นั้นจะปิดไปแล้ว) จึงนับงานที่เสร็จในสปรินต์ครบเสมอ</li>
+                      <li><strong>ไม่นำมาคำนวณสถิติในแดชบอร์ด</strong> ticket ที่อยู่ใน <strong>โซน Backlog ของบอร์ด</strong> คือไม่อยู่ใน Sprint ใดเลย (รวมถึงที่ Done แล้วแต่ถูกดันกลับ backlog) และ ticket ที่ติด label <code>backlog</code> — เพราะไม่แสดงบนบอร์ด Jira</li>
                     </ul>
                   </li>
                   <li><strong>QA Owner:</strong> นับแต่ละ ticket ใต้ QA owner คนแรก (primary) เท่านั้น ป้องกัน double count เมื่อมีหลาย QA owner <span style="color:var(--muted)">(ตัวเลขในลิงก์ Jira อาจสูงกว่า เพราะแสดงทุก ticket ที่ผู้นั้นเป็น QA owner ไม่ว่า primary หรือไม่)</span></li>
@@ -1729,13 +1729,19 @@ const EPICS = [
 ]
 
 // ── Epic group-by options ──
-const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints() OR statusCategory = Done)'
-// Per-epic Epic Breakdown refinement for OLS only — mirrors saved Jira filter 22196
-// ("[OLS] Regression Lot1+2 - 16 epics not Done"): drop tickets labelled `backlog`
-// and tickets parked in OLS Sprint 7 (id 6144, delivered after Regression 2). Done is
-// intentionally kept so each donut still shows its progress slice. Applied ONLY to OLS
-// epic cards — other systems (ELMS/CBMS/EvMS) and system-total scopes are untouched.
-const OLS_REGRESSION_EXCL = '(labels is EMPTY OR labels != backlog) AND (sprint is EMPTY OR sprint NOT IN (6144))'
+// Base scope for every epic/system donut. A ticket counts only if it is ON THE BOARD —
+// i.e. in an active or future sprint — OR it is Done AND still tied to a sprint (so
+// completed work stays counted after its sprint closes). Two kinds of "backlog work" are
+// therefore excluded everywhere, matching what the Jira board itself shows:
+//   • tickets labelled `backlog`  → (labels is EMPTY OR labels != backlog)
+//   • tickets sitting in the board's Backlog zone = no sprint at all. Non-Done no-sprint
+//     tickets were already excluded; adding `AND sprint is not EMPTY` to the Done branch
+//     also drops Done tickets that were pushed back to the backlog (sprint cleared).
+const EPIC_FILTER = 'issuetype in (Story, Bug, Task) AND (sprint in openSprints() OR sprint in futureSprints() OR (statusCategory = Done AND sprint is not EMPTY)) AND (labels is EMPTY OR labels != backlog)'
+// Extra refinement applied ONLY to the OLS epic cards (regression scope): also drop
+// tickets parked in OLS Sprint 7 (id 6144, delivered after Regression 2). The `backlog`
+// exclusions above already live in EPIC_FILTER for every system, so this is Sprint 7 only.
+const OLS_REGRESSION_EXCL = '(sprint is EMPTY OR sprint NOT IN (6144))'
 const epicScopeExtra = epic => epic && epic.system === 'OLS' ? ` AND ${OLS_REGRESSION_EXCL}` : ''
 const GROUP_OPTIONS = [
   {
