@@ -1181,6 +1181,11 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .rsc-lotblock--next { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--rc-bd, var(--border)); }
 .rsc-lot { margin-top: 12px; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--rc); }
 .rsc-lotblock--next .rsc-lot { margin-top: 0; }
+/* Chrome / Edge sub-blocks stacked inside ONE HI-QA card. */
+.rsc-sub { display: flex; flex-direction: column; }
+.rsc-sub--next { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--rc-bd, var(--border)); }
+.rsc-browser { margin-top: 8px; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.rsc-sub--next .rsc-browser { margin-top: 0; }
 /* Lot whose test cases aren't ready yet. */
 .rsc-soon { margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--muted); font-style: italic; }
 @media (max-width: 900px) { .rt-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -1277,6 +1282,9 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
    per dropdown to its widest option. */
 .gb-trigger-label { display: inline-block; }
 .rt-toolbar .gb-trigger-label { min-width: 140px; } /* widest: "Ready to test for HI-QA" */
+/* Status-source dropdown, directly above the system cards. */
+.rt-toolbar--src { margin: 0 0 10px; }
+.rt-toolbar--src .gb-trigger-label { min-width: 208px; } /* widest: "HI-QA Test Status - Chrome" */
 #gb-dropdown .gb-trigger-label { min-width: 78px; }  /* widest: "Issue Type" */
 /* "Ready to test for HI-QA" tag above each system block */
 .rt-ev-tag { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: .01em;
@@ -1452,6 +1460,22 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <div class="rt-qa-grid">
             <div class="rt-qa-card elms"><div class="rt-qa-sys">ELMS, EvMS, CBMS</div><ul><li>Pasit (Kim)</li><li>Papawarin (Maple)</li><li>Chayakorn (Korn)</li><li>Duangsamon (Noon)</li><li>Oran (Oran)</li><li>Makkawan (Moss)</li></ul></div>
             <div class="rt-qa-card ols"><div class="rt-qa-sys">OLS</div><ul><li>Samorn (Mapraw)</li><li>Sujaree (Manoi)</li><li>Nipit (Mark)</li></ul></div>
+          </div>
+        </div>
+      </div>
+      <div class="rt-toolbar rt-toolbar--src">
+        <div class="groupby-wrap">
+          <span class="groupby-label">Group by</span>
+          <div class="gb-dropdown">
+            <button class="gb-trigger" id="rt-src-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="gb-trigger-label" id="rt-src-label">SKL-QA Test Status</span>
+              <svg class="gb-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <ul class="gb-menu" id="rt-src-menu" role="listbox">
+              <li class="gb-item gb-item--selected" role="option" data-value="skl">SKL-QA Test Status</li>
+              <li class="gb-item" role="option" data-value="chrome">HI-QA Test Status - Chrome</li>
+              <li class="gb-item" role="option" data-value="edge">HI-QA Test Status - Edge</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -3541,85 +3565,146 @@ const RT_SKL_CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzGMRz
 // system's "Ready to test for HI-QA" cell (--rt-<sys>-t / --rt-<sys>-l).
 // `unit` = what `counts` is counting right now ('test case' once TC data loads).
 const RT_SKL = [
-  { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  tcGid: '887562437',  unit: 'module', counts: { 'NOT STARTED': 6 } },
-  { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', tcGid: '152253607',  unit: 'module', counts: { 'NOT STARTED': 11 } },
-  { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  tcGid: '1384123613', unit: 'module', counts: { 'NOT STARTED': 6 } },
+  { id: 'ELMS', color: '#6a4bce', tint: '#efedfb', line: '#ddd4f4', ready: '22 Jul 2026',      gid: '533644237',  tcGid: '887562437',  unit: 'module', counts: { 'NOT STARTED': 6 },  hiUnit: 'module', hi: { chrome: { 'NOT STARTED': 6 },  edge: { 'NOT STARTED': 6 } } },
+  { id: 'CBMS', color: '#b06a12', tint: '#f8f1e4', line: '#ecdfc7', ready: '27 & 30 Jul 2026', gid: '2040053581', tcGid: '152253607',  unit: 'module', counts: { 'NOT STARTED': 11 }, hiUnit: 'module', hi: { chrome: { 'NOT STARTED': 11 }, edge: { 'NOT STARTED': 11 } } },
+  { id: 'EvMS', color: '#12857a', tint: '#e9f5f3', line: '#cbe6e1', ready: '3 Aug 2026',       gid: '550278191',  tcGid: '1384123613', unit: 'module', counts: { 'NOT STARTED': 6 },  hiUnit: 'module', hi: { chrome: { 'NOT STARTED': 6 },  edge: { 'NOT STARTED': 6 } } },
   // OLS is split into two HI-QA lots shown stacked in the SAME card, each backed by
   // its own "OLS: TC List (LotN)" tab (a tab rename does NOT change its gid). Both
   // share the "OLS: Summary" tab (gid 1115838130) as the module-count fallback.
   { id: 'OLS',  color: '#2b4b80', tint: '#eef1f8', line: '#d5dded', lots: [
-    { label: 'Lot 1', ready: '3 Aug 2026', gid: '1115838130', tcGid: '2084955184', unit: 'module', counts: { 'NOT STARTED': 16 } },
-    { label: 'Lot 2', ready: '7 Aug 2026', gid: '1115838130', tcGid: '1568233273', unit: 'module', counts: { 'NOT STARTED': 16 } },
+    { label: 'Lot 1', ready: '3 Aug 2026', gid: '1115838130', tcGid: '2084955184', unit: 'module', counts: { 'NOT STARTED': 16 }, hiUnit: 'module', hi: { chrome: { 'NOT STARTED': 16 }, edge: { 'NOT STARTED': 16 } } },
+    { label: 'Lot 2', ready: '7 Aug 2026', gid: '1115838130', tcGid: '1568233273', unit: 'module', counts: { 'NOT STARTED': 16 }, hiUnit: 'module', hi: { chrome: { 'NOT STARTED': 16 }, edge: { 'NOT STARTED': 16 } } },
   ] },
 ]
 
-function buildRegressionStatus() {
-  const host = document.getElementById('rt-legend')
-  if (!host) return
-  const order = RT_SKL_STATUS_META.map(m => m.key)
-  // Sheet values vary in spacing/wording — fold them onto a canonical key first.
-  const norm = k => {
-    const s = String(k).toUpperCase().replace(/\s+/g, ' ').replace(/[.:]+$/, '').trim()
-    return RT_SKL_STATUS_ALIAS[s] || s
-  }
-  const rank = k => { const i = order.indexOf(norm(k)); return i < 0 ? 999 : i }
-  const colorOf = k => {
-    const s = norm(k)
-    const hit = RT_SKL_STATUS_META.find(m => m.key === s)
-    if (hit) return hit.color
-    // Unknown status: pick a stable spare hue from the string so it stays the same
-    // across renders and stays distinct from NOT STARTED grey.
-    let h = 0
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
-    return RT_SKL_STATUS_SPARE[h % RT_SKL_STATUS_SPARE.length]
-  }
-  // Render the status body (optional lot heading + ready line + title + total +
-  // bar + legend) for ONE data object — a whole system, or one lot of a system.
-  // `d`: { ready, counts, unit, label?, pending? }
-  const statusBlock = d => {
-    const lotHead = d.label ? `<div class="rsc-lot">${esc(d.label)}</div>` : ''
-    const readyLine = `<div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(d.ready)}</span></div>`
-    // Lot with no TC List yet: placeholder instead of a bar.
-    if (d.pending) {
-      return `${lotHead}${readyLine}<div class="rsc-title">SKL Regression Testing Status</div><div class="rsc-soon">Update soon — กำลังจัดทำ test cases</div>`
-    }
-    const entries = Object.entries(d.counts || {})
-      .filter(([, n]) => n > 0)
-      .sort((a, b) => rank(a[0]) - rank(b[0]))
-    const total = entries.reduce((a, [, n]) => a + n, 0)
-    // Match the bar in other tabs (.sbc-bar): each segment gets a minimum visual
-    // width so it stays visible, widths are normalised to sum 100%, but the % LABEL
-    // is always the true share (count/total) — never the boosted width.
-    const totalW = entries.reduce((s, [, n]) => s + Math.max(total ? n / total * 100 : 0, 18), 0)
-    const segs = entries.map(([k, n]) => {
-      const pct = total ? Math.round(n / total * 100) : 0
-      const rawW = Math.max(total ? n / total * 100 : 0, 18)
-      const nw = totalW ? rawW / totalW * 100 : 0
-      const lbl = pct >= 1 ? `<span class="rsc-seg-lbl">${pct}%</span>` : ''
-      return `<span class="rsc-seg" style="width:${nw}%;background:${colorOf(k)}" title="${esc(k)} — ${n} (${pct}%)">${lbl}</span>`
-    }).join('')
-    const legend = entries.map(([k, n]) =>
-      `<li><span class="dot" style="background:${colorOf(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
-    ).join('') || '<li class="rsc-empty">Awaiting test cases from QA</li>'
-    // 0 test cases: an empty flex bar would collapse to a bare grey strip that reads
-    // as a status. Give it a hatched "awaiting data" fill instead.
-    const bar = total ? segs : '<span class="rsc-seg rsc-seg-empty"></span>'
-    return `${lotHead}${readyLine}`+
-      `<div class="rsc-title">SKL Regression Testing Status</div>`+
-      `<div class="rsc-total">${total} ${esc(d.unit || 'module')}${total !== 1 ? 's' : ''} total</div>`+
-      `<div class="rsc-bar">${bar}</div>`+
-      `<ul class="rsc-legend">${legend}</ul>`
-  }
+// Status helpers shared by the SKL-QA cards and the HI-QA (Chrome/Edge) cards below.
+// Sheet values vary in spacing/wording — fold them onto a canonical key first.
+function rtNormStatus(k) {
+  const s = String(k).toUpperCase().replace(/\s+/g, ' ').replace(/[.:]+$/, '').trim()
+  return RT_SKL_STATUS_ALIAS[s] || s
+}
+function rtRankStatus(k) {
+  const i = RT_SKL_STATUS_META.findIndex(m => m.key === rtNormStatus(k))
+  return i < 0 ? 999 : i
+}
+function rtColorOfStatus(k) {
+  const s = rtNormStatus(k)
+  const hit = RT_SKL_STATUS_META.find(m => m.key === s)
+  if (hit) return hit.color
+  // Unknown status: pick a stable spare hue from the string so it stays the same
+  // across renders and stays distinct from NOT STARTED grey.
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
+  return RT_SKL_STATUS_SPARE[h % RT_SKL_STATUS_SPARE.length]
+}
+// total line + bar + legend for one counts map. Used by both card rows.
+function rtStatusBody(counts, unit) {
+  const entries = Object.entries(counts || {})
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => rtRankStatus(a[0]) - rtRankStatus(b[0]))
+  const total = entries.reduce((a, [, n]) => a + n, 0)
+  // Match the bar in other tabs (.sbc-bar): each segment gets a minimum visual
+  // width so it stays visible, widths are normalised to sum 100%, but the % LABEL
+  // is always the true share (count/total) — never the boosted width.
+  const totalW = entries.reduce((s, [, n]) => s + Math.max(total ? n / total * 100 : 0, 18), 0)
+  const segs = entries.map(([k, n]) => {
+    const pct = total ? Math.round(n / total * 100) : 0
+    const rawW = Math.max(total ? n / total * 100 : 0, 18)
+    const nw = totalW ? rawW / totalW * 100 : 0
+    const lbl = pct >= 1 ? `<span class="rsc-seg-lbl">${pct}%</span>` : ''
+    return `<span class="rsc-seg" style="width:${nw}%;background:${rtColorOfStatus(k)}" title="${esc(k)} — ${n} (${pct}%)">${lbl}</span>`
+  }).join('')
+  const legend = entries.map(([k, n]) =>
+    `<li><span class="dot" style="background:${rtColorOfStatus(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
+  ).join('') || '<li class="rsc-empty">Awaiting test cases from QA</li>'
+  // 0 test cases: an empty flex bar would collapse to a bare grey strip that reads
+  // as a status. Give it a hatched "awaiting data" fill instead.
+  const bar = total ? segs : '<span class="rsc-seg rsc-seg-empty"></span>'
+  return `<div class="rsc-total">${total} ${esc(unit || 'module')}${total !== 1 ? 's' : ''} total</div>`+
+    `<div class="rsc-bar">${bar}</div>`+
+    `<ul class="rsc-legend">${legend}</ul>`
+}
+// Lot heading + "Ready to test for HI-QA" line — identical on both card rows.
+function rtCardHead(d) {
+  const lotHead = d.label ? `<div class="rsc-lot">${esc(d.label)}</div>` : ''
+  return `${lotHead}<div class="rsc-ready"><span class="rsc-ready-lbl">Ready to test for HI-QA</span><span class="rsc-ready-date">${esc(d.ready)}</span></div>`
+}
+// One card per system; `render(d)` draws the body for a whole system or a single lot.
+function rtRenderCards(host, render) {
   host.innerHTML = RT_SKL.map(sys => {
     const head = `<div class="rsc-head"><span class="rsc-dot"></span><span class="rsc-sys">${esc(sys.id)}</span></div>`
     // A system with `lots` stacks each lot inside the SAME card (a divider between).
     const body = sys.lots
-      ? sys.lots.map((lot, i) => `<div class="rsc-lotblock${i ? ' rsc-lotblock--next' : ''}">${statusBlock(lot)}</div>`).join('')
-      : statusBlock(sys)
+      ? sys.lots.map((lot, i) => `<div class="rsc-lotblock${i ? ' rsc-lotblock--next' : ''}">${render(lot)}</div>`).join('')
+      : render(sys)
     return `<div class="rsc-card" style="--rc:${sys.color};--rc-bg:${sys.tint};--rc-bd:${sys.line}">${head}${body}</div>`
   }).join('')
   scheduleFitBarLabels()
   armReveal(host, '.rsc-card')
+}
+
+// The three status columns the cards can show — picked with the "Group by"
+// dropdown above them. `skl` reads d.counts (the SKL-QA Test Status column);
+// the two browsers read d.hi.<key> ("HI-QA Test Status - Chrome" / "- Edge").
+const RT_STATUS_SRC = [
+  { key: 'skl',    label: 'SKL-QA Test Status',         title: 'SKL Regression Testing Status' },
+  { key: 'chrome', label: 'HI-QA Test Status - Chrome', title: 'HI-QA Regression Testing Status · Chrome', browser: 'Chrome' },
+  { key: 'edge',   label: 'HI-QA Test Status - Edge',   title: 'HI-QA Regression Testing Status · Edge',   browser: 'Edge' },
+]
+const RT_HI_BROWSERS = RT_STATUS_SRC.filter(s => s.browser)
+let _rtStatusSrc = RT_STATUS_SRC[0]
+
+function buildRegressionStatus() {
+  const host = document.getElementById('rt-legend')
+  if (!host) return
+  const src = _rtStatusSrc
+  // Render the status body (optional lot heading + ready line + title + total +
+  // bar + legend) for ONE data object — a whole system, or one lot of a system.
+  // `d`: { ready, counts, unit, hi, hiUnit, label?, pending? }
+  const statusBlock = d => {
+    const title = `<div class="rsc-title">${esc(src.title)}</div>`
+    // Lot with no TC List yet: placeholder instead of a bar.
+    if (d.pending) return `${rtCardHead(d)}${title}<div class="rsc-soon">Update soon — กำลังจัดทำ test cases</div>`
+    const counts = src.browser ? (d.hi || {})[src.key] : d.counts
+    const unit = src.browser ? d.hiUnit : d.unit
+    // null = the sheet has no column for this browser (see rtFetchHiTcCounts) —
+    // say so instead of drawing a 0% bar that reads as "never tested".
+    const body = src.browser && !counts
+      ? `<div class="rsc-soon">ไม่พบคอลัมน์ “${esc(src.label)}” ในชีท</div>`
+      : rtStatusBody(counts, unit)
+    return `${rtCardHead(d)}${title}${body}`
+  }
+  rtRenderCards(host, statusBlock)
+}
+
+// "Group by" dropdown above the cards: swaps which status column every card shows.
+function initStatusSrcDropdown() {
+  const trigger = document.getElementById('rt-src-trigger')
+  const menu = document.getElementById('rt-src-menu')
+  const label = document.getElementById('rt-src-label')
+  if (!trigger || !menu || !label) return
+  const close = () => { menu.classList.remove('gb-open'); trigger.setAttribute('aria-expanded', 'false') }
+  const select = item => {
+    const src = RT_STATUS_SRC.find(s => s.key === item.dataset.value)
+    if (!src) return
+    menu.querySelectorAll('.gb-item').forEach(i => i.classList.remove('gb-item--selected'))
+    item.classList.add('gb-item--selected')
+    label.textContent = item.textContent
+    _rtStatusSrc = src
+    buildRegressionStatus()                                   // same cards, new column
+    replayInView([...document.querySelectorAll('#rt-legend .rsc-card')])  // "วึ้บ" so the change is visible
+    close()
+  }
+  trigger.addEventListener('click', e => {
+    e.stopPropagation()
+    const open = menu.classList.toggle('gb-open')
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false')
+  })
+  menu.querySelectorAll('.gb-item').forEach(item => item.addEventListener('click', () => select(item)))
+  document.addEventListener('click', close)
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close() })
+  // back to SKL-QA on tab switch, like every other dropdown
+  trigger._gbReset = () => select(menu.querySelector('.gb-item'))
 }
 
 // Minimal RFC-4180 CSV parser (handles quoted fields, embedded commas/newlines).
@@ -3639,21 +3724,61 @@ function rtParseCSV(text) {
   return rows
 }
 
+// One fetch+parse per tab per refresh pass — a TC List tab is read by BOTH the
+// SKL-QA and the HI-QA card rows. Cleared at the start of every refresh so a
+// re-opened tab never renders stale rows.
+const _rtCsvRows = new Map()
+function rtFetchCsvRows(gid) {
+  if (_rtCsvRows.has(gid)) return _rtCsvRows.get(gid)
+  const p = (async () => {
+    const url = `${RT_SKL_CSV_BASE}?gid=${gid}&single=true&output=csv`
+    const res = await fetch(url, { cache: 'no-store' })
+    if (!res.ok) throw new Error('HTTP ' + res.status)
+    const rows = rtParseCSV(await res.text())
+    if (!rows.length) throw new Error('empty sheet')
+    return rows
+  })()
+  // A failed fetch must not be replayed to every later caller as a cached rejection.
+  p.catch(() => _rtCsvRows.delete(gid))
+  _rtCsvRows.set(gid, p)
+  return p
+}
+
+// Header lookup — every column is found by its HEADER NAME, never by a fixed
+// A/B/C index: tabs differ (OLS Lot 2 carries an extra column, so its HI-QA pair
+// sits two places further right than the other tabs').
+const rtH = h => String(h).toUpperCase().replace(/\s+/g, ' ').trim()
+function rtCol(header, name) { return header.findIndex(h => rtH(h) === name) }
+// A real test case has a Module OR a Test case name. The TC tabs are padded with
+// hundreds of rows carrying only a running number — those are not test cases.
+// Header names first, but NEVER let a renamed/wrapped header ("Module\n(โมดูล)")
+// filter every row away: an empty result is read downstream as "0 test cases,
+// valid", so it would silently zero the cards. Fall back to the fixed positions
+// the tabs have always used (No. | Module | Test case name).
+function rtTcRowFilter(header) {
+  let mod = rtCol(header, 'MODULE')
+  let tcn = rtCol(header, 'TEST CASE NAME')
+  if (mod < 0 && tcn < 0) {
+    console.warn('TC List: no Module / Test case name header — falling back to columns 1 & 2')
+    mod = 1; tcn = 2
+  }
+  return r => (mod >= 0 && (r[mod] || '').trim()) || (tcn >= 0 && (r[tcn] || '').trim())
+}
+
 // Live SKL-QA status counts from a system's "Summary" tab (published CSV).
 async function rtFetchSklCounts(gid) {
-  const url = `${RT_SKL_CSV_BASE}?gid=${gid}&single=true&output=csv`
-  const res = await fetch(url, { cache: 'no-store' })
-  if (!res.ok) throw new Error('HTTP ' + res.status)
-  const rows = rtParseCSV(await res.text())
-  if (!rows.length) throw new Error('empty sheet')
+  const rows = await rtFetchCsvRows(gid)
   // Match the status column by its header start — NOT a loose /SKL-QA/ test: an
   // earlier column ("...after passed test by SKL-QA") also contains that substring.
   const col = rows[0].findIndex(h => /^\s*SKL-QA/i.test(h))
   if (col < 0) throw new Error('no SKL-QA column')
+  // The Summary tabs label this column "Topic/Module"; accept a plain "Module"
+  // too, and only then fall back to the first column.
+  const modCol = Math.max(rtCol(rows[0], 'TOPIC/MODULE'), rtCol(rows[0], 'MODULE'), 0)
   const counts = {}
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i]
-    if (!r || !(r[0] || '').trim()) continue        // skip rows without a module name
+    if (!r || !(r[modCol] || '').trim()) continue   // skip rows without a module name
     const v = ((r[col] || '').trim() || 'NOT STARTED').toUpperCase()
     counts[v] = (counts[v] || 0) + 1
   }
@@ -3664,11 +3789,7 @@ async function rtFetchSklCounts(gid) {
 // Live SKL-QA status counts from a system's "<SYS>: TC List" tab — one row per TEST
 // CASE, so the card's % is the share of test cases, not of modules.
 async function rtFetchSklTcCounts(gid) {
-  const url = `${RT_SKL_CSV_BASE}?gid=${gid}&single=true&output=csv`
-  const res = await fetch(url, { cache: 'no-store' })
-  if (!res.ok) throw new Error('HTTP ' + res.status)
-  const rows = rtParseCSV(await res.text())
-  if (!rows.length) throw new Error('empty sheet')
+  const rows = await rtFetchCsvRows(gid)
   // Locate the SKL-QA *Test Status* column. Two header shapes exist in the wild:
   //   ELMS/CBMS/EvMS — the column is labeled "SKL-QA Test Status" (matched directly).
   //   OLS            — a "SKL-QA Recheck - compare result" column was inserted and the
@@ -3677,21 +3798,17 @@ async function rtFetchSklTcCounts(gid) {
   //                    FOR QA RECHECK — the wrong values).
   // Both shapes are handled by anchoring to the always-present "SKL-QA QA Name" column:
   // the Test Status column always sits immediately before it. Never a fixed A/B/C index.
-  const H = h => String(h).toUpperCase().replace(/\s+/g, ' ').trim()
-  let col = rows[0].findIndex(h => H(h) === 'SKL-QA TEST STATUS')
+  let col = rtCol(rows[0], 'SKL-QA TEST STATUS')
   if (col < 0) {
-    const qaName = rows[0].findIndex(h => H(h) === 'SKL-QA QA NAME')
+    const qaName = rtCol(rows[0], 'SKL-QA QA NAME')
     if (qaName > 0) col = qaName - 1               // status column is the one before QA Name
   }
   if (col < 0) throw new Error('no SKL-QA Test Status column')
+  const isTcRow = rtTcRowFilter(rows[0])
   const counts = {}
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i]
-    if (!r) continue
-    // A real test case has a module OR a test case name. The tab is padded with
-    // hundreds of rows that carry only a running number (EvMS) — those are not
-    // test cases and must not be counted as NOT STARTED.
-    if (!(r[1] || '').trim() && !(r[2] || '').trim()) continue
+    if (!r || !isTcRow(r)) continue
     const v = ((r[col] || '').trim() || 'NOT STARTED').toUpperCase()
     counts[v] = (counts[v] || 0) + 1
   }
@@ -3702,18 +3819,58 @@ async function rtFetchSklTcCounts(gid) {
   return counts
 }
 
+// Live HI-QA status counts from the same "<SYS>: TC List" tab — one map per browser.
+// Both columns are matched by HEADER TEXT, never by a fixed index: OLS Lot 2 carries
+// an extra column, so the pair sits at 12/13 there and at 11/12 everywhere else.
+// A blank cell means the case has not been run yet → NOT STARTED, same as SKL-QA.
+async function rtFetchHiTcCounts(gid) {
+  const rows = await rtFetchCsvRows(gid)
+  const cols = {}
+  for (const b of RT_HI_BROWSERS) cols[b.key] = rtCol(rows[0], b.label.toUpperCase())
+  if (cols.chrome < 0 && cols.edge < 0) throw new Error('no HI-QA Test Status columns')
+  const isTcRow = rtTcRowFilter(rows[0])
+  // A browser whose column is missing gets `null`, NOT an empty map: an empty map
+  // renders as a real "0 test cases" bar, which reads as "HI never tested on Edge"
+  // instead of "that column is gone from the sheet".
+  const out = { chrome: null, edge: null }
+  for (const b of RT_HI_BROWSERS) {
+    if (cols[b.key] >= 0) out[b.key] = {}
+    else console.warn(`HI-QA TC List: no "${b.label}" column in gid ${gid}`)
+  }
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i]
+    if (!r || !isTcRow(r)) continue
+    for (const b of ['chrome', 'edge']) {
+      if (!out[b]) continue
+      const v = ((r[cols[b]] || '').trim() || 'NOT STARTED').toUpperCase()
+      out[b][v] = (out[b][v] || 0) + 1
+    }
+  }
+  return out
+}
+
 // Refresh every card from the sheet; each system falls back to its snapshot on failure.
 async function loadRegressionStatusLive() {
   let live = 0
+  _rtCsvRows.clear()
   // Refresh one data object (a whole system OR a single lot). Test cases are the
   // unit — that's what the % measures. An empty TC List is not a failure (0 test
   // cases so far), so only a fetch/parse error drops it to module counts.
   const refresh = async (d, tag) => {
-    try { d.counts = await rtFetchSklTcCounts(d.tcGid); d.unit = 'test case'; return true }
+    // HI-QA lives in the same TC List tab; a failure there leaves the HI snapshot in
+    // place and must not change whether the SKL-QA half counts as live.
+    const hi = rtFetchHiTcCounts(d.tcGid)
+      .then(c => { d.hi = c; d.hiUnit = 'test case' })
+      .catch(e => console.warn('HI-QA TC List fetch failed for', tag, '-', e.message, '(using snapshot)'))
+    let ok = false
+    try { d.counts = await rtFetchSklTcCounts(d.tcGid); d.unit = 'test case'; ok = true }
     catch (e) { console.warn('SKL-QA TC List fetch failed for', tag, '-', e.message, '(falling back to module counts)') }
-    try { d.counts = await rtFetchSklCounts(d.gid); d.unit = 'module'; return true }
-    catch (e) { console.warn('SKL-QA live fetch failed for', tag, '-', e.message, '(using snapshot)') }
-    return false
+    if (!ok) {
+      try { d.counts = await rtFetchSklCounts(d.gid); d.unit = 'module'; ok = true }
+      catch (e) { console.warn('SKL-QA live fetch failed for', tag, '-', e.message, '(using snapshot)') }
+    }
+    await hi
+    return ok
   }
   await Promise.all(RT_SKL.map(async sys => {
     if (sys.lots) {
@@ -3924,6 +4081,7 @@ function switchView(viewId) {
   // every tab's selections go back to default when switching tabs
   document.getElementById('gb-trigger')?._gbReset?.()
   document.getElementById('rt-gb-trigger')?._gbReset?.()
+  document.getElementById('rt-src-trigger')?._gbReset?.()
   // Repaint the header for the view we just entered, then refetch its data.
   // These views have no interval of their own, so opening the tab IS the refresh —
   // without it the tab keeps serving whatever it fetched on first page load.
@@ -4066,6 +4224,7 @@ function showApp() {
   })()
   initGrid()
   renderUpdatedLabel()
+  initStatusSrcDropdown()
   buildRegressionStatus()
   loadRegressionStatusLive()
   buildRegressionTimeline()
@@ -4203,7 +4362,11 @@ function showApp() {
     const gbTrigger = e.target.closest('.gb-trigger')
     if (gbTrigger) {
       e.preventDefault(); e.stopPropagation()
-      const menuFinder = () => document.getElementById('gb-menu')
+      // The menu that belongs to THIS trigger — there are several .gb-trigger
+      // dropdowns now (Epic group-by, timeline filter, status source), so a
+      // hardcoded #gb-menu would open the Epic tab's options from any of them.
+      const wrap = gbTrigger.closest('.gb-dropdown')
+      const menuFinder = () => (wrap && wrap.querySelector('.gb-menu')) || document.getElementById('gb-menu')
       openSheet('Group by', 'single', menuFinder, '.gb-item', ['gb-item--selected'])
       return
     }
