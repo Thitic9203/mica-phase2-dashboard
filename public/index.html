@@ -3611,8 +3611,12 @@ function rtStatusBody(counts, unit) {
     const pct = total ? Math.round(n / total * 100) : 0
     const rawW = Math.max(total ? n / total * 100 : 0, 18)
     const nw = totalW ? rawW / totalW * 100 : 0
-    const lbl = pct >= 1 ? `<span class="rsc-seg-lbl">${pct}%</span>` : ''
-    return `<span class="rsc-seg" style="width:${nw}%;background:${rtColorOfStatus(k)}" title="${esc(k)} — ${n} (${pct}%)">${lbl}</span>`
+    // A segment that exists must carry a number: a count that rounds to 0% still
+    // gets a visible min-width block, so a blank block reads as a bug. Same "<1%"
+    // wording the Progress Tracker bars use.
+    const pctTxt = pct >= 1 ? `${pct}%` : (n > 0 ? '&lt;1%' : '')
+    const lbl = pctTxt ? `<span class="rsc-seg-lbl">${pctTxt}</span>` : ''
+    return `<span class="rsc-seg" style="width:${nw}%;background:${rtColorOfStatus(k)}" title="${esc(k)} — ${n} (${pctTxt || '0%'})">${lbl}</span>`
   }).join('')
   const legend = entries.map(([k, n]) =>
     `<li><span class="dot" style="background:${rtColorOfStatus(k)}"></span>${esc(k)} <span class="n">(${n})</span></li>`
