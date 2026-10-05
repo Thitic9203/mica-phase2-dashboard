@@ -209,6 +209,7 @@ body {
    .tn-right off-screen between 769px and ~1030px, where no media query applies. */
 .tn-tabs { display: flex; align-items: stretch; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .tn-tabs::-webkit-scrollbar { display: none; }
+.sb-nav-item[hidden] { display: none; }
 .sb-nav-item {
   display: flex; align-items: center; gap: 7px;
   padding: 0 15px; height: 100%;
@@ -1343,7 +1344,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       <a class="sb-nav-item" data-view="epic-tc">
         <span class="sb-dot" style="background:#0F766E"></span>Epic Breakdown
       </a>
-      <a class="sb-nav-item" data-view="regression-timeline">
+      <a class="sb-nav-item" data-view="regression-timeline" hidden>
         <span class="sb-dot" style="background:#1a8f4c"></span>Regression Testing Timeline
       </a>
     </div>
