@@ -209,6 +209,11 @@ body {
    .tn-right off-screen between 769px and ~1030px, where no media query applies. */
 .tn-tabs { display: flex; align-items: stretch; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .tn-tabs::-webkit-scrollbar { display: none; }
+.lbl-short { display: none; }
+@media (max-width: 1100px) { .lbl-full { display: none; } .lbl-short { display: inline; } }
+.tn-tabs.fade-r { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
+.tn-tabs.fade-l { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to left, #000 calc(100% - 28px), transparent); }
+.tn-tabs.fade-l.fade-r { -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); }
 .sb-nav-item[hidden] { display: none; }
 .sb-nav-item {
   display: flex; align-items: center; gap: 7px;
@@ -1427,7 +1432,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
         <span class="sb-dot" style="background:#0F766E"></span>Epic Breakdown
       </a>
       <a class="sb-nav-item" data-view="retest-usage">
-        <span class="sb-dot" style="background:#B45309"></span>AI Skill Adoption Overview
+        <span class="sb-dot" style="background:#B45309"></span><span class="lbl-full">AI Skill Adoption Overview</span><span class="lbl-short">AI Skill Adoption</span>
       </a>
       <a class="sb-nav-item" data-view="regression-timeline" hidden>
         <span class="sb-dot" style="background:#1a8f4c"></span>Regression Testing Timeline
@@ -4507,6 +4512,28 @@ function switchView(viewId) {
   document.querySelectorAll('.view-panel').forEach(el => {
     el.classList.toggle('hidden', el.id !== 'view-' + viewId)
   })
+  // Narrow screens: the tab bar scrolls horizontally with a hidden scrollbar, so bring
+  // the active tab into view and show a fade on whichever edge still hides tabs.
+  const tabsBar = document.querySelector('.tn-tabs')
+  const activeTab = tabsBar && [...tabsBar.querySelectorAll('[data-view]')].find(t => t.dataset.view === viewId)
+  if (activeTab) {
+    // Measure after the active styling has laid out (bold label = wider tab).
+    const reveal = () => {
+      const PAD = 28 // width of the edge fade, so the active label never sits under it
+      const tabs = [...tabsBar.querySelectorAll('[data-view]')].filter(t => t.offsetWidth > 0)
+      if (activeTab === tabs[tabs.length - 1]) tabsBar.scrollLeft = tabsBar.scrollWidth // last: pin to the end
+      else if (activeTab === tabs[0]) tabsBar.scrollLeft = 0
+      else {
+        const br = tabsBar.getBoundingClientRect(), tr = activeTab.getBoundingClientRect()
+        if (tr.left < br.left + PAD) tabsBar.scrollLeft -= (br.left + PAD - tr.left)
+        else if (tr.right > br.right - PAD) tabsBar.scrollLeft += (tr.right - (br.right - PAD))
+      }
+      updateTabsFade()
+    }
+    // Run after the active styling has laid out, and once more after late layout (fonts).
+    requestAnimationFrame(reveal)
+    setTimeout(reveal, 400)
+  }
   document.getElementById('pt-blocked-container')?._btReset?.()
   document.getElementById('pt-missing-container')?._mtReset?.()
   // every tab's selections go back to default when switching tabs
@@ -4525,6 +4552,16 @@ function switchView(viewId) {
   // automatically. PT/Regression re-arm through their on-open refetch + re-render.
 }
 
+
+function updateTabsFade() {
+  const bar = document.querySelector('.tn-tabs')
+  if (!bar) return
+  const max = bar.scrollWidth - bar.clientWidth
+  bar.classList.toggle('fade-l', max > 1 && bar.scrollLeft > 1)
+  bar.classList.toggle('fade-r', max > 1 && bar.scrollLeft < max - 1)
+}
+document.querySelector('.tn-tabs')?.addEventListener('scroll', updateTabsFade, { passive: true })
+window.addEventListener('resize', updateTabsFade)
 // ── App ──
 function initGrid() {
   document.getElementById('epic-total-count').textContent = `${EPICS.length} epics`
