@@ -1307,6 +1307,86 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .rt-mtop { position: static; }
   .rt-mtop, .rt-dow, .rt-days { min-width: 700px; }
 }
+
+/* ── AI SKILL ADOPTION OVERVIEW (view-retest-usage) ──
+   Built only from the existing tokens (--card/--border/--text/--muted/--dim/--accent/
+   --elevated/--radius) and the .pt-card / .card-skeleton patterns, so dark mode
+   follows the same :root[data-theme="dark"] re-pointing with no extra overrides. */
+#view-retest-usage.view-panel { padding-top: 14px; }
+.ru { display: grid; gap: 14px; min-width: 0; }
+.ru-card { min-width: 0; }
+.ru-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.01em; margin: 0 0 12px; }
+.ru-h2 { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.01em; margin: 0 0 3px; }
+.ru-h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 8px; }
+.ru-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; line-height: 1.5; }
+.ru-kpi { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 24px; margin-bottom: 14px; }
+.ru-total { min-width: 0; }
+.ru-total-num { font-size: 1.6rem; font-weight: 600; color: var(--text); line-height: 1; font-variant-numeric: tabular-nums; min-height: 1em; display: inline-block; }
+.ru-total-lbl { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.ru-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; flex: 1 1 280px; min-width: 0; }
+.ru-type { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 10px; background: var(--fill-faint); min-width: 0; }
+.ru-type-k { font-size: 11px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: .04em; }
+.ru-type-v { font-size: 15px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.ru-meta { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 12px; line-height: 1.5; padding-top: 12px; border-top: 1px solid var(--border); }
+.ru-meta dt { color: var(--muted); }
+.ru-meta dd { margin: 0; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.ru-skel.card-skeleton { min-height: 0; height: 18px; border-radius: 6px; }
+.ru-skel-lg.card-skeleton { min-height: 0; height: 26px; width: 72px; border-radius: 6px; }
+.ru-skel-block.card-skeleton { min-height: 0; height: 120px; border-radius: var(--radius-sm); }
+.ru-fail { display: flex; align-items: center; gap: 8px; color: var(--danger); font-size: 12px; min-height: 44px; }
+.ru-fail::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--danger); flex-shrink: 0; }
+.ru-note { font-size: 12px; color: var(--warn); }
+/* Tables */
+.ru-table-wrap { overflow-x: auto; min-width: 0; }
+.ru-table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.ru-table th { text-align: left; font-size: 10px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .09em; padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.ru-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); white-space: nowrap; vertical-align: top; }
+.ru-table .n { text-align: right; }
+.ru-table td.wrap { white-space: normal; overflow-wrap: anywhere; }
+.ru-table tr.total td { font-weight: 700; border-top: 1px solid var(--border-strong); border-bottom: none; }
+.ru-table tbody tr:not(.total):hover td { background: var(--hover-row); }
+/* Bar chart: label | track | value — the value column sizes to its own text, so the
+   "N ticket" label can never be clipped, whatever the width. */
+.ru-chart { position: relative; display: grid; gap: 2px; }
+.ru-bar { display: grid; grid-template-columns: minmax(48px, max-content) minmax(0, 1fr) max-content; align-items: center; gap: 12px; min-height: 44px; padding: 0 6px; border-radius: 8px; cursor: default; outline: none; }
+.ru-bar:hover, .ru-bar:focus-visible { background: var(--hover-row); }
+.ru-bar:focus-visible { box-shadow: 0 0 0 2px rgba(var(--accent-rgb),0.45); }
+.ru-bar-name { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; }
+.ru-bar-track { height: 14px; border-radius: 99px; background: var(--elevated); overflow: hidden; min-width: 0; }
+.ru-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+.ru-bar-val { font-size: 12px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ru-tip { position: absolute; z-index: 5; pointer-events: none; background: var(--card); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); padding: 8px 10px; font-size: 11.5px; line-height: 1.5; color: var(--text); max-width: min(320px, 100%); }
+.ru-tip-h { font-weight: 700; }
+.ru-tip-d { color: var(--muted); }
+.ru-foot { font-size: 12px; color: var(--muted); display: grid; gap: 4px; line-height: 1.5; padding: 0 2px; }
+@media (max-width: 1024px) {
+  .ru-table th, .ru-table td { padding: 9px 10px; }
+}
+@media (max-width: 640px) {
+  .ru-table { font-size: 11.5px; }
+  .ru-table th, .ru-table td { padding: 8px 6px; }
+  .ru-table th { letter-spacing: .05em; }
+  /* Data-sources table stacks into a two-line card per source. */
+  .ru-src thead { display: none; }
+  .ru-src, .ru-src tbody { display: block; width: 100%; }
+  .ru-src tr { display: grid; grid-template-columns: minmax(0, 1fr) max-content; column-gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .ru-src td { border: none; padding: 0; white-space: normal; overflow-wrap: anywhere; }
+  .ru-src td:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 600; }
+  .ru-src td:nth-child(4) { grid-column: 2; grid-row: 1; }
+  .ru-src td:nth-child(2), .ru-src td:nth-child(3) { grid-column: 1 / -1; color: var(--muted); }
+  .ru-src tr.total { border-bottom: none; border-top: 1px solid var(--border-strong); }
+  .ru-src tr.total td { border-top: none; }
+  .ru-src tr.total td:nth-child(2), .ru-src tr.total td:nth-child(3) { display: none; }
+  .ru-rules td:first-child { white-space: normal; width: 34%; }
+}
+@media (max-width: 430px) {
+  .ru-title { font-size: 15px; }
+  .ru-meta { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .ru-meta dd { margin-bottom: 6px; }
+  .ru-table th, .ru-table td { padding: 8px 4px; }
+  .ru-table th { font-size: 9.5px; letter-spacing: .02em; }
+  .ru-types { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }
+}
   </style>
 </head>
 <body>
@@ -1343,6 +1423,9 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
       </a>
       <a class="sb-nav-item" data-view="epic-tc">
         <span class="sb-dot" style="background:#0F766E"></span>Epic Breakdown
+      </a>
+      <a class="sb-nav-item" data-view="retest-usage">
+        <span class="sb-dot" style="background:#B45309"></span>AI Skill Adoption Overview
       </a>
       <a class="sb-nav-item" data-view="regression-timeline" hidden>
         <span class="sb-dot" style="background:#1a8f4c"></span>Regression Testing Timeline
@@ -1551,6 +1634,61 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
         </div>
       </div>
       <div id="pt-content"><div class="view-loading"><span class="view-loading-text">Loading ticket data…</span><span class="view-loading-sub">Fetching from Jira</span></div></div>
+    </div>
+
+    <!-- View 4: AI Skill Adoption Overview (retest skill usage) -->
+    <div id="view-retest-usage" class="view-panel hidden">
+      <div class="ru">
+        <header class="pt-card ru-card">
+          <h1 class="ru-title">AI Skill Adoption Overview</h1>
+          <div class="ru-kpi">
+            <div class="ru-total">
+              <div class="ru-total-num" id="ru-total"><span class="card-skeleton ru-skel-lg" style="display:block"></span></div>
+              <div class="ru-total-lbl">ticket ที่ทดสอบด้วยสกิล AI ทั้งสิ้น</div>
+            </div>
+            <div class="ru-types" id="ru-types"></div>
+          </div>
+          <dl class="ru-meta">
+            <dt>ช่วงเวลาของข้อมูล</dt><dd id="ru-range"><span class="card-skeleton ru-skel" style="display:block"></span></dd>
+            <dt>บันทึกผลครั้งแรก</dt><dd id="ru-first"><span class="card-skeleton ru-skel" style="display:block;width:120px"></span></dd>
+            <dt>การปรับปรุงข้อมูล</dt><dd>ข้อมูลจาก Jira ปรับปรุงอัตโนมัติทุกครั้งที่เปิดรายงาน</dd>
+          </dl>
+        </header>
+        <section class="pt-card ru-card">
+          <h2 class="ru-h2">Summary by Project and Issue Type</h2>
+          <p class="ru-sub" id="ru-sum-sub">นับเฉพาะ ticket ที่ทดสอบด้วยสกิล AI และมีการบันทึกผลการทดสอบ ตั้งแต่ 28 May 2026 ถึงปัจจุบัน</p>
+          <div class="ru-table-wrap" id="ru-proj-box"><div class="card-skeleton ru-skel-block"></div></div>
+        </section>
+        <section class="pt-card ru-card">
+          <h2 class="ru-h2">Usage by Project</h2>
+          <p class="ru-sub">จำนวน ticket ทุกประเภทของแต่ละ project</p>
+          <div class="ru-chart" id="ru-chart"><div class="card-skeleton ru-skel-block"></div></div>
+        </section>
+        <section class="pt-card ru-card">
+          <h2 class="ru-h2">Data Sources and Counting Rules</h2>
+          <p class="ru-sub">ticket แต่ละใบนับเพียงครั้งเดียว กรณีพบในหลายแหล่ง จะนับรวมไว้ในแหล่งแรกตามลำดับในตาราง</p>
+          <div class="ru-table-wrap" id="ru-src-box"><div class="card-skeleton ru-skel-block"></div></div>
+          <h3 class="ru-h3">Counting Rules</h3>
+          <div class="ru-table-wrap">
+            <table class="ru-table ru-rules">
+              <thead><tr><th>หัวข้อ</th><th>หลักเกณฑ์</th></tr></thead>
+              <tbody>
+                <tr><td>หน่วยที่นับ</td><td class="wrap">จำนวน ticket ที่ทดสอบด้วยสกิล AI และมีการบันทึกผลใน Jira หรือชีต test case โดย ticket ที่ทดสอบหลายรอบนับเป็น 1 ticket</td></tr>
+                <tr><td>รายการที่ไม่นับ</td><td class="wrap">ผลที่บันทึกด้วยตนเองโดยไม่ใช้สกิล และการทดสอบด้วย AI ที่ไม่มีการบันทึกผล (มีเพียงการแจ้งใน Discord)</td></tr>
+                <tr><td>การตรวจสอบรายการซ้ำ</td><td class="wrap">การแจ้งใน Discord และผลใน Jira ของ ticket เดียวกันที่ห่างกันไม่เกิน 1 วัน ถือเป็นการทดสอบครั้งเดียวกัน ข้อมูลจาก Discord ใช้เพื่อยืนยันการทดสอบด้วย AI และตรวจสอบรายการซ้ำเท่านั้น</td></tr>
+                <tr><td>การระบุสกิล</td><td class="wrap">ก่อน 8 Oct 2026 อ้างอิงจากประวัติการใช้งาน Claude Code ตั้งแต่ 8 Oct 2026 อ้างอิงจากตัวระบุสกิลท้ายคอมเมนต์ (helix v1.5.108)</td></tr>
+                <tr><td>ช่วงเวลา</td><td class="wrap">เริ่มนับตั้งแต่ 28 May 2026 ซึ่งเป็นวันที่เริ่มใช้งานสกิล ผลก่อนหน้านั้นไม่นำมานับ</td></tr>
+                <tr><td>ประเภท ticket</td><td class="wrap">อ้างอิงตามช่อง issuetype ใน Jira หากพบประเภทใหม่ ระบบจะเพิ่มคอลัมน์ในตารางสรุปโดยอัตโนมัติ</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <footer class="ru-foot">
+          <div id="ru-live-note" class="ru-note" hidden></div>
+          <div id="ru-excluded"></div>
+          <div>รายละเอียดแหล่งที่มาของข้อมูลและหลักเกณฑ์การนับ ดูได้ที่หัวข้อ "Data Sources and Counting Rules"</div>
+        </footer>
+      </div>
     </div>
 
 
@@ -3486,6 +3624,7 @@ const _UPDATED_SUB = {
   'epic-tc': 'Auto-refresh from Jira every 5 minutes',
   'progress-tracker': 'Refreshes each time you open this tab',
   'regression-timeline': 'Refreshes each time you open this tab',
+  'retest-usage': 'Refreshes each time you open this tab',
 }
 function activeViewId() {
   return document.querySelector('.sb-nav-item.active')?.dataset.view || ''
@@ -3510,6 +3649,282 @@ function renderUpdatedLabel() {
 function stampData(view) {
   _dataAt[view] = Date.now()
   if (activeViewId() === view) renderUpdatedLabel()
+}
+
+// ── AI Skill Adoption Overview (retest skill usage) ──
+// Frozen history (snapshot, served by the authenticated /api/retest-usage function)
+// + live Jira comments carrying the skill marker posted after the snapshot cutoff.
+// Unit everywhere = distinct tickets; each ticket has exactly one project/issuetype,
+// so per-type columns, per-source rows and the chart all add up to the same total.
+const RU_MAIN_TYPES = ['Bug', 'Task', 'Story']
+const RU_MAIN_PROJECTS = ['OLS', 'PLUT', 'MICA2']
+const RU_MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const RU_SOURCES = [
+  { src: 'jira', name: 'Jira: ผลการ retest', what: 'ผลการทดสอบซ้ำของ Bug และ Task ที่บันทึกในคอมเมนต์ Jira', when: '28 May – 8 Oct 2026' },
+  { src: 'marker', name: 'Jira: ผลที่มีตัวระบุสกิล (ปรับปรุงอัตโนมัติ)', what: 'ผลการทดสอบของสมาชิกทุกคนในทีมที่มีตัวระบุสกิลกำกับท้ายคอมเมนต์', when: 'ตั้งแต่ 8 Oct 2026' },
+  { src: 'sheet', name: 'ชีต Test Cases - OLS QA', what: 'ผลการทดสอบ Story ที่ระบุว่า "Tested by Claude AI" ในแท็บของแต่ละ ticket', when: 'Jul – Oct 2026' },
+  { src: 'discord-only', name: 'Discord: เธรดแจ้งการทดสอบด้วย AI', what: 'ใช้ยืนยันการทดสอบด้วย AI และตรวจสอบรายการซ้ำ ไม่นับเป็นจำนวนแยก', when: '25 Aug – 8 Oct 2026' },
+]
+const ruFmt = n => Number(n || 0).toLocaleString('en-US')
+const ruDate = iso => iso ? `${Number(iso.slice(8, 10))} ${RU_MON[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}` : '—'
+const ruJiraTime = t => new Date(String(t).replace(/([+-]\d\d)(\d\d)$/, '$1:$2'))
+
+// ADF → plain text: text nodes inside one block join directly (so a marker split
+// across bold/code marks stays on one line); block nodes are separated by newlines.
+function ruAdfText(node) {
+  if (node == null) return ''
+  if (typeof node === 'string') return node
+  if (Array.isArray(node)) return node.map(ruAdfText).join('')
+  if (node.type === 'text') return node.text || ''
+  if (node.type === 'hardBreak') return '\n'
+  const inner = ruAdfText(node.content || [])
+  return ['paragraph', 'heading', 'listItem', 'codeBlock', 'blockquote', 'tableRow', 'panel'].includes(node.type) ? inner + '\n' : inner
+}
+
+async function ruAuthHeaders() {
+  const idToken = auth.currentUser ? await auth.currentUser.getIdToken() : ''
+  return { 'Accept': 'application/json', 'Authorization': `Bearer ${idToken}` }
+}
+
+async function ruLoadSnapshot() {
+  const res = await fetch('/api/retest-usage', { headers: await ruAuthHeaders() })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const data = await res.json()
+  if (!data || !Array.isArray(data.rows)) throw new Error('bad snapshot')
+  return data
+}
+
+// Every comment of an issue; the search response may carry only the first page.
+async function ruAllComments(issue) {
+  const c = issue.fields?.comment || {}
+  const got = c.comments || []
+  if (!(typeof c.total === 'number' && c.total > got.length)) return got
+  const out = []
+  const headers = await ruAuthHeaders()
+  for (let startAt = 0; startAt < c.total; startAt += 100) {
+    const res = await fetch(`${JIRA_BASE}/issue/${encodeURIComponent(issue.key)}/comment?startAt=${startAt}&maxResults=100`, { headers })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const d = await res.json()
+    out.push(...(d.comments || []))
+    if (!d.comments || !d.comments.length) break
+  }
+  return out
+}
+
+async function ruLoadLive(cutoff) {
+  const issues = await fetchIssues('comment ~ "retestskillmarker"', 'issuetype,project,comment')
+  const cut = new Date(cutoff)
+  const rows = []
+  for (const issue of issues) {
+    const f = issue.fields || {}
+    const comments = await ruAllComments(issue)
+    comments.forEach(c => {
+      if (!ruAdfText(c.body).includes('retestskillmarker')) return
+      if (!(ruJiraTime(c.created) >= cut)) return
+      rows.push({
+        issue_key: issue.key, project: f.project?.key || '', issuetype: f.issuetype?.name || '',
+        date: String(c.created).slice(0, 10), created: String(c.created),
+        author: c.author?.accountId || '', // kept for traceability only; never rendered
+        source: 'marker', in_discord: 'no', counted: 'yes', excluded: '',
+      })
+    })
+  }
+  return rows
+}
+
+function ruCompute(allRuns, skillCreated) {
+  const counted = allRuns.filter(r => r.counted === 'yes')
+  // One record per ticket. Live rows come last, so the current Jira project/issuetype wins.
+  const tickets = new Map()
+  counted.forEach(r => tickets.set(r.issue_key, { project: r.project, issuetype: r.issuetype }))
+  const list = [...tickets.values()]
+  const total = list.length
+  const types = [...RU_MAIN_TYPES, ...[...new Set(list.map(t => t.issuetype))].filter(t => t && !RU_MAIN_TYPES.includes(t)).sort()]
+  const projects = [...RU_MAIN_PROJECTS, ...[...new Set(list.map(t => t.project))].filter(p => p && !RU_MAIN_PROJECTS.includes(p)).sort()]
+  const row = (name, ts) => {
+    const o = { project: name, types: {}, total: ts.length }
+    types.forEach(t => { o.types[t] = ts.filter(x => x.issuetype === t).length })
+    return o
+  }
+  const rows = projects.map(p => row(p, list.filter(t => t.project === p)))
+  // Shares in tenths of a percent, largest-remainder rounded so they sum to 100.0%.
+  if (total) {
+    const raw = rows.map(r => r.total * 1000 / total)
+    const fl = raw.map(Math.floor)
+    let left = 1000 - fl.reduce((a, b) => a + b, 0)
+    raw.map((v, i) => [v - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left-- } })
+    rows.forEach((r, i) => { r.share = fl[i] / 10 })
+  } else rows.forEach(r => { r.share = 0 })
+  const totalRow = row('รวม', list); totalRow.share = total ? 100 : 0
+
+  const seen = new Set()
+  const sources = RU_SOURCES.map(o => {
+    const keys = new Set(counted.filter(r => r.source === o.src && !seen.has(r.issue_key)).map(r => r.issue_key))
+    keys.forEach(k => seen.add(k))
+    return { ...o, n: keys.size }
+  })
+  if (seen.size !== total) console.warn('[retest-usage] source total', seen.size, '!= ticket total', total)
+
+  const dates = counted.filter(r => /^\d{4}-\d{2}-\d{2}/.test(r.date || '')).map(r => r.date.slice(0, 10)).sort()
+  const countedKeys = new Set(tickets.keys())
+  const only = why => new Set(allRuns.filter(r => r.excluded === why && !countedKeys.has(r.issue_key)).map(r => r.issue_key)).size
+  return {
+    types, rows, totalRow, total, sources, sourceTotal: seen.size,
+    first: dates[0] || '', last: dates[dates.length - 1] || '', skillCreated,
+    manual: only('posted by hand'), notPosted: only('not posted to Jira'),
+  }
+}
+
+function ruEl(tag, cls, text) {
+  const e = document.createElement(tag)
+  if (cls) e.className = cls
+  if (text != null) e.textContent = text
+  return e
+}
+function ruFail(box) { box.textContent = ''; box.appendChild(ruEl('div', 'ru-fail', 'ไม่สามารถโหลดข้อมูลได้')) }
+
+function ruRenderChart(box, m) {
+  box.textContent = ''
+  const max = Math.max(1, ...m.rows.map(r => r.total))
+  const tip = ruEl('div', 'ru-tip'); tip.hidden = true
+  const show = (r, bar) => {
+    tip.textContent = ''
+    tip.append(ruEl('div', 'ru-tip-h', r.project),
+      ruEl('div', 'ru-tip-d', m.types.map(t => `${t} ${ruFmt(r.types[t])}`).join(' · ')),
+      ruEl('div', null, `รวม ${ruFmt(r.total)} ticket (${r.share.toFixed(1)}%)`))
+    tip.hidden = false
+    const bw = box.clientWidth, tw = tip.offsetWidth
+    const left = Math.min(Math.max(0, bar.offsetLeft + 60), Math.max(0, bw - tw))
+    tip.style.left = left + 'px'
+    tip.style.top = (bar.offsetTop + bar.offsetHeight + 4) + 'px'
+  }
+  const hide = () => { tip.hidden = true }
+  m.rows.forEach(r => {
+    const bar = ruEl('div', 'ru-bar')
+    bar.tabIndex = 0
+    bar.setAttribute('role', 'img')
+    bar.setAttribute('aria-label', `${r.project}: รวม ${ruFmt(r.total)} ticket (${r.share.toFixed(1)}%) — ` + m.types.map(t => `${t} ${ruFmt(r.types[t])}`).join(', '))
+    const track = ruEl('div', 'ru-bar-track')
+    const fill = ruEl('div', 'ru-bar-fill')
+    fill.style.width = (r.total / max * 100) + '%'
+    track.appendChild(fill)
+    bar.append(ruEl('div', 'ru-bar-name', r.project), track, ruEl('div', 'ru-bar-val', `${ruFmt(r.total)} ticket`))
+    bar.addEventListener('mouseenter', () => show(r, bar))
+    bar.addEventListener('focus', () => show(r, bar))
+    bar.addEventListener('click', () => show(r, bar))
+    bar.addEventListener('mouseleave', hide)
+    bar.addEventListener('blur', hide)
+    box.appendChild(bar)
+  })
+  box.appendChild(tip)
+}
+
+function ruRender(m, liveOk, cutoff) {
+  // Header
+  const tn = document.getElementById('ru-total'); tn.textContent = String(m.total)
+  const ts = document.getElementById('ru-types'); ts.textContent = ''
+  m.types.forEach(t => {
+    const d = ruEl('div', 'ru-type')
+    d.append(ruEl('div', 'ru-type-k', t), ruEl('div', 'ru-type-v', String(m.totalRow.types[t])))
+    ts.appendChild(d)
+  })
+  document.getElementById('ru-range').textContent = `${ruDate(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${ruDate(m.last)} (วันที่บันทึกผลล่าสุด)`
+  document.getElementById('ru-first').textContent = ruDate(m.first)
+  document.getElementById('ru-sum-sub').textContent = `นับเฉพาะ ticket ที่ทดสอบด้วยสกิล AI และมีการบันทึกผลการทดสอบ ตั้งแต่ ${ruDate(m.skillCreated)} ถึงปัจจุบัน`
+
+  // Summary table
+  const pb = document.getElementById('ru-proj-box'); pb.textContent = ''
+  const t = ruEl('table', 'ru-table ru-proj')
+  const hr = document.createElement('tr')
+  hr.appendChild(ruEl('th', null, 'Project'))
+  ;[...m.types, 'รวม', 'สัดส่วน'].forEach(k => hr.appendChild(ruEl('th', 'n', k)))
+  const thead = document.createElement('thead'); thead.appendChild(hr); t.appendChild(thead)
+  const tb = document.createElement('tbody')
+  ;[...m.rows, m.totalRow].forEach(r => {
+    const tr = document.createElement('tr'); tr.dataset.key = r.project
+    if (r === m.totalRow) tr.className = 'total'
+    tr.appendChild(ruEl('td', null, r.project))
+    m.types.forEach(k => tr.appendChild(ruEl('td', 'n', ruFmt(r.types[k]))))
+    tr.appendChild(ruEl('td', 'n', ruFmt(r.total)))
+    tr.appendChild(ruEl('td', 'n', r.share.toFixed(1) + '%'))
+    tb.appendChild(tr)
+  })
+  t.appendChild(tb); pb.appendChild(t)
+
+  ruRenderChart(document.getElementById('ru-chart'), m)
+
+  // Sources table
+  const sb = document.getElementById('ru-src-box'); sb.textContent = ''
+  const st = ruEl('table', 'ru-table ru-src')
+  const sh = document.createElement('tr')
+  ;['แหล่งข้อมูล', 'ขอบเขตข้อมูล', 'ช่วงเวลา'].forEach(k => sh.appendChild(ruEl('th', null, k)))
+  sh.appendChild(ruEl('th', 'n', 'จำนวน ticket'))
+  const sth = document.createElement('thead'); sth.appendChild(sh); st.appendChild(sth)
+  const stb = document.createElement('tbody')
+  ;[...m.sources, { name: 'รวม', what: '', when: '', n: m.sourceTotal, total: true }].forEach(s => {
+    const tr = document.createElement('tr'); tr.dataset.key = s.name
+    if (s.total) tr.className = 'total'
+    tr.append(ruEl('td', 'wrap', s.name), ruEl('td', 'wrap', s.what), ruEl('td', null, s.when), ruEl('td', 'n', ruFmt(s.n)))
+    stb.appendChild(tr)
+  })
+  st.appendChild(stb); sb.appendChild(st)
+
+  // Footer
+  document.getElementById('ru-excluded').textContent =
+    `รายการที่ไม่นำมานับ: ticket ที่มีเพียงผลที่บันทึกด้วยตนเองโดยไม่ใช้สกิล ${ruFmt(m.manual)} ticket และ ticket ที่ทดสอบด้วย AI แต่ไม่มีการบันทึกผล ${ruFmt(m.notPosted)} ticket`
+  const ln = document.getElementById('ru-live-note')
+  ln.hidden = liveOk
+  ln.textContent = liveOk ? '' : `ไม่สามารถโหลดข้อมูลล่าสุดจาก Jira ได้ ตัวเลขในหน้านี้แสดงเฉพาะข้อมูลถึง ${ruDate(String(cutoff).slice(0, 10))}`
+}
+
+function ruRenderFail() {
+  const tn = document.getElementById('ru-total'); tn.textContent = '—'
+  document.getElementById('ru-types').textContent = ''
+  document.getElementById('ru-range').textContent = '—'
+  document.getElementById('ru-first').textContent = '—'
+  ;['ru-proj-box', 'ru-chart', 'ru-src-box'].forEach(id => ruFail(document.getElementById(id)))
+  document.getElementById('ru-excluded').textContent = ''
+  document.getElementById('ru-live-note').hidden = true
+}
+
+// Entrance: gsap.from + clearProps only, opacity (never autoAlpha); no-op under
+// reduced motion or when GSAP failed to load. Rendering never depends on it.
+function ruReveal(panel) {
+  if (!panel || REDUCE_MOTION || typeof gsap === 'undefined') return
+  const tw = []
+  const add = x => { if (x) tw.push(x) }
+  try {
+    add(gsap.from(panel.querySelectorAll('.ru-card'), { duration: 0.55, opacity: 0, y: 14, stagger: 0.05, ease: 'power2.out', clearProps: 'transform,opacity' }))
+    add(gsap.from(panel.querySelectorAll('.ru-bar-fill'), { duration: 0.7, scaleX: 0, transformOrigin: 'left center', stagger: 0.05, delay: 0.15, ease: 'power2.out', clearProps: 'transform,transformOrigin' }))
+    panel.querySelectorAll('#ru-total, .ru-type-v').forEach((el, i) => {
+      const target = parseInt(el.textContent, 10)
+      if (!Number.isFinite(target) || target <= 0) return
+      const o = { v: 0 }
+      add(gsap.to(o, { v: target, duration: 0.85, delay: 0.05 + i * 0.03, ease: 'power2.out',
+        onUpdate() { el.textContent = String(Math.round(o.v)) },
+        onComplete() { el.textContent = String(target) } }))
+    })
+  } finally {
+    // Hidden tabs throttle rAF: force every tween to its end state regardless.
+    window.setTimeout(() => tw.forEach(x => { try { if (x.progress() < 1) x.progress(1) } catch (e) {} }), 2600)
+  }
+}
+
+let _ruSeq = 0
+async function loadRetestUsage() {
+  const seq = ++_ruSeq
+  let snap
+  try { snap = await ruLoadSnapshot() } catch (e) {
+    if (seq === _ruSeq) ruRenderFail()
+    return
+  }
+  let live = [], liveOk = true
+  try { live = await ruLoadLive(snap.cutoff) } catch (e) { liveOk = false }
+  if (seq !== _ruSeq) return // a newer open superseded this one
+  const m = ruCompute([...snap.rows, ...live], snap.skillCreated || '2026-05-28')
+  ruRender(m, liveOk, snap.cutoff)
+  stampData('retest-usage')
+  if (activeViewId() === 'retest-usage') ruReveal(document.getElementById('view-retest-usage'))
 }
 
 // ── SKL-QA: Regression Testing Status (per-system summary cards) ──
@@ -4093,6 +4508,7 @@ function switchView(viewId) {
   renderUpdatedLabel()
   if (viewId === 'progress-tracker') loadProgressTracker()
   if (viewId === 'regression-timeline') loadRegressionStatusLive()
+  if (viewId === 'retest-usage') loadRetestUsage()
   // Epic tab isn't refetched on open, but its cards stay observed by the scroll-reveal
   // observer — showing the panel makes them intersect again, replaying the entrance
   // automatically. PT/Regression re-arm through their on-open refetch + re-render.
