@@ -1353,7 +1353,9 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
 .ru-bar:focus-visible { box-shadow: 0 0 0 2px rgba(var(--accent-rgb),0.45); }
 .ru-bar-name { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; }
 .ru-bar-track { height: 14px; border-radius: 99px; background: var(--elevated); overflow: hidden; min-width: 0; }
-.ru-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); }
+.ru-bar-fill { height: 100%; border-radius: 99px; display: flex; overflow: hidden; }
+.ru-bar-seg { height: 100%; }
+.ru-type-k::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; background: var(--ru-type-color, var(--dim)); }
 .ru-bar-val { font-size: 12px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ru-tip { position: absolute; z-index: 5; pointer-events: none; background: var(--card); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); padding: 8px 10px; font-size: 11.5px; line-height: 1.5; color: var(--text); max-width: min(320px, 100%); }
 .ru-tip-h { font-weight: 700; }
@@ -3807,6 +3809,14 @@ function ruRenderChart(box, m) {
     const track = ruEl('div', 'ru-bar-track')
     const fill = ruEl('div', 'ru-bar-fill')
     fill.style.width = (r.total / max * 100) + '%'
+    // Segments per issue type, in the dashboard's shared issue-type palette.
+    m.types.forEach(t => {
+      if (!r.types[t] || !r.total) return
+      const seg = ruEl('div', 'ru-bar-seg')
+      seg.style.width = (r.types[t] / r.total * 100) + '%'
+      seg.style.background = issueTypeColor(t)
+      fill.appendChild(seg)
+    })
     track.appendChild(fill)
     bar.append(ruEl('div', 'ru-bar-name', r.project), track, ruEl('div', 'ru-bar-val', `${ruFmt(r.total)} ticket`))
     bar.addEventListener('mouseenter', () => show(r, bar))
@@ -3825,6 +3835,7 @@ function ruRender(m, liveOk, cutoff) {
   const ts = document.getElementById('ru-types'); ts.textContent = ''
   m.types.forEach(t => {
     const d = ruEl('div', 'ru-type')
+    d.style.setProperty('--ru-type-color', issueTypeColor(t))
     d.append(ruEl('div', 'ru-type-k', t), ruEl('div', 'ru-type-v', String(m.totalRow.types[t])))
     ts.appendChild(d)
   })
