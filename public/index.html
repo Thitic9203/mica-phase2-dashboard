@@ -1658,7 +1658,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <dl class="ru-meta">
             <dt>ช่วงเวลาของข้อมูล</dt><dd id="ru-range"><span class="card-skeleton ru-skel" style="display:block"></span></dd>
             <dt>บันทึกผลครั้งแรก</dt><dd id="ru-first"><span class="card-skeleton ru-skel" style="display:block;width:120px"></span></dd>
-            <dt>การปรับปรุงข้อมูล</dt><dd>ข้อมูลจาก Jira ปรับปรุงอัตโนมัติทุกครั้งที่เปิดรายงาน</dd>
+            <dt>การปรับปรุงข้อมูล</dt><dd>ข้อมูลจาก Jira ปรับปรุงอัตโนมัติทุก 5 นาที และทุกครั้งที่เปิดรายงาน</dd>
           </dl>
         </header>
         <section class="pt-card ru-card">
@@ -1678,7 +1678,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <h3 class="ru-h3">Counting Rules</h3>
           <div class="ru-table-wrap">
             <table class="ru-table ru-rules">
-              <thead><tr><th>หัวข้อ</th><th>หลักเกณฑ์</th></tr></thead>
+              <thead><tr><th>Topic</th><th>Rule</th></tr></thead>
               <tbody>
                 <tr><td>หน่วยที่นับ</td><td class="wrap">จำนวน ticket ที่ทดสอบด้วยสกิล AI และมีการบันทึกผลใน Jira หรือชีต test case โดย ticket ที่ทดสอบหลายรอบนับเป็น 1 ticket</td></tr>
                 <tr><td>รายการที่ไม่นับ</td><td class="wrap">ผลที่บันทึกด้วยตนเองโดยไม่ใช้สกิล และการทดสอบด้วย AI ที่ไม่มีการบันทึกผล (มีเพียงการแจ้งใน Discord)</td></tr>
@@ -3855,7 +3855,7 @@ function ruRender(m, liveOk, cutoff) {
   const t = ruEl('table', 'ru-table ru-proj')
   const hr = document.createElement('tr')
   hr.appendChild(ruEl('th', null, 'Project'))
-  ;[...m.types, 'รวม', 'สัดส่วน'].forEach(k => hr.appendChild(ruEl('th', 'n', k)))
+  ;[...m.types, 'Total', 'Share'].forEach(k => hr.appendChild(ruEl('th', 'n', k)))
   const thead = document.createElement('thead'); thead.appendChild(hr); t.appendChild(thead)
   const tb = document.createElement('tbody')
   ;[...m.rows, m.totalRow].forEach(r => {
@@ -3875,8 +3875,8 @@ function ruRender(m, liveOk, cutoff) {
   const sb = document.getElementById('ru-src-box'); sb.textContent = ''
   const st = ruEl('table', 'ru-table ru-src')
   const sh = document.createElement('tr')
-  ;['แหล่งข้อมูล', 'ขอบเขตข้อมูล', 'ช่วงเวลา'].forEach(k => sh.appendChild(ruEl('th', null, k)))
-  sh.appendChild(ruEl('th', 'n', 'จำนวน ticket'))
+  ;['Source', 'Scope', 'Period'].forEach(k => sh.appendChild(ruEl('th', null, k)))
+  sh.appendChild(ruEl('th', 'n', 'Tickets'))
   const sth = document.createElement('thead'); sth.appendChild(sh); st.appendChild(sth)
   const stb = document.createElement('tbody')
   ;[...m.sources, { name: 'รวม', what: '', when: '', n: m.sourceTotal, total: true }].forEach(s => {
