@@ -3631,7 +3631,7 @@ const _UPDATED_SUB = {
   'epic-tc': 'Auto-refresh from Jira every 5 minutes',
   'progress-tracker': 'Refreshes each time you open this tab',
   'regression-timeline': 'Refreshes each time you open this tab',
-  'retest-usage': 'Refreshes each time you open this tab',
+  'retest-usage': 'Auto-refresh from Jira every 5 minutes',
 }
 function activeViewId() {
   return document.querySelector('.sb-nav-item.active')?.dataset.view || ''
@@ -3926,21 +3926,36 @@ function ruReveal(panel) {
   }
 }
 
-let _ruSeq = 0
-async function loadRetestUsage() {
+let _ruSeq = 0, _ruHasData = false
+// opts.background = the 5-minute auto-refresh: a failed pass keeps the last good
+// numbers on screen (instead of blanking them) and the entrance animation is not replayed.
+async function loadRetestUsage(opts = {}) {
   const seq = ++_ruSeq
   let snap
   try { snap = await ruLoadSnapshot() } catch (e) {
-    if (seq === _ruSeq) ruRenderFail()
+    if (seq === _ruSeq && !(opts.background && _ruHasData)) ruRenderFail()
     return
   }
   let live = [], liveOk = true
   try { live = await ruLoadLive(snap.cutoff) } catch (e) { liveOk = false }
   if (seq !== _ruSeq) return // a newer open superseded this one
+  if (opts.background && !liveOk && _ruHasData) return // keep the last full (snapshot + live) result
   const m = ruCompute([...snap.rows, ...live], snap.skillCreated || '2026-05-28')
   ruRender(m, liveOk, snap.cutoff)
+  _ruHasData = true
   stampData('retest-usage')
-  if (activeViewId() === 'retest-usage') ruReveal(document.getElementById('view-retest-usage'))
+  // Range end = when this data was actually pulled (same stamp as the header), so it
+  // moves with every refresh. If live Jira failed, the data stops at the last saved
+  // result instead, and the live note says so.
+  if (liveOk) document.getElementById('ru-range').textContent =
+    `${ruDate(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${fmtUpdatedAt(_dataAt['retest-usage'])} (วันเวลาที่อัปเดตข้อมูลล่าสุด)`
+  if (!opts.background && activeViewId() === 'retest-usage') ruReveal(document.getElementById('view-retest-usage'))
+}
+// Auto-refresh every 5 minutes, same cadence as the Epic tab. Only while this tab is
+// open and the page is visible — switching to the tab already refetches, so polling
+// Jira for a hidden tab would only add load without changing what anyone sees.
+function ruAutoRefresh() {
+  if (document.visibilityState === 'visible' && activeViewId() === 'retest-usage') loadRetestUsage({ background: true })
 }
 
 // ── SKL-QA: Regression Testing Status (per-system summary cards) ──
@@ -4700,6 +4715,7 @@ function showApp() {
   loadProgressTracker()
   loadAll()
   setInterval(loadAll, 5 * 60 * 1000)
+  setInterval(ruAutoRefresh, 5 * 60 * 1000)
 }
 
 // ── BOTTOM SHEET (mobile dropdown interceptor) ──────────────────────────────
