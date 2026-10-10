@@ -3674,6 +3674,8 @@ const RU_SOURCES = [
 ]
 const ruFmt = n => Number(n || 0).toLocaleString('en-US')
 const ruDate = iso => iso ? `${Number(iso.slice(8, 10))} ${RU_MON[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}` : '—'
+// Same day/month/year shape as the header's Updated Date (dd/Mon/yyyy), date only.
+const ruDateSlash = iso => iso ? `${iso.slice(8, 10)}/${RU_MON[Number(iso.slice(5, 7)) - 1]}/${iso.slice(0, 4)}` : '—'
 const ruJiraTime = t => new Date(String(t).replace(/([+-]\d\d)(\d\d)$/, '$1:$2'))
 
 // ADF → plain text: text nodes inside one block join directly (so a marker split
@@ -3844,7 +3846,7 @@ function ruRender(m, liveOk, cutoff) {
     d.append(ruEl('div', 'ru-type-k', t), ruEl('div', 'ru-type-v', String(m.totalRow.types[t])))
     ts.appendChild(d)
   })
-  document.getElementById('ru-range').textContent = `${ruDate(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${ruDate(m.last)} (วันที่บันทึกผลล่าสุด)`
+  document.getElementById('ru-range').textContent = `${ruDateSlash(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${ruDate(m.last)} (วันที่บันทึกผลล่าสุด)`
   document.getElementById('ru-first').textContent = ruDate(m.first)
   document.getElementById('ru-sum-sub').textContent = `นับเฉพาะ ticket ที่ทดสอบด้วยสกิล AI และมีการบันทึกผลการทดสอบ ตั้งแต่ ${ruDate(m.skillCreated)} ถึงปัจจุบัน`
 
@@ -3948,7 +3950,7 @@ async function loadRetestUsage(opts = {}) {
   // moves with every refresh. If live Jira failed, the data stops at the last saved
   // result instead, and the live note says so.
   if (liveOk) document.getElementById('ru-range').textContent =
-    `${ruDate(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${fmtUpdatedAt(_dataAt['retest-usage'])} (วันเวลาที่อัปเดตข้อมูลล่าสุด)`
+    `${ruDateSlash(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${fmtUpdatedAt(_dataAt['retest-usage'])} (วันเวลาที่อัปเดตข้อมูลล่าสุด)`
   if (!opts.background && activeViewId() === 'retest-usage') ruReveal(document.getElementById('view-retest-usage'))
 }
 // Auto-refresh every 5 minutes, same cadence as the Epic tab. Only while this tab is
