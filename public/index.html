@@ -1393,7 +1393,16 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
   .ru-table th, .ru-table td { padding: 8px 4px; }
   .ru-table th { font-size: 9.5px; letter-spacing: .02em; }
   .ru-types { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }
+  .ru-skills { grid-template-columns: minmax(0, 1fr); }
 }
+/* Skill filter: one button per AI skill, aria-pressed marks the active one. */
+.ru-skills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 12px; }
+.ru-skill { min-height: 44px; display: grid; gap: 2px; align-content: center; text-align: left; padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--fill-faint); color: var(--text); font: inherit; cursor: pointer; min-width: 0; }
+.ru-skill:hover { background: var(--hover-row); }
+.ru-skill:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(var(--accent-rgb),0.45); }
+.ru-skill[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.ru-skill-k { font-size: 11px; font-weight: 600; color: var(--dim); overflow-wrap: anywhere; }
+.ru-skill-v { font-size: 15px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
@@ -1655,6 +1664,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
             </div>
             <div class="ru-types" id="ru-types"></div>
           </div>
+          <div class="ru-skills" id="ru-skills" role="group" aria-label="กรองตามสกิล"></div>
           <dl class="ru-meta">
             <dt>ช่วงเวลาของข้อมูล</dt><dd id="ru-range"><span class="card-skeleton ru-skel" style="display:block"></span></dd>
             <dt>บันทึกผลครั้งแรก</dt><dd id="ru-first"><span class="card-skeleton ru-skel" style="display:block;width:120px"></span></dd>
@@ -1684,6 +1694,7 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
                 <tr><td>รายการที่ไม่นับ</td><td class="wrap">ผลที่บันทึกด้วยตนเองโดยไม่ใช้สกิล และการทดสอบด้วย AI ที่ไม่มีการบันทึกผล (มีเพียงการแจ้งใน Discord)</td></tr>
                 <tr><td>การตรวจสอบรายการซ้ำ</td><td class="wrap">การแจ้งใน Discord และผลใน Jira ของ ticket เดียวกันที่ห่างกันไม่เกิน 1 วัน ถือเป็นการทดสอบครั้งเดียวกัน ข้อมูลจาก Discord ใช้เพื่อยืนยันการทดสอบด้วย AI และตรวจสอบรายการซ้ำเท่านั้น</td></tr>
                 <tr><td>การระบุสกิล</td><td class="wrap">ก่อน 8 Oct 2026 อ้างอิงจากประวัติการใช้งาน Claude Code ตั้งแต่ 8 Oct 2026 อ้างอิงจากตัวระบุสกิลท้ายคอมเมนต์ (helix v1.5.108)</td></tr>
+                <tr><td>การแยกตามสกิล</td><td class="wrap">ตัวระบุสกิลท้ายคอมเมนต์บอกสกิลที่ใช้ (retest-bug-workflow หรือ testing-ticket) ข้อมูลก่อนมีตัวระบุ ผลใน Jira นับเป็น retest และผลในชีต test case นับเป็น testing-ticket ticket ที่ทดสอบด้วยทั้งสองสกิลนับในแต่ละสกิล แต่นับเพียงครั้งเดียวในยอดรวม</td></tr>
                 <tr><td>ช่วงเวลา</td><td class="wrap">เริ่มนับตั้งแต่ 28 May 2026 ซึ่งเป็นวันที่เริ่มใช้งานสกิล ผลก่อนหน้านั้นไม่นำมานับ</td></tr>
                 <tr><td>ประเภท ticket</td><td class="wrap">อ้างอิงตามช่อง issuetype ใน Jira หากพบประเภทใหม่ ระบบจะเพิ่มคอลัมน์ในตารางสรุปโดยอัตโนมัติ</td></tr>
               </tbody>
@@ -3672,6 +3683,23 @@ const RU_SOURCES = [
   { src: 'sheet', name: 'ชีต Test Cases - OLS QA', what: 'ผลการทดสอบ Story ที่ระบุว่า "Tested by Claude AI" ในแท็บของแต่ละ ticket', when: 'Jul – Oct 2026' },
   { src: 'discord-only', name: 'Discord: เธรดแจ้งการทดสอบด้วย AI', what: 'ใช้ยืนยันการทดสอบด้วย AI และตรวจสอบรายการซ้ำ ไม่นับเป็นจำนวนแยก', when: '25 Aug – 8 Oct 2026' },
 ]
+// Skill filter. A row's skill comes from the marker's `skill=` field (live rows), the snapshot's
+// `skill` column when present, else from its source: 'jira' rows are retest results of Bug/Task,
+// 'sheet' rows are Story results (testing-ticket), and every marker before testing-ticket gained
+// its own marker came from the retest skill. Anything else stays 'unknown' (shown under All only).
+const RU_SKILLS = [
+  { id: 'all', name: 'ทุกสกิล' },
+  { id: 'retest-bug-workflow', name: 'Retest bug' },
+  { id: 'testing-ticket', name: 'Testing ticket' },
+]
+const RU_SOURCE_SKILL = { jira: 'retest-bug-workflow', sheet: 'testing-ticket', marker: 'retest-bug-workflow' }
+const ruRowSkill = r => r.skill || RU_SOURCE_SKILL[r.source] || 'unknown'
+// `skill=` value on the marker line; underscores excluded so a wiki-italic close `_` never sticks.
+function ruMarkerSkill(text) {
+  const line = String(text).split('\n').find(l => l.includes('retestskillmarker')) || ''
+  const m = line.match(/skill=([A-Za-z0-9.-]+)/)
+  return m ? m[1] : 'unknown'
+}
 const ruFmt = n => Number(n || 0).toLocaleString('en-US')
 const ruDate = iso => iso ? `${Number(iso.slice(8, 10))} ${RU_MON[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}` : '—'
 // Same day/month/year shape as the header's Updated Date (dd/Mon/yyyy), date only.
@@ -3728,13 +3756,14 @@ async function ruLoadLive(cutoff) {
     const f = issue.fields || {}
     const comments = await ruAllComments(issue)
     comments.forEach(c => {
-      if (!ruAdfText(c.body).includes('retestskillmarker')) return
+      const text = ruAdfText(c.body)
+      if (!text.includes('retestskillmarker')) return
       if (!(ruJiraTime(c.created) >= cut)) return
       rows.push({
         issue_key: issue.key, project: f.project?.key || '', issuetype: f.issuetype?.name || '',
         date: String(c.created).slice(0, 10), created: String(c.created),
         author: c.author?.accountId || '', // kept for traceability only; never rendered
-        source: 'marker', in_discord: 'no', counted: 'yes', excluded: '',
+        source: 'marker', skill: ruMarkerSkill(text), in_discord: 'no', counted: 'yes', excluded: '',
       })
     })
   }
@@ -3902,6 +3931,7 @@ function ruRenderFail() {
   document.getElementById('ru-first').textContent = '—'
   ;['ru-proj-box', 'ru-chart', 'ru-src-box'].forEach(id => ruFail(document.getElementById(id)))
   document.getElementById('ru-excluded').textContent = ''
+  document.getElementById('ru-skills').textContent = ''
   document.getElementById('ru-live-note').hidden = true
 }
 
@@ -3928,7 +3958,36 @@ function ruReveal(panel) {
   }
 }
 
-let _ruSeq = 0, _ruHasData = false
+let _ruSeq = 0, _ruHasData = false, _ruData = null, _ruSkill = 'all'
+
+// Per-skill ticket counts on the filter buttons (always from every run, so a button shows its
+// own size whichever skill is active), then the whole view for the active skill.
+function ruRenderSkills(runs) {
+  const box = document.getElementById('ru-skills'); box.textContent = ''
+  const counted = runs.filter(r => r.counted === 'yes')
+  RU_SKILLS.forEach(s => {
+    const n = new Set(counted.filter(r => s.id === 'all' || ruRowSkill(r) === s.id).map(r => r.issue_key)).size
+    const b = ruEl('button', 'ru-skill')
+    b.type = 'button'
+    b.setAttribute('aria-pressed', s.id === _ruSkill ? 'true' : 'false')
+    b.append(ruEl('span', 'ru-skill-k', s.name), ruEl('span', 'ru-skill-v', ruFmt(n)))
+    b.addEventListener('click', () => { if (_ruSkill === s.id) return; _ruSkill = s.id; ruApply() })
+    box.appendChild(b)
+  })
+}
+function ruApply() {
+  if (!_ruData) return
+  const { runs, skillCreated, liveOk, cutoff } = _ruData
+  ruRenderSkills(runs)
+  const view = _ruSkill === 'all' ? runs : runs.filter(r => ruRowSkill(r) === _ruSkill)
+  const m = ruCompute(view, skillCreated)
+  ruRender(m, liveOk, cutoff)
+  // Range end = when this data was actually pulled (same stamp as the header), so it
+  // moves with every refresh. If live Jira failed, the data stops at the last saved
+  // result instead, and the live note says so.
+  if (liveOk) document.getElementById('ru-range').textContent =
+    `${ruDateSlash(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${fmtUpdatedAt(_dataAt['retest-usage'])} (วันเวลาที่อัปเดตข้อมูลล่าสุด)`
+}
 // opts.background = the 5-minute auto-refresh: a failed pass keeps the last good
 // numbers on screen (instead of blanking them) and the entrance animation is not replayed.
 async function loadRetestUsage(opts = {}) {
@@ -3942,15 +4001,10 @@ async function loadRetestUsage(opts = {}) {
   try { live = await ruLoadLive(snap.cutoff) } catch (e) { liveOk = false }
   if (seq !== _ruSeq) return // a newer open superseded this one
   if (opts.background && !liveOk && _ruHasData) return // keep the last full (snapshot + live) result
-  const m = ruCompute([...snap.rows, ...live], snap.skillCreated || '2026-05-28')
-  ruRender(m, liveOk, snap.cutoff)
-  _ruHasData = true
   stampData('retest-usage')
-  // Range end = when this data was actually pulled (same stamp as the header), so it
-  // moves with every refresh. If live Jira failed, the data stops at the last saved
-  // result instead, and the live note says so.
-  if (liveOk) document.getElementById('ru-range').textContent =
-    `${ruDateSlash(m.skillCreated)} (วันที่เริ่มใช้งานสกิล) – ${fmtUpdatedAt(_dataAt['retest-usage'])} (วันเวลาที่อัปเดตข้อมูลล่าสุด)`
+  _ruData = { runs: [...snap.rows, ...live], skillCreated: snap.skillCreated || '2026-05-28', liveOk, cutoff: snap.cutoff }
+  ruApply()
+  _ruHasData = true
   if (!opts.background && activeViewId() === 'retest-usage') ruReveal(document.getElementById('view-retest-usage'))
 }
 // Auto-refresh every 5 minutes, same cadence as the Epic tab. Only while this tab is
