@@ -3855,7 +3855,7 @@ function ruRender(m, liveOk, cutoff) {
   const t = ruEl('table', 'ru-table ru-proj')
   const hr = document.createElement('tr')
   hr.appendChild(ruEl('th', null, 'Project'))
-  ;[...m.types, 'Total', 'Share'].forEach(k => hr.appendChild(ruEl('th', 'n', k)))
+  ;[...m.types, 'Total', '% of Total'].forEach(k => hr.appendChild(ruEl('th', 'n', k)))
   const thead = document.createElement('thead'); thead.appendChild(hr); t.appendChild(thead)
   const tb = document.createElement('tbody')
   ;[...m.rows, m.totalRow].forEach(r => {
