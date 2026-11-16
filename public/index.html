@@ -1671,6 +1671,26 @@ tfoot .pt-td { border-top: 1px solid var(--border); border-bottom: none; backgro
           <p class="ru-sub">จำนวน ticket ทุกประเภทของแต่ละ project</p>
           <div class="ru-chart" id="ru-chart"><div class="card-skeleton ru-skel-block"></div></div>
         </section>
+        <section class="pt-card ru-card" id="te-card">
+          <h2 class="ru-h2">tc-to-e2e Skill: REV and MICA2</h2>
+          <p class="ru-sub">ticket ที่ทดสอบระบบด้วยสกิล tc-to-e2e (Playwright E2E แทนการทดสอบแบบ manual) นับจาก label <code>tc-to-e2e</code> บน ticket ใน Jira</p>
+          <div class="ru-kpi">
+            <div class="ru-total">
+              <div class="ru-total-num" id="te-total"><span class="card-skeleton ru-skel-lg" style="display:block"></span></div>
+              <div class="ru-total-lbl">ticket ที่ติด label tc-to-e2e</div>
+            </div>
+            <div class="ru-types te-types" id="te-types"></div>
+          </div>
+          <div class="ru-table-wrap" id="te-proj-box"><div class="card-skeleton ru-skel-block"></div></div>
+          <p class="ru-sub te-empty" id="te-empty" hidden>ยังไม่มี ticket ที่ติด label tc-to-e2e ตัวเลขจะแสดงอัตโนมัติเมื่อมี ticket ติด label นี้</p>
+          <dl class="ru-meta">
+            <dt>สกิล</dt><dd><a href="https://github.com/makkawanc-skilllane/tc-to-e2e-skill" target="_blank" rel="noopener noreferrer">makkawanc-skilllane/tc-to-e2e-skill</a></dd>
+            <dt>วันที่สร้างสกิล</dt><dd>28 Oct 2026</dd>
+            <dt>Project ใน Jira</dt><dd>REV (MiCA Revamp), MICA2</dd>
+            <dt>วิธีการนับ</dt><dd>นับ ticket ที่มี label <code>tc-to-e2e</code> ซึ่งสกิลติดให้หลังทดสอบ ticket ละ 1 ครั้ง (JQL: <code>project in (REV, MICA2) AND labels = "tc-to-e2e"</code>)</dd>
+            <dt>การปรับปรุงข้อมูล</dt><dd>ปรับปรุงอัตโนมัติทุก 5 นาที และทุกครั้งที่เปิดรายงาน</dd>
+          </dl>
+        </section>
         <section class="pt-card ru-card">
           <h2 class="ru-h2">Data Sources and Counting Rules</h2>
           <p class="ru-sub">ticket แต่ละใบนับเพียงครั้งเดียว กรณีพบในหลายแหล่ง จะนับรวมไว้ในแหล่งแรกตามลำดับในตาราง</p>
@@ -3914,7 +3934,7 @@ function ruReveal(panel) {
   try {
     add(gsap.from(panel.querySelectorAll('.ru-card'), { duration: 0.55, opacity: 0, y: 14, stagger: 0.05, ease: 'power2.out', clearProps: 'transform,opacity' }))
     add(gsap.from(panel.querySelectorAll('.ru-bar-fill'), { duration: 0.7, scaleX: 0, transformOrigin: 'left center', stagger: 0.05, delay: 0.15, ease: 'power2.out', clearProps: 'transform,transformOrigin' }))
-    panel.querySelectorAll('#ru-total, .ru-type-v').forEach((el, i) => {
+    panel.querySelectorAll('#ru-total, .ru-type-v, #te-total').forEach((el, i) => {
       const target = parseInt(el.textContent, 10)
       if (!Number.isFinite(target) || target <= 0) return
       const o = { v: 0 }
@@ -3928,11 +3948,92 @@ function ruReveal(panel) {
   }
 }
 
+// ── tc-to-e2e skill section (spec: docs/sdd/tc-to-e2e-section) ──
+// Live from Jira: tickets in REV / MICA2 labelled `tc-to-e2e` (the skill adds the label
+// after a run). Unit = distinct tickets; counts only, no names or ticket content.
+const TE_JQL = 'project in (REV, MICA2) AND labels = "tc-to-e2e"'
+const TE_PROJECTS = ['REV', 'MICA2']
+function teCompute(issues) {
+  const tickets = new Map()
+  ;(issues || []).forEach(i => tickets.set(i.key, { project: i.fields?.project?.key || '', issuetype: i.fields?.issuetype?.name || '' }))
+  const list = [...tickets.values()]
+  const total = list.length
+  const types = [...RU_MAIN_TYPES, ...[...new Set(list.map(t => t.issuetype))].filter(t => t && !RU_MAIN_TYPES.includes(t)).sort()]
+  const projects = [...TE_PROJECTS, ...[...new Set(list.map(t => t.project))].filter(p => p && !TE_PROJECTS.includes(p)).sort()]
+  const row = (name, ts) => {
+    const o = { project: name, types: {}, total: ts.length }
+    types.forEach(t => { o.types[t] = ts.filter(x => x.issuetype === t).length })
+    return o
+  }
+  const rows = projects.map(p => row(p, list.filter(t => t.project === p)))
+  // Tenths of a percent, largest-remainder rounded so shares sum to 100.0% (same as helix).
+  if (total) {
+    const raw = rows.map(r => r.total * 1000 / total)
+    const fl = raw.map(Math.floor)
+    let left = 1000 - fl.reduce((a, b) => a + b, 0)
+    raw.map((v, i) => [v - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left-- } })
+    rows.forEach((r, i) => { r.share = fl[i] / 10 })
+  } else rows.forEach(r => { r.share = 0 })
+  const totalRow = row('รวม', list); totalRow.share = total ? 100 : 0
+  return { total, types, rows, totalRow }
+}
+
+function teRender(m) {
+  document.getElementById('te-total').textContent = String(m.total)
+  const ts = document.getElementById('te-types'); ts.textContent = ''
+  m.types.forEach(t => {
+    const d = ruEl('div', 'ru-type')
+    d.style.setProperty('--ru-type-color', issueTypeColor(t))
+    d.append(ruEl('div', 'ru-type-k', t), ruEl('div', 'ru-type-v', String(m.totalRow.types[t])))
+    ts.appendChild(d)
+  })
+  const pb = document.getElementById('te-proj-box'); pb.textContent = ''
+  const t = ruEl('table', 'ru-table ru-proj')
+  const hr = document.createElement('tr')
+  hr.appendChild(ruEl('th', null, 'Project'))
+  ;[...m.types, 'Total', '% of Total'].forEach(k => hr.appendChild(ruEl('th', 'n', k)))
+  const thead = document.createElement('thead'); thead.appendChild(hr); t.appendChild(thead)
+  const tb = document.createElement('tbody')
+  ;[...m.rows, m.totalRow].forEach(r => {
+    const tr = document.createElement('tr'); tr.dataset.key = r.project
+    if (r === m.totalRow) tr.className = 'total'
+    tr.appendChild(ruEl('td', null, r.project))
+    m.types.forEach(k => tr.appendChild(ruEl('td', 'n', ruFmt(r.types[k]))))
+    tr.appendChild(ruEl('td', 'n', ruFmt(r.total)))
+    tr.appendChild(ruEl('td', 'n', r.share.toFixed(1) + '%'))
+    tb.appendChild(tr)
+  })
+  t.appendChild(tb); pb.appendChild(t)
+  document.getElementById('te-empty').hidden = m.total > 0
+}
+
+function teRenderFail() {
+  document.getElementById('te-total').textContent = '—'
+  document.getElementById('te-types').textContent = ''
+  ruFail(document.getElementById('te-proj-box'))
+  document.getElementById('te-empty').hidden = true
+}
+
+let _teSeq = 0, _teHasData = false
+// Independent of the helix load: a failure here never blanks the helix numbers, and vice versa.
+async function loadTcToE2e(opts = {}) {
+  const seq = ++_teSeq
+  let issues
+  try { issues = await fetchIssues(TE_JQL, 'issuetype,project') } catch (e) {
+    if (seq === _teSeq && !(opts.background && _teHasData)) teRenderFail()
+    return
+  }
+  if (seq !== _teSeq) return
+  teRender(teCompute(issues))
+  _teHasData = true
+}
+
 let _ruSeq = 0, _ruHasData = false
 // opts.background = the 5-minute auto-refresh: a failed pass keeps the last good
 // numbers on screen (instead of blanking them) and the entrance animation is not replayed.
 async function loadRetestUsage(opts = {}) {
   const seq = ++_ruSeq
+  loadTcToE2e(opts) // runs alongside; never awaited, so neither section blocks the other
   let snap
   try { snap = await ruLoadSnapshot() } catch (e) {
     if (seq === _ruSeq && !(opts.background && _ruHasData)) ruRenderFail()
