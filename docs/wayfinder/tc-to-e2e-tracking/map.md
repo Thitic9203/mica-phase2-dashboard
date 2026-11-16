@@ -35,6 +35,7 @@ handed off as the spec for a new tc-to-e2e section in the dashboard's AI Skill A
 
 <!-- one line per closed ticket -->
 
+- [Find tc-to-e2e outputs on GitHub that name REV or MICA2 tickets](tickets/01-github-artifact-survey.md): none found in 911 readable trees; the skill keys tests by TC ID, not Jira key, so GitHub cannot support the backfill.
 - [What Jira allows for each signal in REV and MICA2](tickets/02-jira-signal-capabilities.md): a label is the strongest candidate (exact match, no admin, one JQL query); a comment marker of one unbroken word is the fallback; GitHub commit info cannot tell skill runs from dev work; no signal exists in Jira today.
 - [Choose the tracking signal going forward](tickets/04-choose-tracking-signal.md): Jira label `tc-to-e2e`, added automatically by the skill; the dashboard reads `project in (REV, MICA2) AND labels = "tc-to-e2e"`.
 
