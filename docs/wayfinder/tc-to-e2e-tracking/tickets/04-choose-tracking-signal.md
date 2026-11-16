@@ -22,3 +22,5 @@ dashboard use to read it?
 - **Dashboard query:** `project in (REV, MICA2) AND labels = "tc-to-e2e"`.
 - The owner decided this before tickets 01 and 03 were resolved. Their findings now feed only the
   backfill ticket.
+- The label is not created in advance (owner, 16 Nov 2026). Jira creates it the first time it is
+  applied to a ticket that was really tested. Until then, the dashboard query returns 0.
