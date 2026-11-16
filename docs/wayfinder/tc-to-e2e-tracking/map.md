@@ -18,7 +18,7 @@ handed off as the spec for a new tc-to-e2e section in the dashboard's AI Skill A
 - Skill: https://github.com/makkawanc-skilllane/tc-to-e2e-skill (created 28 Oct 2026, last push 3 Nov 2026).
   As of that commit it writes nothing back to Jira: no comment, label, field or marker.
   Its outputs (Playwright specs, `evidence-<name>/index.html`, bug files) stay wherever the tester ran it.
-- Jira projects in scope: `REV` (MiCA Revamp, id 10891, team-managed / next-gen) and `MICA2`.
+- Jira projects in scope: `REV` (MiCA Revamp, id 10891) and `MICA2`, both team-managed (next-gen).
 - Precedent: the helix retest skill appends `retestskillmarker` to its Jira comments, and the dashboard
   counts those with `comment ~ "retestskillmarker"` (`public/index.html`, `ruLoadLive`).
 - Candidates to weigh: a marker at the end of a Jira comment, a Jira label, a Jira custom field,
@@ -34,6 +34,8 @@ handed off as the spec for a new tc-to-e2e section in the dashboard's AI Skill A
 ## Decisions so far
 
 <!-- one line per closed ticket -->
+
+- [What Jira allows for each signal in REV and MICA2](tickets/02-jira-signal-capabilities.md): a label is the strongest candidate (exact match, no admin, one JQL query); a comment marker of one unbroken word is the fallback; GitHub commit info cannot tell skill runs from dev work; no signal exists in Jira today.
 
 ## Not yet specified
 
