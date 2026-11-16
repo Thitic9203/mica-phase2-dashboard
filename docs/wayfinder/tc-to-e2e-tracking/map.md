@@ -36,13 +36,14 @@ handed off as the spec for a new tc-to-e2e section in the dashboard's AI Skill A
 <!-- one line per closed ticket -->
 
 - [What Jira allows for each signal in REV and MICA2](tickets/02-jira-signal-capabilities.md): a label is the strongest candidate (exact match, no admin, one JQL query); a comment marker of one unbroken word is the fallback; GitHub commit info cannot tell skill runs from dev work; no signal exists in Jira today.
+- [Choose the tracking signal going forward](tickets/04-choose-tracking-signal.md): Jira label `tc-to-e2e`, added automatically by the skill; the dashboard reads `project in (REV, MICA2) AND labels = "tc-to-e2e"`.
 
 ## Not yet specified
 
 - How the dashboard should count a ticket tested by both helix and tc-to-e2e: whether one ticket can
   count once per skill or only once in total, and how the existing totals change.
-- Whether the skill owner will accept a change to the skill (a Jira write-back step), and who
-  maintains it.
+- Whether the skill author will accept adding the auto-label step, and when. Until then, no new
+  tickets get the label.
 - How to stop the signal from being forgotten or faked, for example a check, a reminder, or the skill
   doing it automatically.
 - What "tested" means for counting: a full run with evidence, or any run, including failed or blocked
